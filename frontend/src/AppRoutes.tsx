@@ -1,10 +1,10 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import MainLayout from './Layout/MainLayout';
-import ProfileView from './pages/ProfileView/ProfileView';
-import EmailVerification from './pages/EmailVerification/EmailVerification';
-import './App.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import VerificationSuccess from "./pages/VerificationSuccess/VerificationSuccess";
+import EmailVerification from "./pages/EmailVerification/EmailVerification";
+import ProfileView from "./pages/ProfileView/ProfileView";
+import MainLayout from "./Layout/MainLayout";
+import Candidates from "./pages/Candidates/Candidates";
 
-// Move dashboard, duplicates, settings components here or import them
 const Dashboard = () => (
   <div className="dashboard">
     <h2>Dashboard</h2>
@@ -26,41 +26,49 @@ const Settings = () => (
   </div>
 );
 
-function App() {
+const AppRoutes = () => {
   return (
-    <Router>
-      <div className="App">
-        <Routes>
-          <Route path="/profile" element={<ProfileView />} />
-          <Route path="/email-verification" element={<EmailVerification />} />
-          <Route 
-            path="/dashboard" 
-            element={
-              <MainLayout>
-                <Dashboard />
-              </MainLayout>
-            } 
-          />
-          <Route 
-            path="/duplicates" 
-            element={
-              <MainLayout>
-                <Duplicates />
-              </MainLayout>
-            } 
-          />
-          <Route 
-            path="/settings" 
-            element={
-              <MainLayout>
-                <Settings />
-              </MainLayout>
-            } 
-          />
-        </Routes>
-      </div>
-    </Router>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<VerificationSuccess />} />
+        <Route path="/verified" element={<VerificationSuccess />} />
+        <Route path="/email-verification" element={<EmailVerification />} />
+        <Route path="/profile" element={<ProfileView />} />
+        <Route
+          path="/dashboard"
+          element={
+            <MainLayout>
+              <Dashboard />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/candidates"
+          element={
+            <MainLayout>
+              <Candidates />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/duplicates"
+          element={
+            <MainLayout>
+              <Duplicates />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <MainLayout>
+              <Settings />
+            </MainLayout>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
-}
+};
 
-export default App;
+export default AppRoutes;
