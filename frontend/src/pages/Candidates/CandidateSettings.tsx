@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiUser, FiSettings, FiGrid, FiUsers, FiCopy, FiLock, FiMail, FiPhone } from 'react-icons/fi';
+import { FiUser, FiLock } from 'react-icons/fi';
 
 const CandidateSettings: React.FC = () => {
   return (

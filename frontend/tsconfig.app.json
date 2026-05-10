@@ -6,10 +6,7 @@
     "module": "esnext",
     "types": ["vite/client"],
     "skipLibCheck": true,
-<<<<<<< HEAD
-=======
     "allowJs": true,
->>>>>>> 4d0d5e9cf670627f264b33f3be0a82fea11ad518
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -26,8 +23,4 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": ["src"]
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 4d0d5e9cf670627f264b33f3be0a82fea11ad518

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiAlertTriangle, FiUser, FiArrowRight, FiRotateCcw, FiPlusCircle, FiMessageCircle } from 'react-icons/fi';
+import { FiAlertTriangle, FiRotateCcw, FiPlusCircle, FiMessageCircle } from 'react-icons/fi';
 
 const DuplicationView: React.FC = () => {
   return (
