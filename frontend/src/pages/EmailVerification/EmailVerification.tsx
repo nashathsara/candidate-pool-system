@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FiShield, FiMail, FiCheckCircle, FiLock } from 'react-icons/fi';
+import { FiShield, FiMail, FiLock } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
 const EmailVerification: React.FC = () => {
   const [code, setCode] = useState(['', '', '', '', '', '']);
@@ -7,8 +8,8 @@ const EmailVerification: React.FC = () => {
   const [isResendDisabled, setIsResendDisabled] = useState(true);
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState('');
-  const [isVerified, setIsVerified] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const navigate = useNavigate();
 
   // Timer effect for resend button
   useEffect(() => {
@@ -73,7 +74,8 @@ const EmailVerification: React.FC = () => {
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       if (enteredCode === '123456') {
-        setIsVerified(true);
+        // Navigate to verification success page
+        navigate('/verified');
       } else {
         setError('Invalid verification code. Please try again.');
       }
@@ -95,23 +97,6 @@ const EmailVerification: React.FC = () => {
   const setInputRef = (index: number) => (el: HTMLInputElement | null) => {
     inputRefs.current[index] = el;
   };
-
-  if (isVerified) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FiCheckCircle className="w-8 h-8 text-green-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Email Verified!</h2>
-          <p className="text-gray-600 mb-6">Your email has been successfully verified.</p>
-          <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition">
-            Continue to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center p-4">
@@ -171,7 +156,7 @@ const EmailVerification: React.FC = () => {
           ) : (
             <>
               Verify
-              < FiShield className="w-5 h-5" />
+              <FiShield className="w-5 h-5" />
             </>
           )}
         </button>
@@ -201,11 +186,12 @@ const EmailVerification: React.FC = () => {
         </div>
       </div>
          
-         <div className="mt-6 ">
-          <p className="text-xs text-black text-center mt-2">
-            To ensure the security of your TalentPulse recruitment suite, please verify your identity with the code sent to your inbox.
-          </p>
-        </div>
+      <div className="mt-6">
+        <p className="text-xs text-black text-center mt-2">
+          To ensure the security of your TalentPulse recruitment suite, please verify your identity with the code sent to your inbox.
+        </p>
+      </div>
+      
       {/* Footer - OUTSIDE the white container */}
       <div className="max-w-md w-full mt-6 pt-4 text-center text-xs text-gray-400 border-t border-gray-200">
         <p>© 2024 WHS Solution Recruitment Suite. All rights reserved.</p>
