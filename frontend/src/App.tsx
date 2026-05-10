@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
 import SignIn from './pages/Home/SignIn.tsx'
@@ -23,3 +24,13 @@ function App() {
 }
 
 export default App
+=======
+import AppRoutes from './AppRoutes';
+import './App.css';
+
+function App() {
+  return <AppRoutes />;
+}
+
+export default App;
+>>>>>>> 4d0d5e9cf670627f264b33f3be0a82fea11ad518
