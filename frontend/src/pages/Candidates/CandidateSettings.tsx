@@ -5,7 +5,7 @@ const CandidateSettings: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar - Consistent with CandidateHub Style */}
-      <aside className="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
+      {/* <aside className="w-64 bg-white border-r border-gray-200 p-6 flex flex-col">
         <div className="flex items-center gap-2 mb-10">
           <div className="bg-blue-600 p-1.5 rounded-lg text-white font-bold text-xl">CH</div>
           <span className="font-bold text-gray-800 text-lg">CandidateHub</span>
@@ -23,7 +23,7 @@ const CandidateSettings: React.FC = () => {
             </div>
           ))}
         </nav>
-      </aside>
+      </aside> */}
 
       {/* Main Content */}
       <main className="flex-1 p-10 max-w-5xl mx-auto">
