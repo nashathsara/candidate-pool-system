@@ -4,6 +4,9 @@ import EmailVerification from "./pages/EmailVerification/EmailVerification";
 import ProfileView from "./pages/ProfileView/ProfileView";
 import MainLayout from "./Layout/MainLayout";
 import Candidates from "./pages/Candidates/Candidates";
+import DuplicateResolution from './pages/Admin/DuplicateResolution';
+import CandidateSettings from './pages/Candidates/CandidateSettings';
+import DuplicationView from './pages/Candidates/DuplicationView';
 
 const Dashboard = () => (
   <div className="dashboard">
@@ -34,6 +37,9 @@ const AppRoutes = () => {
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/email-verification" element={<EmailVerification />} />
         <Route path="/profile" element={<ProfileView />} />
+
+        <Route path="/candidate/duplicate-check" element={<DuplicationView />} />
+
         <Route
           path="/dashboard"
           element={
@@ -54,7 +60,7 @@ const AppRoutes = () => {
           path="/duplicates"
           element={
             <MainLayout>
-              <Duplicates />
+              <DuplicateResolution />
             </MainLayout>
           }
         />
@@ -62,7 +68,7 @@ const AppRoutes = () => {
           path="/settings"
           element={
             <MainLayout>
-              <Settings />
+              <CandidateSettings />
             </MainLayout>
           }
         />
