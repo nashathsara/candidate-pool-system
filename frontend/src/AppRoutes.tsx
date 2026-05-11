@@ -6,11 +6,48 @@ const AppRoutes = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<VerificationSuccess />} />
-        <Route path="*" element={
-          <div style={{ padding: '20px', textAlign: 'center', fontSize: '18px', color: '#666' }}>
-            Page not found - Try <a href="/">home</a>
-          </div>
-        } />
+        <Route path="/verified" element={<VerificationSuccess />} />
+        <Route path="/email-verification" element={<EmailVerification />} />
+        <Route
+          path="/profile"
+          element={
+            <MainLayout>
+              <ProfileView />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <MainLayout>
+              <Dashboard />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/candidates"
+          element={
+            <MainLayout>
+              <Candidates />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/duplicates"
+          element={
+            <MainLayout>
+              <Duplicates />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <MainLayout>
+              <Settings />
+            </MainLayout>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
