@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import VerificationSuccess from "./pages/VerificationSuccess/VerificationSuccess";
 import EmailVerification from "./pages/EmailVerification/EmailVerification";
 import ProfileView from "./pages/ProfileView/ProfileView";
+import ProfileMerge from "./pages/ProfileMerge/ProfileMerge";
 import MainLayout from "./Layout/MainLayout";
 import Candidates from "./pages/Candidates/Candidates";
 
@@ -38,6 +39,14 @@ const AppRoutes = () => {
           element={
             <MainLayout>
               <ProfileView />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/profile-merge"
+          element={
+            <MainLayout>
+              <ProfileMerge />
             </MainLayout>
           }
         />

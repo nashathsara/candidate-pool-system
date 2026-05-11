@@ -75,9 +75,6 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       {/* Main Content */}
       <main className="flex-1 ml-64 bg-gray-50">
         <div className="p-8">
-          <div className="page-header mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Candidate view</h2>
-          </div>
           <div className="page-content">{children}</div>
         </div>
         
