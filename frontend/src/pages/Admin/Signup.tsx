@@ -12,7 +12,9 @@ const Signup: React.FC = () => {
   };
 
   return (
+    
     <div className="flex h-screen w-full font-sans">
+        <h1>IF YOU SEE THIS, SIGNUP IS WORKING</h1>
       {/* LEFT PANEL: Brand Section */}
       <div 
         className="hidden lg:flex w-1/2 flex-col justify-center px-16 text-white"

@@ -1,41 +1,107 @@
+
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import VerificationSuccess from "./pages/VerificationSuccess/VerificationSuccess";
 import EmailVerification from "./pages/EmailVerification/EmailVerification";
 import ProfileView from "./pages/ProfileView/ProfileView";
+import ProfileMerge from "./pages/ProfileMerge/ProfileMerge";
 import MainLayout from "./Layout/MainLayout";
 import Candidates from "./pages/Candidates/Candidates";
 import DuplicateResolution from './pages/Admin/DuplicateResolution';
 import CandidateSettings from './pages/Candidates/CandidateSettings';
 import DuplicationView from './pages/Candidates/DuplicationView';
+import ApplicationSuccess from './pages/ApplicationSuccess/ApplicationSuccess';
+import BrowseJobs from './pages/BrowseJobs/BrowseJobs';
+import SignIn from './pages/Home/SignIn';
 import Signup from './pages/Admin/Signup';
 import Settings from './pages/Admin/Settings';
 
-// IMPORTANT: Do not define "const Settings" or "const CandidateSettings" here!
-// Doing so creates a conflict with the imports above.
+const Dashboard = () => (
+  <div className="dashboard">
+    <h2>Dashboard</h2>
+    <p>Welcome to CandidateHub</p>
+  </div>
+);
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Your Assigned Pages */}
+        {/* Public routes (without MainLayout) */}
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin/settings" element={<Settings />} />
-        
-        {/* Candidate & Team Pages */}
-        <Route path="/settings" element={<MainLayout><CandidateSettings /></MainLayout>} />
-        <Route path="/candidates" element={<MainLayout><Candidates /></MainLayout>} />
-        <Route path="/duplicates" element={<MainLayout><DuplicateResolution /></MainLayout>} />
-        
-        {/* Verification & Profile */}
+        <Route path="/" element={<VerificationSuccess />} />
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/email-verification" element={<EmailVerification />} />
-        <Route path="/profile" element={<ProfileView />} />
-        <Route path="/candidate/duplicate-check" element={<DuplicationView />} />
-
-        {/* Redirect root to your work */}
-        <Route path="/" element={<Navigate to="/signup" />} /> 
+        {/* <Route path="/candidate/duplicate-check" element={<DuplicationView />} /> */}
+        <Route path="/application-success" element={<ApplicationSuccess />} />
+        <Route path="/browse" element={<BrowseJobs />} />
+        <Route path="/signin" element={<SignIn />} />
         
-        <Route path="/ticket-success" element={<div>Ticket Success (Coming Soon)</div>} />
+        {/* Protected routes (with MainLayout) */}
+        <Route
+          path="/dashboard"
+          element={
+            <MainLayout>
+              <Dashboard />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/candidates"
+          element={
+            <MainLayout>
+              <Candidates />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <MainLayout>
+              <ProfileView />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/profile-merge"
+          element={
+            <MainLayout>
+              <ProfileMerge />
+            </MainLayout>
+          }
+        />
+         <Route
+          path="/duplicates"
+          element={
+            <MainLayout>
+              <DuplicationView />
+            </MainLayout>
+          }
+        />
+         <Route
+          path="/duplicates-admin"
+          element={
+            <MainLayout>
+              <DuplicateResolution />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <MainLayout>
+              <CandidateSettings />
+            </MainLayout>}/>
+
+            <Route path="/" element={<Navigate to="/signup" />} />
+
+            <Route path="*" element={<Navigate to="/signup" />} />
+
+          <Route 
+          path="/ticket-success" 
+          element={<div>Ticket Success (Coming Soon)</div>} />
+  
+
       </Routes>
     </BrowserRouter>
   );
