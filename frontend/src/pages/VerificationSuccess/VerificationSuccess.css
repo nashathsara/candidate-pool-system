@@ -1,0 +1,75 @@
+.success-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f5f7fa;
+}
+
+.card {
+  text-align: center;
+  background: white;
+  padding: 50px 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  width: 380px;
+}
+
+.icon {
+  width: 80px;
+  height: 80px;
+  background: #10b981;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  margin: 0 auto 30px;
+  font-weight: bold;
+}
+
+h2 {
+  margin-bottom: 15px;
+  font-size: 24px;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+p {
+  font-size: 15px;
+  color: #6b7280;
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+.primary-btn {
+  background: #1f2937;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  width: 100%;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.primary-btn:hover {
+  background: #111827;
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 14px;
+  transition: color 0.3s ease;
+}
+
+.link-btn:hover {
+  color: #1f2937;
+}

@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import type { ClipboardEvent, KeyboardEvent } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { FiShield, FiMail, FiLock } from 'react-icons/fi';
+import { useNavigate } from 'react-router-dom';
 
 const EmailVerification: React.FC = () => {
-  const [code, setCode] = useState<string[]>(['', '', '', '', '', '']);
-  const [timer, setTimer] = useState<number>(30);
-  const [isResendDisabled, setIsResendDisabled] = useState<boolean>(true);
-  const [isVerifying, setIsVerifying] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-  const [isVerified, setIsVerified] = useState<boolean>(false);
+  const [code, setCode] = useState(['', '', '', '', '', '']);
+  const [timer, setTimer] = useState(30);
+  const [isResendDisabled, setIsResendDisabled] = useState(true);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [error, setError] = useState('');
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const navigate = useNavigate();
 
   // Timer effect for resend button
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval> | undefined;
-    
+    let interval: ReturnType<typeof setInterval>;
     if (isResendDisabled && timer > 0) {
       interval = setInterval(() => {
         setTimer((prev) => prev - 1);
@@ -20,40 +21,32 @@ const EmailVerification: React.FC = () => {
     } else if (timer === 0) {
       setIsResendDisabled(false);
     }
-    
     return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
+      if (interval) clearInterval(interval);
     };
   }, [isResendDisabled, timer]);
 
-  const handleCodeChange = (index: number, value: string): void => {
-    // Allow only numbers
+  const handleCodeChange = (index: number, value: string) => {
     if (value && !/^\d+$/.test(value)) return;
     
     const newCode = [...code];
-    // Take only last character if more than one digit is pasted
     newCode[index] = value.slice(-1);
     setCode(newCode);
     setError('');
 
     // Auto-focus next input
     if (value && index < 5) {
-      const nextInput = document.getElementById(`code-input-${index + 1}`);
-      if (nextInput) nextInput.focus();
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
-  const handleKeyDown = (index: number, e: KeyboardEvent<HTMLInputElement>): void => {
-    // Handle backspace to move to previous input
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Backspace' && !code[index] && index > 0) {
-      const prevInput = document.getElementById(`code-input-${index - 1}`);
-      if (prevInput) prevInput.focus();
+      inputRefs.current[index - 1]?.focus();
     }
   };
 
-  const handlePaste = (e: ClipboardEvent<HTMLDivElement>): void => {
+  const handlePaste = (e: React.ClipboardEvent) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').slice(0, 6);
     if (/^\d+$/.test(pastedData)) {
@@ -63,14 +56,12 @@ const EmailVerification: React.FC = () => {
         if (i < 6) newCode[i] = digits[i];
       }
       setCode(newCode);
-      // Focus last filled or next empty
       const lastFilledIndex = Math.min(digits.length, 5);
-      const nextInput = document.getElementById(`code-input-${lastFilledIndex}`);
-      if (nextInput) nextInput.focus();
+      inputRefs.current[lastFilledIndex]?.focus();
     }
   };
 
-  const handleVerify = async (): Promise<void> => {
+  const handleVerify = async () => {
     const enteredCode = code.join('');
     if (enteredCode.length !== 6) {
       setError('Please enter the full 6-digit code');
@@ -80,160 +71,133 @@ const EmailVerification: React.FC = () => {
     setIsVerifying(true);
     setError('');
 
-    // Simulate API call
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      // Demo: Accept any 6-digit code for demonstration
-      if (enteredCode.length === 6) {
-        setIsVerified(true);
+      if (enteredCode === '123456') {
+        // Navigate to verification success page
+        navigate('/verified');
       } else {
         setError('Invalid verification code. Please try again.');
       }
-    } catch (err) {
+    } catch {
       setError('Verification failed. Please try again.');
     } finally {
       setIsVerifying(false);
     }
   };
 
-  const handleResendCode = async (): Promise<void> => {
+  const handleResendCode = async () => {
     setIsResendDisabled(true);
     setTimer(30);
     setError('');
-    // Simulate resend API call
     await new Promise((resolve) => setTimeout(resolve, 500));
-    console.log('Code resent to email');
   };
 
-  if (isVerified) {
-    return (
-      <div style={{ minHeight: '100vh', background: 'linear-gradient(to bottom right, #eff6ff, #e0e7ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-        <div style={{ backgroundColor: 'white', borderRadius: '1rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', maxWidth: '28rem', width: '100%', padding: '2rem', textAlign: 'center' }}>
-          <div style={{ width: '4rem', height: '4rem', backgroundColor: '#dcfce7', borderRadius: '9999px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
-            <svg style={{ width: '2rem', height: '2rem', color: '#16a34a' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937', marginBottom: '0.5rem' }}>Email Verified!</h2>
-          <p style={{ color: '#4b5563', marginBottom: '1.5rem' }}>Your email has been successfully verified.</p>
-          <button
-            onClick={() => window.location.reload()}
-            style={{ width: '100%', backgroundColor: '#4f46e5', color: 'white', fontWeight: '600', padding: '0.5rem 1rem', borderRadius: '0.5rem', border: 'none', cursor: 'pointer', transition: 'background-color 0.2s' }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4338ca'}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#4f46e5'}
-          >
-            Continue to Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Set ref callback
+  const setInputRef = (index: number) => (el: HTMLInputElement | null) => {
+    inputRefs.current[index] = el;
+  };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(to bottom right, #eff6ff, #e0e7ff)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
-      <div style={{ backgroundColor: 'white', borderRadius: '1rem', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', maxWidth: '28rem', width: '100%', padding: '2rem' }}>
-        {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#1f2937' }}>CandidateHub</h1>
-          <div style={{ height: '0.25rem', width: '3rem', backgroundColor: '#4f46e5', borderRadius: '9999px', margin: '0.5rem auto 0' }}></div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col items-center justify-center p-4">
+      {/* Main White Container */}
+      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-8">
+        {/* Header with Logo */}
+        <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="bg-indigo-100 p-2 rounded-lg">
+            <FiMail className="w-5 h-5 text-indigo-600" />
+          </div>
+          <span className="text-xl font-bold text-gray-800">CandidateHub</span>
         </div>
 
-        {/* Main Content */}
-        <div style={{ textAlign: 'center' }}>
-          <div style={{ marginBottom: '0.5rem' }}>
-            <span style={{ fontSize: '1.875rem' }}>✉️</span>
+        {/* Title */}
+        <h2 className="text-xl font-bold text-gray-800 mb-1 text-center">VERIFY YOUR EMAIL</h2>
+        <p className="text-gray-500 text-sm mb-6 text-center">
+          We sent a 6-digit code to: <span className="font-medium text-gray-700">j***@example.com</span>
+        </p>
+
+        {/* 6-Digit Code Input */}
+        <div className="flex justify-center gap-3 mb-6" onPaste={handlePaste}>
+          {code.map((digit, index) => (
+            <input
+              key={index}
+              ref={setInputRef(index)}
+              type="text"
+              inputMode="numeric"
+              maxLength={1}
+              value={digit}
+              onChange={(e) => handleCodeChange(index, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(index, e)}
+              className="w-12 h-12 text-center text-2xl font-semibold border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none transition-all bg-gray-50 focus:bg-white"
+            />
+          ))}
+        </div>
+
+        {error && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-600 text-sm">{error}</p>
           </div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: '600', color: '#1f2937', marginBottom: '0.5rem' }}>VERIFY YOUR EMAIL</h2>
-          <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-            We sent a 6-digit code to: <span style={{ fontWeight: '500', color: '#374151' }}>j***@example.com</span>
-          </p>
+        )}
 
-          {/* 6-Digit Code Input */}
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem' }} onPaste={handlePaste}>
-            {code.map((digit, index) => (
-              <input
-                key={index}
-                id={`code-input-${index}`}
-                type="text"
-                inputMode="numeric"
-                maxLength={1}
-                value={digit}
-                onChange={(e) => handleCodeChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                style={{ width: '3rem', height: '3rem', textAlign: 'center', fontSize: '1.5rem', fontWeight: '600', border: '2px solid #d1d5db', borderRadius: '0.5rem', outline: 'none', transition: 'all 0.2s' }}
-                onFocus={(e) => e.currentTarget.style.borderColor = '#4f46e5'}
-                onBlur={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
-                aria-label={`Digit ${index + 1} of verification code`}
-              />
-            ))}
-          </div>
-
-          {error && (
-            <div style={{ marginBottom: '1rem', padding: '0.5rem', backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '0.5rem' }}>
-              <p style={{ color: '#dc2626', fontSize: '0.875rem' }}>{error}</p>
-            </div>
-          )}
-
-          {/* Verify Button */}
-          <button
-            onClick={handleVerify}
-            disabled={isVerifying}
-            style={{ width: '100%', backgroundColor: '#4f46e5', color: 'white', fontWeight: '600', padding: '0.5rem 1rem', borderRadius: '0.5rem', border: 'none', cursor: isVerifying ? 'not-allowed' : 'pointer', transition: 'background-color 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', opacity: isVerifying ? 0.7 : 1 }}
-            onMouseEnter={(e) => !isVerifying && (e.currentTarget.style.backgroundColor = '#4338ca')}
-            onMouseLeave={(e) => !isVerifying && (e.currentTarget.style.backgroundColor = '#4f46e5')}
-          >
-            {isVerifying ? (
-              <>
-                <svg className="animate-spin" style={{ height: '1.25rem', width: '1.25rem', color: 'white' }} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Verifying...
-              </>
-            ) : (
-              <>
-                <span>🔍</span> Verify
-              </>
-            )}
-          </button>
-
-          {/* Resend Section */}
-          <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-            <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-              Didn't receive the code?{' '}
-              <button
-                onClick={handleResendCode}
-                disabled={isResendDisabled}
-                style={{ background: 'none', border: 'none', fontWeight: '500', cursor: isResendDisabled ? 'not-allowed' : 'pointer', color: isResendDisabled ? '#9ca3af' : '#4f46e5', transition: 'color 0.2s' }}
-                onMouseEnter={(e) => !isResendDisabled && (e.currentTarget.style.color = '#4338ca')}
-                onMouseLeave={(e) => !isResendDisabled && (e.currentTarget.style.color = '#4f46e5')}
-              >
-                Resend code {isResendDisabled && `(${timer}s)`}
-              </button>
-            </p>
-          </div>
-
-          {/* Secure Verification Banner */}
-          <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #f3f4f6' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#9ca3af' }}>
-              <svg style={{ width: '1rem', height: '1rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        {/* Verify Button */}
+        <button
+          onClick={handleVerify}
+          disabled={isVerifying}
+          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+        >
+          {isVerifying ? (
+            <>
+              <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
-              <span>Secure Verification</span>
-            </div>
-            <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: '0.5rem' }}>
-              To ensure the security of your TalentPulse recruitment suite, please verify your identity with the code sent to your inbox.
-            </p>
-          </div>
+              Verifying...
+            </>
+          ) : (
+            <>
+              Verify
+              <FiShield className="w-5 h-5" />
+            </>
+          )}
+        </button>
+
+        {/* Resend Section */}
+        <div className="mt-6 text-center">
+          <p className="text-gray-500 text-sm">
+            Didn't receive the code?{' '}
+            <button
+              onClick={handleResendCode}
+              disabled={isResendDisabled}
+              className="font-medium text-indigo-600 hover:text-indigo-700 transition disabled:text-gray-400 disabled:cursor-not-allowed"
+            >
+              Resend code {isResendDisabled && `(${timer}s)`}
+            </button>
+          </p>
         </div>
 
-        {/* Footer */}
-        <div style={{ marginTop: '1.5rem', paddingTop: '1rem', textAlign: 'center', fontSize: '0.75rem', color: '#9ca3af', borderTop: '1px solid #f3f4f6' }}>
-          <p>© 2024 TalentPulse Recruitment Suite. All rights reserved.</p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '1rem', marginTop: '0.25rem' }}>
-            <a href="#" style={{ color: '#9ca3af', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#6b7280'} onMouseLeave={(e) => e.currentTarget.style.color = '#9ca3af'}>Privacy Policy</a>
-            <a href="#" style={{ color: '#9ca3af', textDecoration: 'none', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#6b7280'} onMouseLeave={(e) => e.currentTarget.style.color = '#9ca3af'}>Help Center</a>
+        {/* Divider */}
+        <div className="mt-8 border-t border-gray-100"></div>
+        {/* Secure Verification Banner - INSIDE the white container as separate div */}
+        <div className="mt-5">
+          <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
+            <FiLock className="w-4 h-4" />
+            <span>Secure Verification</span>
           </div>
+        </div>
+      </div>
+         
+      <div className="mt-6">
+        <p className="text-xs text-black text-center mt-2">
+          To ensure the security of your TalentPulse recruitment suite, please verify your identity with the code sent to your inbox.
+        </p>
+      </div>
+      
+      {/* Footer - OUTSIDE the white container */}
+      <div className="max-w-md w-full mt-6 pt-4 text-center text-xs text-gray-400 border-t border-gray-200">
+        <p>© 2024 WHS Solution Recruitment Suite. All rights reserved.</p>
+        <div className="flex justify-center gap-4 mt-1">
+          <a href="#" className="hover:text-gray-600 transition">Privacy Policy</a>
+          <a href="#" className="hover:text-gray-600 transition">Help Center</a>
         </div>
       </div>
     </div>
