@@ -18,10 +18,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const location = useLocation();
 
   const navigationItems = [
-    { name: "Dashboard", path: "/dashboard", icon: <FiHome className="w-5 h-5" /> },
-    { name: "Candidates", path: "/candidates", icon: <FiUsers className="w-5 h-5" /> },
-    { name: "Duplicates", path: "/duplicates", icon: <FiCopy className="w-5 h-5" /> },
-    { name: "Settings", path: "/settings", icon: <FiSettings className="w-5 h-5" /> },
+    { name: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
+    { name: "Candidates", path: "/candidates", icon: <CandidatesIcon /> },
+    { name: "Duplicates", path: "/duplicates", icon: <DuplicatesIcon /> },
+    { name: "Duplicate Check", path: "/candidate/duplicate-check", icon: <DuplicatesIcon /> },
+    { name: "Email Verification", path: "/email-verification", icon: <SettingsIcon /> },
+    { name: "Profile", path: "/profile", icon: <SettingsIcon /> },
+    { name: "Settings", path: "/settings", icon: <SettingsIcon /> },
   ];
 
   return (
