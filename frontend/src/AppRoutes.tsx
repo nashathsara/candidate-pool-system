@@ -33,7 +33,14 @@ const AppRoutes = () => {
         <Route path="/" element={<VerificationSuccess />} />
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/email-verification" element={<EmailVerification />} />
-        <Route path="/profile" element={<ProfileView />} />
+        <Route
+          path="/profile"
+          element={
+            <MainLayout>
+              <ProfileView />
+            </MainLayout>
+          }
+        />
         <Route
           path="/dashboard"
           element={
