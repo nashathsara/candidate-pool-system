@@ -1,58 +1,78 @@
-﻿import { Search, Bell, Settings, MapPin } from 'lucide-react'
-import './BrowseJobs.css'
+﻿import { useEffect, useMemo, useState } from "react";
+import { Search, Bell, Settings, MapPin } from "lucide-react";
+import "./BrowseJobs.css";
+import { fetchJobs } from "../../services/firebaseService";
+import type { QueryDocumentSnapshot } from "firebase/firestore";
+import { useAuth } from "../../hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
-const jobs = [
-  {
-    title: 'Senior Software Engineer',
-    badge: 'ENGINEERING',
-    location: 'Remote - EMEA',
-    type: 'Full-time',
-    salary: '$140k - $190k',
-    icon: '🧠',
-  },
-  {
-    title: 'Principal UX Designer',
-    badge: 'PRODUCT DESIGN',
-    location: 'San Francisco, CA',
-    type: 'Full-time',
-    salary: '$160k - $210k',
-    icon: '✏️',
-  },
-  {
-    title: 'Backend Developer (Rust)',
-    badge: 'ENGINEERING',
-    location: 'London, UK / Remote',
-    type: 'Full-time',
-    salary: '$130k - $180k',
-    icon: '💻',
-  },
-  {
-    title: 'Technical Project Manager',
-    badge: 'OPERATIONS',
-    location: 'Hybrid - Berlin',
-    type: 'Full-time',
-    salary: '$110k - $150k',
-    icon: '📌',
-  },
-  {
-    title: 'Security Analyst',
-    badge: 'ENGINEERING',
-    location: 'Tokyo, Japan',
-    type: 'Full-time',
-    salary: '$120k - $170k',
-    icon: '🛡️',
-  },
-  {
-    title: 'Product Owner',
-    badge: 'PRODUCT',
-    location: 'Remote - US',
-    type: 'Full-time',
-    salary: '$130k - $175k',
-    icon: '📦',
-  },
-]
+type Job = {
+  id: string;
+  title?: string;
+  location?: string;
+  jobType?: string;
+  salary?: string;
+  badge?: string;
+};
+
+type JobFilters = {
+  department?: string;
+  location?: string;
+  jobType?: string;
+};
 
 function BrowseJobs() {
+  const navigate = useNavigate();
+  const { user, loading, isSignedIn } = useAuth();
+
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [pageSize] = useState<number>(6);
+  const [page, setPage] = useState<number>(1);
+  const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot | null>(null);
+  const [filters, setFilters] = useState<JobFilters>({});
+  const [loadingJobs, setLoadingJobs] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+
+  const canLoad = useMemo(() => !loading && isSignedIn, [loading, isSignedIn]);
+
+  useEffect(() => {
+    if (!loading && !isSignedIn) {
+      navigate("/signin");
+    }
+  }, [canLoad, isSignedIn, loading, navigate]);
+
+  useEffect(() => {
+    if (!canLoad) return;
+
+    const load = async () => {
+      setLoadingJobs(true);
+      setError("");
+      try {
+        const { jobs: fetchedJobs, lastVisible: newLastVisible } = await fetchJobs(
+          filters,
+          pageSize,
+          lastVisible,
+        );
+        setJobs(fetchedJobs as Job[]);
+        setLastVisible(newLastVisible);
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Failed to load jobs";
+        setError(message);
+      } finally {
+        setLoadingJobs(false);
+      }
+    };
+
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canLoad, filters, page, pageSize]);
+
+  const handleFindJobs = () => {
+    setPage(1);
+    setLastVisible(null);
+    // triggers useEffect because page/lastVisible are dependencies indirectly (page is)
+  };
+
   return (
     <div className="browse-page">
       <header className="browse-header">
@@ -66,7 +86,7 @@ function BrowseJobs() {
               Browse Jobs
             </a>
             <a href="#">Applications</a>
-            <a href="#">Profile</a>
+            <a href="/settings">Profile</a>
           </nav>
 
           <div className="header-right">
@@ -76,7 +96,7 @@ function BrowseJobs() {
             <button type="button" className="icon-btn" aria-label="Settings">
               <Settings size={18} />
             </button>
-            <div className="avatar">JS</div>
+            <div className="avatar">{user?.email?.[0]?.toUpperCase() ?? "U"}</div>
           </div>
         </div>
       </header>
@@ -85,10 +105,7 @@ function BrowseJobs() {
         <section className="hero-section">
           <div className="hero-copy">
             <h1>Join the Future of Engineering</h1>
-            <p>
-              WHS Solution is where high-performance engineering meets elegant design.
-              Browse our current openings across globally distributed teams.
-            </p>
+            <p>Browse our current openings across globally distributed teams.</p>
           </div>
 
           <div className="search-panel">
@@ -98,55 +115,81 @@ function BrowseJobs() {
                 type="search"
                 placeholder="Search by title, keywords, or technology..."
                 aria-label="Search jobs"
+                onChange={(e) => {
+                  // This UI search isn't wired to Firestore filtering yet (Firestore needs query fields).
+                  // Keep it for future enhancement.
+                  void e;
+                }}
               />
             </div>
-            <select>
-              <option>Department</option>
-              <option>Engineering</option>
-              <option>Product Design</option>
-              <option>Operations</option>
+
+            <select
+              value={filters.department ?? ""}
+              onChange={(e) => setFilters((prev) => ({ ...prev, department: e.target.value || undefined }))}
+            >
+              <option value="">Department</option>
+              <option value="Engineering">Engineering</option>
+              <option value="Product Design">Product Design</option>
+              <option value="Operations">Operations</option>
             </select>
-            <select>
-              <option>Location</option>
-              <option>Remote</option>
-              <option>San Francisco, CA</option>
-              <option>Tokyo, Japan</option>
+
+            <select
+              value={filters.location ?? ""}
+              onChange={(e) => setFilters((prev) => ({ ...prev, location: e.target.value || undefined }))}
+            >
+              <option value="">Location</option>
+              <option value="Remote">Remote</option>
+              <option value="San Francisco, CA">San Francisco, CA</option>
+              <option value="Tokyo, Japan">Tokyo, Japan</option>
             </select>
-            <select>
-              <option>Job Type</option>
-              <option>Full-time</option>
-              <option>Part-time</option>
-              <option>Contract</option>
+
+            <select
+              value={filters.jobType ?? ""}
+              onChange={(e) => setFilters((prev) => ({ ...prev, jobType: e.target.value || undefined }))}
+            >
+              <option value="">Job Type</option>
+              <option value="Full-time">Full-time</option>
+              <option value="Part-time">Part-time</option>
+              <option value="Contract">Contract</option>
             </select>
-            <button type="button" className="find-btn">
+
+            <button type="button" className="find-btn" onClick={handleFindJobs}>
               Find Jobs
             </button>
           </div>
         </section>
 
         <section className="jobs-summary">
-          <p className="summary-title">SHOWING 6 OPEN POSITIONS</p>
+          <p className="summary-title">
+            {loadingJobs ? "LOADING..." : `SHOWING ${jobs.length} OPEN POSITIONS`}
+          </p>
         </section>
+
+        {error && (
+          <div style={{ padding: 16, color: "crimson" }}>
+            <strong>Error:</strong> {error}
+          </div>
+        )}
 
         <section className="jobs-grid">
           {jobs.map((job) => (
-            <article className="job-card" key={job.title}>
+            <article className="job-card" key={job.id}>
               <div className="job-card-top">
-                <div className="job-icon-box">{job.icon}</div>
-                <span className="job-badge">{job.badge}</span>
+                <div className="job-icon-box">{job.badge ?? "🧠"}</div>
+                <span className="job-badge">{job.badge ?? "ENGINEERING"}</span>
               </div>
 
               <div className="job-card-body">
-                <h2>{job.title}</h2>
+                <h2>{job.title ?? "Untitled position"}</h2>
                 <div className="job-detail-row">
                   <MapPin size={16} className="location-icon" />
-                  <span>{job.location}</span>
+                  <span>{job.location ?? "Location not set"}</span>
                 </div>
-                <p className="job-type">{job.type}</p>
+                <p className="job-type">{job.jobType ?? "Job type not set"}</p>
               </div>
 
               <div className="job-card-footer">
-                <span className="job-salary">{job.salary}</span>
+                <span className="job-salary">{job.salary ?? ""}</span>
                 <a href="#" className="details-link">
                   View Details →
                 </a>
@@ -156,26 +199,29 @@ function BrowseJobs() {
         </section>
 
         <section className="pagination-row">
-          <button type="button" className="page-btn active">1</button>
-          <button type="button" className="page-btn">2</button>
-          <button type="button" className="page-btn">3</button>
+          <button type="button" className={`page-btn ${page === 1 ? "active" : ""}`} onClick={() => setPage(1)}>
+            1
+          </button>
+          <button
+            type="button"
+            className="page-btn"
+            onClick={() => setPage((p) => p + 1)}
+            disabled={!lastVisible}
+          >
+            2
+          </button>
+          <button
+            type="button"
+            className="page-btn"
+            onClick={() => setPage((p) => p + 2)}
+            disabled={!lastVisible}
+          >
+            3
+          </button>
         </section>
       </main>
-
-      <footer className="browse-footer">
-        <div className="footer-brand">
-          <span className="footer-title">WHS Solution</span>
-          <span className="footer-copy">© 2024 WHS Solution Engineered for Excellence.</span>
-        </div>
-        <div className="footer-links">
-          <a href="#">Legal</a>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Help Center</a>
-          <a href="#">Contact Support</a>
-        </div>
-      </footer>
     </div>
-  )
+  );
 }
 
-export default BrowseJobs
+export default BrowseJobs;

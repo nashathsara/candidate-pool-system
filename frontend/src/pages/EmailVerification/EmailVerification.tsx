@@ -1,34 +1,39 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiShield, FiMail, FiLock } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
 const EmailVerification: React.FC = () => {
-  const [code, setCode] = useState(['', '', '', '', '', '']);
-  const [timer, setTimer] = useState(30);
-  const [isResendDisabled, setIsResendDisabled] = useState(true);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [error, setError] = useState('');
+  const [code, setCode] = useState<string[]>(['', '', '', '', '', '']);
+  const [timer, setTimer] = useState<number>(30);
+  const [isResendDisabled, setIsResendDisabled] = useState<boolean>(true);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const navigate = useNavigate();
 
   // Timer effect for resend button
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (isResendDisabled && timer > 0) {
-      interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
-      }, 1000);
-    } else if (timer === 0) {
-      setIsResendDisabled(false);
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
+    if (timer <= 0) return;
+
+    if (!isResendDisabled) return;
+
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          // flip when countdown reaches 0
+          setIsResendDisabled(false);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, [isResendDisabled, timer]);
 
   const handleCodeChange = (index: number, value: string) => {
     if (value && !/^\d+$/.test(value)) return;
-    
+
     const newCode = [...code];
     newCode[index] = value.slice(-1);
     setCode(newCode);
@@ -46,16 +51,20 @@ const EmailVerification: React.FC = () => {
     }
   };
 
-  const handlePaste = (e: React.ClipboardEvent) => {
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData('text').slice(0, 6);
+
     if (/^\d+$/.test(pastedData)) {
       const digits = pastedData.split('');
       const newCode = [...code];
+
       for (let i = 0; i < digits.length; i++) {
         if (i < 6) newCode[i] = digits[i];
       }
+
       setCode(newCode);
+
       const lastFilledIndex = Math.min(digits.length, 5);
       inputRefs.current[lastFilledIndex]?.focus();
     }
@@ -72,9 +81,8 @@ const EmailVerification: React.FC = () => {
     setError('');
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      await new Promise<void>((resolve) => setTimeout(resolve, 1500));
       if (enteredCode === '123456') {
-        // Navigate to verification success page
         navigate('/verified');
       } else {
         setError('Invalid verification code. Please try again.');
@@ -90,7 +98,7 @@ const EmailVerification: React.FC = () => {
     setIsResendDisabled(true);
     setTimer(30);
     setError('');
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise<void>((resolve) => setTimeout(resolve, 500));
   };
 
   // Set ref callback
@@ -177,6 +185,7 @@ const EmailVerification: React.FC = () => {
 
         {/* Divider */}
         <div className="mt-8 border-t border-gray-100"></div>
+
         {/* Secure Verification Banner - INSIDE the white container as separate div */}
         <div className="mt-5">
           <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
@@ -185,13 +194,13 @@ const EmailVerification: React.FC = () => {
           </div>
         </div>
       </div>
-         
+
       <div className="mt-6">
         <p className="text-xs text-black text-center mt-2">
           To ensure the security of your TalentPulse recruitment suite, please verify your identity with the code sent to your inbox.
         </p>
       </div>
-      
+
       {/* Footer - OUTSIDE the white container */}
       <div className="max-w-md w-full mt-6 pt-4 text-center text-xs text-gray-400 border-t border-gray-200">
         <p>© 2024 WHS Solution Recruitment Suite. All rights reserved.</p>

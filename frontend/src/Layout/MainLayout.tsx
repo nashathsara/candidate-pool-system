@@ -1,33 +1,14 @@
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
-import "./MainLayout.css";
-
-const DashboardIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" className="icon-svg">
-    <path d="M4 4h7v7H4V4Zm0 9h7v7H4v-7Zm9-9h7v7h-7V4Zm0 9h7v7h-7v-7Z" fill="currentColor" />
-  </svg>
-);
-
-const CandidatesIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" className="icon-svg">
-    <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4Zm-6.5 8a6.5 6.5 0 0 1 13 0H5.5Z" fill="currentColor" />
-  </svg>
-);
-
-const DuplicatesIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" className="icon-svg">
-    <path d="M7 4h11a2 2 0 0 1 2 2v11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    <path d="M17 20H6a2 2 0 0 1-2-2V7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    <rect x="7" y="7" width="10" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
-  </svg>
-);
-
-const SettingsIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" className="icon-svg">
-    <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" strokeWidth="1.8" />
-    <path d="M19.4 15a1.8 1.8 0 0 0 .3 2l.1.1a.8.8 0 0 1-.6 1.4h-2a1.8 1.8 0 0 0-1.7 1.2l-.2.5a.8.8 0 0 1-1.5 0l-.2-.5a1.8 1.8 0 0 0-1.7-1.2h-2a.8.8 0 0 1-.6-1.4l.1-.1a1.8 1.8 0 0 0 .3-2l-.5-.9a.8.8 0 0 1 .2-1l1.4-1.1a1.8 1.8 0 0 0 .6-2l-.1-.2a.8.8 0 0 1 .6-1.1h2a1.8 1.8 0 0 0 1.7-1.2l.2-.5a.8.8 0 0 1 1.5 0l.2.5a1.8 1.8 0 0 0 1.7 1.2h2a.8.8 0 0 1 .6 1.4l-.1.1a1.8 1.8 0 0 0-.3 2l.5.9Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
+import { 
+  FiHome, 
+  FiUsers, 
+  FiCopy, 
+  FiSettings, 
+  FiSearch, 
+  FiHelpCircle, 
+  FiLogOut,
+} from 'react-icons/fi';
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -37,29 +18,32 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const location = useLocation();
 
   const navigationItems = [
-    { name: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
-    { name: "Candidates", path: "/candidates", icon: <CandidatesIcon /> },
-    { name: "Duplicates", path: "/duplicates", icon: <DuplicatesIcon /> },
-    { name: "Duplicate Check", path: "/candidate/duplicate-check", icon: <DuplicatesIcon /> },
-    { name: "Email Verification", path: "/email-verification", icon: <SettingsIcon /> },
-    { name: "Profile", path: "/profile", icon: <SettingsIcon /> },
-    { name: "Settings", path: "/settings", icon: <SettingsIcon /> },
+    { name: "Dashboard", path: "/dashboard", icon: <FiHome className="w-5 h-5" /> },
+    { name: "Candidates", path: "/candidates", icon: <FiUsers className="w-5 h-5" /> },
+    { name: "Duplicates", path: "/duplicates", icon: <FiCopy className="w-5 h-5" /> },
+    { name: "Settings", path: "/settings", icon: <FiSettings className="w-5 h-5" /> },
   ];
 
   return (
-    <div className="main-layout">
-      <aside className="sidebar">
-        <div className="sidebar-header">
-          <h1>Candidate pool</h1>
-          <p>Global Talent Pool</p>
+    <div className="flex min-h-screen bg-gray-50 text-gray-900">
+      {/* Sidebar */}
+      <aside className="w-64 bg-white text-gray-900 p-6 fixed h-screen overflow-y-auto border-r border-gray-100">
+        <div className="logo-section mb-10">
+          <h1 className="text-xl font-bold mb-1 text-gray-900">
+            Candidate<span className="text-blue-500">Hub</span>
+          </h1>
+          <p className="text-xs text-gray-400">Global Talent Pool</p>
         </div>
-        <nav className="sidebar-nav">
+
+        <nav className="flex flex-col gap-1 mb-8">
           {navigationItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`nav-item ${
-                location.pathname === item.path ? "active" : ""
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-all duration-200 ${
+                location.pathname === item.path 
+                  ? "bg-blue-100 text-blue-700" 
+                  : "text-gray-700 hover:bg-blue-50 hover:text-blue-600"
               }`}
             >
               <span className="nav-icon">{item.icon}</span>
@@ -67,23 +51,46 @@ const MainLayout = ({ children }: MainLayoutProps) => {
             </Link>
           ))}
         </nav>
+
+        {/* Bottom section */}
+        <div className="absolute bottom-6 left-6 right-6">
+          <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-xl bg-gray-50 cursor-pointer transition-all duration-200 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+            <FiSearch className="w-5 h-5" />
+            <span className="text-sm font-medium">New Search</span>
+          </div>
+          
+          <div className="flex flex-col gap-1">
+            <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 hover:bg-blue-50 hover:text-blue-600 text-sm transition-all duration-200">
+              <FiHelpCircle className="w-4 h-4" />
+              Support
+            </a>
+            <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 hover:bg-blue-50 hover:text-blue-600 text-sm transition-all duration-200">
+              <FiLogOut className="w-4 h-4" />
+              Sign Out
+            </a>
+          </div>
+        </div>
       </aside>
 
-      <main className="content">
-        <div className="page-header">
-          <h2>Candidate view</h2>
+      {/* Main Content */}
+      <main className="flex-1 ml-64 bg-gray-50">
+        <div className="p-8">
+          <div className="page-content">{children}</div>
         </div>
-        <div className="page-content">{children}</div>
-        <footer className="app-footer">
-          <div className="footer-left">
-            <strong>Candidate pool</strong>
-            <p>© 2024 WHS. All rights reserved.</p>
-          </div>
-          <div className="footer-right">
-            <a href="#privacy">Privacy Policy</a>
-            <a href="#terms">Terms of Service</a>
-            <a href="#help">Help Center</a>
-            <a href="#contact">Contact Us</a>
+        
+        {/* Footer */}
+        <footer className="mt-auto py-6 px-8 text-center text-gray-400 text-xs border-t border-gray-200">
+          <div className="flex justify-between items-center">
+            <div className="footer-left text-left">
+              <strong className="text-gray-500">Candidate pool</strong>
+              <p className="mt-1">© 2024 WHS. All rights reserved.</p>
+            </div>
+            <div className="footer-right flex gap-6">
+              <a href="#privacy" className="hover:text-blue-600 transition-colors">Privacy Policy</a>
+              <a href="#terms" className="hover:text-blue-600 transition-colors">Terms of Service</a>
+              <a href="#help" className="hover:text-blue-600 transition-colors">Help Center</a>
+              <a href="#contact" className="hover:text-blue-600 transition-colors">Contact Us</a>
+            </div>
           </div>
         </footer>
       </main>
