@@ -1,4 +1,4 @@
-.support-page {
+.ticket-submit-page {
   min-height: 100vh;
   background: #f4f7fb;
   display: flex;
@@ -7,25 +7,25 @@
   padding: 48px 16px 56px;
 }
 
-.support-shell {
+.ticket-submit-shell {
   width: min(980px, 100%);
   display: grid;
   gap: 28px;
 }
 
-.support-intro {
+.ticket-submit-intro {
   text-align: center;
   padding: 0 10px;
 }
 
-.support-intro h1 {
+.ticket-submit-intro h1 {
   margin: 0;
   font-size: clamp(2rem, 2.2vw, 2.75rem);
   color: #101828;
   letter-spacing: -0.04em;
 }
 
-.support-intro p {
+.ticket-submit-intro p {
   margin: 16px auto 0;
   max-width: 720px;
   color: #475569;
@@ -33,7 +33,7 @@
   line-height: 1.8;
 }
 
-.support-card {
+.ticket-submit-card {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 28px;
@@ -43,7 +43,7 @@
   gap: 22px;
 }
 
-.support-grid {
+.ticket-submit-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
@@ -217,7 +217,7 @@
   white-space: nowrap;
 }
 
-.support-footer {
+.ticket-submit-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -228,27 +228,27 @@
   font-size: 0.92rem;
 }
 
-.support-footer-links {
+.ticket-submit-footer-links {
   display: flex;
   gap: 18px;
   flex-wrap: wrap;
 }
 
-.support-footer-links a {
+.ticket-submit-footer-links a {
   color: #475569;
   text-decoration: none;
 }
 
 @media (max-width: 820px) {
-  .support-page {
+  .ticket-submit-page {
     padding: 32px 16px 40px;
   }
 
-  .support-card {
+  .ticket-submit-card {
     padding: 24px;
   }
 
-  .support-grid {
+  .ticket-submit-grid {
     grid-template-columns: 1fr;
   }
 
@@ -259,11 +259,11 @@
 }
 
 @media (max-width: 560px) {
-  .support-page {
+  .ticket-submit-page {
     padding: 24px 14px 32px;
   }
 
-  .support-shell {
+  .ticket-submit-shell {
     gap: 18px;
   }
 
@@ -271,7 +271,7 @@
     padding: 22px 20px;
   }
 
-  .support-footer {
+  .ticket-submit-footer {
     padding: 0 0 8px;
     gap: 8px;
   }

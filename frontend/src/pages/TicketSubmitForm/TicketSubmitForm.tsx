@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import './SupportTicket.css'
+import './TicketSubmitForm.css'
 
-function SupportTicket() {
+function TicketSubmitForm() {
   const [subject, setSubject] = useState('')
   const [category, setCategory] = useState('')
   const [description, setDescription] = useState('')
@@ -24,17 +24,17 @@ function SupportTicket() {
   }
 
   return (
-    <div className="support-page">
-      <div className="support-shell">
-        <section className="support-intro">
+    <div className="ticket-submit-page">
+      <div className="ticket-submit-shell">
+        <section className="ticket-submit-intro">
           <h1>Open a Support Ticket</h1>
           <p>
             Our team is here to help you navigate your career journey. Please provide details below.
           </p>
         </section>
 
-        <form className="support-card" onSubmit={handleSubmit}>
-          <div className="support-grid">
+        <form className="ticket-submit-card" onSubmit={handleSubmit}>
+          <div className="ticket-submit-grid">
             <label className="form-field">
               <span className="field-label">Subject</span>
               <input
@@ -111,9 +111,9 @@ function SupportTicket() {
           </a>
         </section>
 
-        <footer className="support-footer">
+        <footer className="ticket-submit-footer">
           <span>© 2024 WHS Solution Recruitment Suite. All rights reserved.</span>
-          <div className="support-footer-links">
+          <div className="ticket-submit-footer-links">
             <a href="#">Privacy Policy</a>
             <a href="#">Help Center</a>
           </div>
@@ -123,4 +123,4 @@ function SupportTicket() {
   )
 }
 
-export default SupportTicket
+export default TicketSubmitForm
