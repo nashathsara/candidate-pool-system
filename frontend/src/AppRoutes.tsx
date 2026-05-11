@@ -5,6 +5,12 @@ import ProfileView from "./pages/ProfileView/ProfileView";
 import ProfileMerge from "./pages/ProfileMerge/ProfileMerge";
 import MainLayout from "./Layout/MainLayout";
 import Candidates from "./pages/Candidates/Candidates";
+import DuplicateResolution from './pages/Admin/DuplicateResolution';
+import CandidateSettings from './pages/Candidates/CandidateSettings';
+import DuplicationView from './pages/Candidates/DuplicationView';
+import ApplicationSuccess from './pages/ApplicationSuccess/ApplicationSuccess';
+import BrowseJobs from './pages/BrowseJobs/BrowseJobs';
+import SignIn from './pages/Home/SignIn';
 
 const Dashboard = () => (
   <div className="dashboard">
@@ -13,43 +19,22 @@ const Dashboard = () => (
   </div>
 );
 
-const Duplicates = () => (
-  <div className="duplicates">
-    <h2>Duplicates</h2>
-    <p>Find duplicate candidate records</p>
-  </div>
-);
 
-const Settings = () => (
-  <div className="settings">
-    <h2>Settings</h2>
-    <p>Manage your account settings</p>
-  </div>
-);
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Public routes (without MainLayout) */}
         <Route path="/" element={<VerificationSuccess />} />
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/email-verification" element={<EmailVerification />} />
-        <Route
-          path="/profile"
-          element={
-            <MainLayout>
-              <ProfileView />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/profile-merge"
-          element={
-            <MainLayout>
-              <ProfileMerge />
-            </MainLayout>
-          }
-        />
+        <Route path="/candidate/duplicate-check" element={<DuplicationView />} />
+        <Route path="/application-success" element={<ApplicationSuccess />} />
+        <Route path="/browse" element={<BrowseJobs />} />
+        <Route path="/signin" element={<SignIn />} />
+        
+        {/* Protected routes (with MainLayout) */}
         <Route
           path="/dashboard"
           element={
@@ -67,10 +52,26 @@ const AppRoutes = () => {
           }
         />
         <Route
+          path="/profile"
+          element={
+            <MainLayout>
+              <ProfileView />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/profile-merge"
+          element={
+            <MainLayout>
+              <ProfileMerge />
+            </MainLayout>
+          }
+        />
+         <Route
           path="/duplicates"
           element={
             <MainLayout>
-              <Duplicates />
+              <DuplicateResolution />
             </MainLayout>
           }
         />
@@ -78,7 +79,7 @@ const AppRoutes = () => {
           path="/settings"
           element={
             <MainLayout>
-              <Settings />
+              <CandidateSettings />
             </MainLayout>
           }
         />
