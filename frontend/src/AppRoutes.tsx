@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import VerificationSuccess from "./pages/VerificationSuccess/VerificationSuccess";
 import EmailVerification from "./pages/EmailVerification/EmailVerification";
 import ProfileView from "./pages/ProfileView/ProfileView";
@@ -7,6 +7,7 @@ import Candidates from "./pages/Candidates/Candidates";
 import DuplicateResolution from './pages/Admin/DuplicateResolution';
 import CandidateSettings from './pages/Candidates/CandidateSettings';
 import DuplicationView from './pages/Candidates/DuplicationView';
+import Signup from './pages/Admin/Signup';
 
 const Dashboard = () => (
   <div className="dashboard">
@@ -72,6 +73,15 @@ const AppRoutes = () => {
             </MainLayout>
           }
         />
+        
+        <Route path="/signup" element={<Signup />} />
+        {/* Redirect root to signup for now so you see your work immediately */}
+        <Route path="/" element={<Navigate to="/signup" />} /> 
+        
+        {/* Placeholders for your other assigned pages */}
+        <Route path="/admin/settings" element={<div>Admin Settings (Coming Soon)</div>} />
+        <Route path="/ticket-success" element={<div>Ticket Success (Coming Soon)</div>} />
+
       </Routes>
     </BrowserRouter>
   );
