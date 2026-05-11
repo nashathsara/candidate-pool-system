@@ -1,0 +1,139 @@
+.submitted-page {
+  min-height: 100vh;
+  background: #F9FAFB;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #111827;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 48px 20px 24px;
+}
+
+.submitted-main {
+  width: min(640px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 34px;
+  text-align: center;
+}
+
+.success-badge {
+  width: 84px;
+  height: 84px;
+  border-radius: 24px;
+  background: #ECFDF5;
+  display: grid;
+  place-items: center;
+}
+
+.success-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #10B981;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  font-size: 1.65rem;
+}
+
+.submitted-main h1 {
+  margin: 0;
+  font-size: clamp(2rem, 2.3vw, 2.6rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #111827;
+}
+
+.submitted-main p {
+  margin: 0;
+  max-width: 520px;
+  color: #6B7280;
+  line-height: 1.95;
+  font-size: 1rem;
+}
+
+.actions-row {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.primary-button,
+.secondary-button {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: transform 0.18s ease, background-color 0.18s ease;
+}
+
+.primary-button {
+  background: #000000;
+  color: #ffffff;
+}
+
+.secondary-button {
+  background: #F3F4F6;
+  color: #000000;
+  border: 1px solid #D1D5DB;
+}
+
+.primary-button:hover,
+.secondary-button:hover {
+  transform: translateY(-1px);
+}
+
+.support-copy {
+  margin: 0;
+  color: #6B7280;
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.support-copy a {
+  color: #111827;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.submitted-footer {
+  width: min(640px, 100%);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  color: #9CA3AF;
+  font-size: 0.9rem;
+  padding: 18px 8px 0;
+  border-top: 1px solid #E5E7EB;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.footer-links a {
+  color: #9CA3AF;
+  text-decoration: none;
+}
+
+@media (max-width: 560px) {
+  .submitted-page {
+    padding: 32px 16px 20px;
+  }
+
+  .submitted-footer {
+    justify-content: center;
+    text-align: center;
+  }
+}
