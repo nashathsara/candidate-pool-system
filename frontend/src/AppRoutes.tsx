@@ -29,7 +29,7 @@ const AppRoutes = () => {
         <Route path="/" element={<VerificationSuccess />} />
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/email-verification" element={<EmailVerification />} />
-        <Route path="/candidate/duplicate-check" element={<DuplicationView />} />
+        {/* <Route path="/candidate/duplicate-check" element={<DuplicationView />} /> */}
         <Route path="/application-success" element={<ApplicationSuccess />} />
         <Route path="/browse" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
@@ -69,6 +69,14 @@ const AppRoutes = () => {
         />
          <Route
           path="/duplicates"
+          element={
+            <MainLayout>
+              <DuplicationView />
+            </MainLayout>
+          }
+        />
+         <Route
+          path="/duplicates-admin"
           element={
             <MainLayout>
               <DuplicateResolution />
