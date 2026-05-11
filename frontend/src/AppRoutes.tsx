@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import VerificationSuccess from "./pages/VerificationSuccess/VerificationSuccess";
 import EmailVerification from "./pages/EmailVerification/EmailVerification";
 import ProfileView from "./pages/ProfileView/ProfileView";
@@ -11,14 +12,8 @@ import DuplicationView from './pages/Candidates/DuplicationView';
 import ApplicationSuccess from './pages/ApplicationSuccess/ApplicationSuccess';
 import BrowseJobs from './pages/BrowseJobs/BrowseJobs';
 import SignIn from './pages/Home/SignIn';
-
-const Dashboard = () => (
-  <div className="dashboard">
-    <h2>Dashboard</h2>
-    <p>Welcome to CandidateHub</p>
-  </div>
-);
-
+import Signup from './pages/Admin/Signup';
+import Settings from './pages/Admin/Settings';
 
 
 const AppRoutes = () => {
@@ -26,6 +21,8 @@ const AppRoutes = () => {
     <BrowserRouter>
       <Routes>
         {/* Public routes (without MainLayout) */}
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/admin/settings" element={<Settings />} />
         <Route path="/" element={<VerificationSuccess />} />
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/email-verification" element={<EmailVerification />} />
@@ -34,15 +31,6 @@ const AppRoutes = () => {
         <Route path="/browse" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
         
-        {/* Protected routes (with MainLayout) */}
-        <Route
-          path="/dashboard"
-          element={
-            <MainLayout>
-              <Dashboard />
-            </MainLayout>
-          }
-        />
         <Route
           path="/candidates"
           element={
@@ -88,9 +76,14 @@ const AppRoutes = () => {
           element={
             <MainLayout>
               <CandidateSettings />
-            </MainLayout>
-          }
-        />
+            </MainLayout>}/>
+
+          <Route 
+          path="/ticket-success" 
+          element={<div>Ticket Success (Coming Soon)</div>} />
+  
+          <Route path="/" element={<Navigate to="/signup" />} />
+
       </Routes>
     </BrowserRouter>
   );
