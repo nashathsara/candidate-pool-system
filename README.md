@@ -158,18 +158,32 @@ candidate-pool-system/
 │   │   │   └── constants.js
 │   │   │
 │   │   ├── layouts/
+<<<<<<< HEAD
+│   │   │   ├── MainLayout.jsx
+│   │   │   └── AdminLayout.jsx
+=======
 │   │   │   ├── MainLayout.tsx
 │   │   │   └── AdminLayout.tsx
+>>>>>>> 4d0d5e9cf670627f264b33f3be0a82fea11ad518
 │   │   │
 │   │   ├── styles/
 │   │   │   └── globals.css
 │   │   │
+<<<<<<< HEAD
+│   │   ├── App.jsx
+│   │   ├── AppRoutes.jsx
+│   │   └── main.jsx
+│   │
+│   ├── package.json
+│   └── vite.config.js
+=======
 │   │   ├── App.tsx
 │   │   ├── AppRoutes.tsx
 │   │   └── main.tsx
 │   │
 │   ├── package.json
 │   └── vite.config.ts
+>>>>>>> 4d0d5e9cf670627f264b33f3be0a82fea11ad518
 │
 ├── functions/                         # Node.js Backend
 │
@@ -229,4 +243,8 @@ candidate-pool-system/
 ├── README.md
 └── package.json
 
+<<<<<<< HEAD
 ```
+=======
+```
+>>>>>>> 4d0d5e9cf670627f264b33f3be0a82fea11ad518

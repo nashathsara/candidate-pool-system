@@ -40,6 +40,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { name: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
     { name: "Candidates", path: "/candidates", icon: <CandidatesIcon /> },
     { name: "Duplicates", path: "/duplicates", icon: <DuplicatesIcon /> },
+    { name: "Duplicate Check", path: "/candidate/duplicate-check", icon: <DuplicatesIcon /> },
+    { name: "Email Verification", path: "/email-verification", icon: <SettingsIcon /> },
+    { name: "Profile", path: "/profile", icon: <SettingsIcon /> },
     { name: "Settings", path: "/settings", icon: <SettingsIcon /> },
   ];
 
