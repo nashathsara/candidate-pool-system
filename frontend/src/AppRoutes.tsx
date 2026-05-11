@@ -3,6 +3,7 @@ import VerificationSuccess from "./pages/VerificationSuccess/VerificationSuccess
 import EmailVerification from "./pages/EmailVerification/EmailVerification";
 import ProfileView from "./pages/ProfileView/ProfileView";
 import ProfileMerge from "./pages/ProfileMerge/ProfileMerge";
+import ProfileCancel from "./pages/ProfileCancel/ProfileCancel";
 import MainLayout from "./Layout/MainLayout";
 import Candidates from "./pages/Candidates/Candidates";
 import DuplicateResolution from './pages/Admin/DuplicateResolution';
@@ -64,6 +65,14 @@ const AppRoutes = () => {
           element={
             <MainLayout>
               <ProfileMerge />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/profile-cancel"
+          element={
+            <MainLayout>
+              <ProfileCancel />
             </MainLayout>
           }
         />

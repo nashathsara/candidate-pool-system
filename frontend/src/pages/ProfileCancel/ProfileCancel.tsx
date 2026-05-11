@@ -5,11 +5,11 @@ import {
   FiCopy,
   FiSearch,
   FiBell,
-  FiInfo
+  FiInfo,
 } from 'react-icons/fi';
 import { FaCircleCheck, FaUserCheck, FaArrowLeft } from 'react-icons/fa6';
 
-const ProfileMerge: React.FC = () => {
+const ProfileCancel: React.FC = () => {
   return (
     <div>
       {/* Top Header with Search, Notifications, and Profile */}
@@ -55,7 +55,7 @@ const ProfileMerge: React.FC = () => {
       <div className="flex justify-center">
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden mb-8 shadow-lg max-w-2xl w-full">
           {/* Master Record Header - Centered with new color */}
-          <div className="px-6 py-8 border-b border-gray-200" style={{ backgroundColor: '#3ec9b6' }}>
+          <div className="px-6 py-8 border-b border-gray-200" style={{ backgroundColor: '#c93e3e' }}>
             <div className="flex flex-col items-center text-center gap-3">
               <div className="relative">
                 <div className="rounded-full flex items-center justify-center shadow-lg ring-8 ring-white/35">
@@ -63,10 +63,7 @@ const ProfileMerge: React.FC = () => {
                 </div>
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white">Profiles Successfully Merged</h2>
-                <p className=" text-sm text-white/90 mt-0.5">
-                  Duplicate records for Marcus Sterling have been unified into a single master profile.
-                </p>
+                <h2 className="text-2xl font-bold text-white">Profiles Successfully Cancelled</h2>
               </div>
             </div>
           </div>
@@ -157,12 +154,12 @@ const ProfileMerge: React.FC = () => {
               <Link
                 to="/profile"
                 className="flex items-center justify-center gap-2 px-8 py-3 min-w-[220px] transition-all duration-200 text-sm font-medium rounded-md shadow-md"
-                style={{ backgroundColor: '#3ec9b6', color: 'white' }}
+                style={{ backgroundColor: '#c93e3e', color: 'white' }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#34b5a3';
+                  e.currentTarget.style.backgroundColor = '#d72e2e';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#3ec9b6';
+                  e.currentTarget.style.backgroundColor = '#c93e3e';
                 }}
               >
                 <FaUserCheck className="w-4 h-4" />
@@ -178,13 +175,13 @@ const ProfileMerge: React.FC = () => {
             </div>
 
           </div>
-          <div className="px-6 py-4  flex items-center justify-between" style={{ backgroundColor: '#f1f1f1' }}>
-                <div className="text-sm text-gray-500">
-                      <span className="font-medium">Audit log updated:</span> ID #IDUPE-0921-Unified
-                </div>
-                <button className="text-gray-400 hover:text-gray-600 transition-colors flex items-center">
-                          <FiInfo className="w-4 h-4" />
-                </button>
+            <div className="px-6 py-4  flex items-center justify-between" style={{ backgroundColor: '#f1f1f1' }}>
+              <div className="text-sm text-gray-500">
+                <span className="font-medium">Audit log updated:</span> ID #IDUPE-0921-Unified
+               </div>
+              <button className="text-gray-400 hover:text-gray-600 transition-colors flex items-center">
+                <FiInfo className="w-4 h-4" />
+             </button>
             </div>
         </div>
       </div>
@@ -192,4 +189,4 @@ const ProfileMerge: React.FC = () => {
   );
 };
 
-export default ProfileMerge;
+export default ProfileCancel;
