@@ -93,15 +93,12 @@ const AppRoutes = () => {
               <CandidateSettings />
             </MainLayout>}/>
 
-            <Route path="/" element={<Navigate to="/signup" />} />
-
-            <Route path="*" element={<Navigate to="/signup" />} />
-
           <Route 
           path="/ticket-success" 
           element={<div>Ticket Success (Coming Soon)</div>} />
   
-
+          <Route path="/" element={<Navigate to="/signup" />} />
+          
       </Routes>
     </BrowserRouter>
   );
