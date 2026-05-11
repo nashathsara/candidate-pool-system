@@ -15,12 +15,6 @@ import SignIn from './pages/Home/SignIn';
 import Signup from './pages/Admin/Signup';
 import Settings from './pages/Admin/Settings';
 
-const Dashboard = () => (
-  <div className="dashboard">
-    <h2>Dashboard</h2>
-    <p>Welcome to CandidateHub</p>
-  </div>
-);
 
 const AppRoutes = () => {
   return (
@@ -37,15 +31,6 @@ const AppRoutes = () => {
         <Route path="/browse" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
         
-        {/* Protected routes (with MainLayout) */}
-        <Route
-          path="/dashboard"
-          element={
-            <MainLayout>
-              <Dashboard />
-            </MainLayout>
-          }
-        />
         <Route
           path="/candidates"
           element={
@@ -98,7 +83,7 @@ const AppRoutes = () => {
           element={<div>Ticket Success (Coming Soon)</div>} />
   
           <Route path="/" element={<Navigate to="/signup" />} />
-          
+
       </Routes>
     </BrowserRouter>
   );

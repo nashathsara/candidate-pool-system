@@ -13,11 +13,10 @@ const Signup: React.FC = () => {
 
   return (
     
-    <div className="flex h-screen w-full font-sans">
-        <h1>IF YOU SEE THIS, SIGNUP IS WORKING</h1>
+    <div className="flex min-h-screen w-full font-sans">
       {/* LEFT PANEL: Brand Section */}
       <div 
-        className="hidden lg:flex w-1/2 flex-col justify-center px-16 text-white"
+        className="hidden lg:flex w-1/2 flex-col justify-center px-16 text-white py-12"
         style={{ backgroundColor: colors.brandNavy }}
       >
         <h1 className="text-5xl font-bold leading-tight mb-6">
@@ -58,7 +57,7 @@ const Signup: React.FC = () => {
 
       {/* RIGHT PANEL: Form Section */}
       <div 
-        className="w-full lg:w-1/2 flex flex-col items-center px-10 pt-8"
+        className="w-full lg:w-1/2 flex flex-col items-center px-10 pt-8 pb-12"
         style={{ backgroundColor: colors.formBg }}
       >
         <div className="w-full flex justify-between items-center mb-20 text-sm">
