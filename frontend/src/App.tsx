@@ -11,6 +11,7 @@ import DuplicationView from './pages/Candidates/DuplicationView';
 import ApplicationSuccess from './pages/ApplicationSuccess/ApplicationSuccess';
 import BrowseJobs from './pages/BrowseJobs/BrowseJobs';
 import SignIn from './pages/Home/SignIn';
+import SupportTicket from './pages/SupportTicket/SupportTicket';
 
 const Dashboard = () => (
   <div className="dashboard">
@@ -29,6 +30,7 @@ function App() {
         <Route path="/profile" element={<ProfileView />} />
         <Route path="/candidate/duplicate-check" element={<DuplicationView />} />
 
+        <Route path="/support" element={<SupportTicket />} />
         <Route path="/application-success" element={<ApplicationSuccess />} />
         <Route path="/browse" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />

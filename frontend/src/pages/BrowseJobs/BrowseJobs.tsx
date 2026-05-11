@@ -1,3 +1,4 @@
+﻿import { Search, Bell, Settings, MapPin } from 'lucide-react'
 import './BrowseJobs.css'
 
 const jobs = [
@@ -55,32 +56,33 @@ function BrowseJobs() {
   return (
     <div className="browse-page">
       <header className="browse-header">
-        <div className="brand-row">
-          <div className="brand-logo">CandidateHub</div>
-          <nav className="nav-links">
-            <a href="/browse" className="active">
+        <div className="header-container">
+          <div className="header-left">
+            <div className="header-logo">CandidateHub</div>
+          </div>
+
+          <nav className="header-nav">
+            <a href="/browse" className="nav-link active">
               Browse Jobs
             </a>
             <a href="#">Applications</a>
-            <a href="#">Profile & Settings</a>
+            <a href="#">Profile</a>
           </nav>
-        </div>
 
-        <div className="header-actions">
-          <button type="button" className="icon-btn">
-            <span className="icon">🔔</span>
-          </button>
-          <button type="button" className="icon-btn">
-            <span className="icon">⚙️</span>
-          </button>
-          <div className="profile-chip">
-            <span className="avatar">JS</span>
+          <div className="header-right">
+            <button type="button" className="icon-btn" aria-label="Notifications">
+              <Bell size={18} />
+            </button>
+            <button type="button" className="icon-btn" aria-label="Settings">
+              <Settings size={18} />
+            </button>
+            <div className="avatar">JS</div>
           </div>
         </div>
       </header>
 
       <main className="browse-content">
-        <section className="hero-panel">
+        <section className="hero-section">
           <div className="hero-copy">
             <h1>Join the Future of Engineering</h1>
             <p>
@@ -89,94 +91,87 @@ function BrowseJobs() {
             </p>
           </div>
 
-          <div className="search-card">
-            <div className="search-input">
-              <span className="search-icon">🔍</span>
+          <div className="search-panel">
+            <div className="search-field">
+              <Search size={18} className="search-icon" />
               <input
-                type="text"
+                type="search"
                 placeholder="Search by title, keywords, or technology..."
+                aria-label="Search jobs"
               />
             </div>
-            <div className="filters-row">
-              <select>
-                <option>Department</option>
-                <option>Engineering</option>
-                <option>Product Design</option>
-                <option>Operations</option>
-              </select>
-              <select>
-                <option>Location</option>
-                <option>Remote</option>
-                <option>San Francisco, CA</option>
-                <option>Tokyo, Japan</option>
-              </select>
-              <select>
-                <option>Job Type</option>
-                <option>Full-time</option>
-                <option>Part-time</option>
-                <option>Contract</option>
-              </select>
-              <button type="button" className="find-btn">
-                Find Jobs
-              </button>
-            </div>
+            <select>
+              <option>Department</option>
+              <option>Engineering</option>
+              <option>Product Design</option>
+              <option>Operations</option>
+            </select>
+            <select>
+              <option>Location</option>
+              <option>Remote</option>
+              <option>San Francisco, CA</option>
+              <option>Tokyo, Japan</option>
+            </select>
+            <select>
+              <option>Job Type</option>
+              <option>Full-time</option>
+              <option>Part-time</option>
+              <option>Contract</option>
+            </select>
+            <button type="button" className="find-btn">
+              Find Jobs
+            </button>
           </div>
         </section>
 
         <section className="jobs-summary">
-          <div className="summary-text">SHOWING 12 OPEN POSITIONS</div>
-          <div className="view-toggle">
-            <button type="button" className="toggle-btn active">
-              <span>▦</span>
-            </button>
-            <button type="button" className="toggle-btn">
-              <span>☰</span>
-            </button>
-          </div>
+          <p className="summary-title">SHOWING 6 OPEN POSITIONS</p>
         </section>
 
         <section className="jobs-grid">
           {jobs.map((job) => (
             <article className="job-card" key={job.title}>
               <div className="job-card-top">
-                <span className="job-icon">{job.icon}</span>
+                <div className="job-icon-box">{job.icon}</div>
                 <span className="job-badge">{job.badge}</span>
               </div>
 
-              <h2>{job.title}</h2>
-              <div className="job-meta">
-                <span>{job.location}</span>
-                <span>{job.type}</span>
+              <div className="job-card-body">
+                <h2>{job.title}</h2>
+                <div className="job-detail-row">
+                  <MapPin size={16} className="location-icon" />
+                  <span>{job.location}</span>
+                </div>
+                <p className="job-type">{job.type}</p>
               </div>
-              <div className="job-footer">
+
+              <div className="job-card-footer">
                 <span className="job-salary">{job.salary}</span>
-                <button type="button" className="details-link">
+                <a href="#" className="details-link">
                   View Details →
-                </button>
+                </a>
               </div>
             </article>
           ))}
         </section>
 
         <section className="pagination-row">
-          <button type="button" className="page-btn">←</button>
           <button type="button" className="page-btn active">1</button>
           <button type="button" className="page-btn">2</button>
           <button type="button" className="page-btn">3</button>
-          <button type="button" className="page-btn">→</button>
         </section>
       </main>
 
       <footer className="browse-footer">
         <div className="footer-brand">
-          <strong>WHS Solution</strong>
-          <span>© 2024 WHS Solution Engineered for Excellence.</span>
+          <span className="footer-title">WHS Solution</span>
+          <span className="footer-copy">© 2024 WHS Solution Engineered for Excellence.</span>
         </div>
         <div className="footer-links">
-          <a href="#">LEGAL</a>
-          <a href="#">PRIVACY POLICY</a>
-          <a href="#">HELP CENTER</a>
-          <a href="#">CONTACT SUPPORT</a>
+          <a href="#">Legal</a>
+          <a href="#">Privacy Policy</a>
+          <a href="#">Help Center</a>
+          <a href="#">Contact Support</a>
         </div>
       </footer>
     </div>

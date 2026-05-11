@@ -19,7 +19,7 @@ function ApplicationSuccess() {
         </div>
 
         <p className="support-copy">
-          Questions about your application? <a href="#">Contact Support</a>
+          Questions about your application? <a href="/support">Contact Support</a>
         </p>
       </main>
 
