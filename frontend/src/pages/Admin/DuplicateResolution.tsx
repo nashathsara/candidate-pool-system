@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiLayers, FiSearch, FiAlertCircle, FiCheck, FiX, FiRefreshCcw } from 'react-icons/fi';
+import { FiLayers, FiSearch, FiAlertCircle, FiCheck, FiRefreshCcw } from 'react-icons/fi';
 
 const DuplicateResolution: React.FC = () => {
   return (
