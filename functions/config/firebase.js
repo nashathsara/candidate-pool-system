@@ -1,6 +1,7 @@
 const { initializeApp } = require("firebase/app");
 const { getFirestore } = require("firebase/firestore");
 const { getAuth } = require("firebase/auth");
+require('dotenv').config({ path: '../.env' });
 
 const firebaseConfig = {
   apiKey: process.env.VITE_FIREBASE_API_KEY,
