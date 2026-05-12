@@ -1,258 +1,132 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { FiInfo, FiMail, FiPhone, FiUser } from "react-icons/fi";
-import type { DuplicateCase } from "../../types/candidate";
-import { formatDateLabel, formatRelativeTime } from "../../utils/formatters";
-import { getDuplicateCaseById, keepDuplicateSeparate, listDuplicateCases } from "../../services/duplicateService";
+import React from 'react';
+import { FiMail, FiPhone, FiUser, FiInfo, FiCheckCircle } from 'react-icons/fi';
 
-const DuplicationView = () => {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const duplicateId = searchParams.get("duplicateId");
-  const candidateId = searchParams.get("candidateId");
-
-  const [duplicateCase, setDuplicateCase] = useState<DuplicateCase | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isResolving, setIsResolving] = useState(false);
-
-  useEffect(() => {
-    const loadDuplicateCase = async () => {
-      setIsLoading(true);
-
-      let nextCase: DuplicateCase | null = null;
-      if (duplicateId) {
-        nextCase = await getDuplicateCaseById(duplicateId);
-      }
-
-      if (!nextCase) {
-        const duplicateCases = await listDuplicateCases();
-        nextCase =
-          duplicateCases.find((caseItem) => caseItem.candidateId === candidateId) ??
-          duplicateCases.find((caseItem) => caseItem.status === "pending") ??
-          null;
-      }
-
-      setDuplicateCase(nextCase);
-      setIsLoading(false);
-    };
-
-    void loadDuplicateCase();
-  }, [candidateId, duplicateId]);
-
-  const handleKeepSeparate = async () => {
-    if (!duplicateCase) {
-      return;
-    }
-
-    setIsResolving(true);
-    const resolvedCase = await keepDuplicateSeparate(duplicateCase.id);
-    setIsResolving(false);
-
-    if (resolvedCase) {
-      navigate(`/profile?candidateId=${resolvedCase.candidateId}&updated=1&duplicateResolved=1`);
-    }
-  };
-
-  if (isLoading) {
-    return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        Loading duplicate review...
-      </div>
-    );
-  }
-
-  if (!duplicateCase) {
-    return (
-      <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-        <h1 className="text-2xl font-bold text-slate-900">No duplicate case selected</h1>
-        <p className="mt-2 text-sm text-slate-500">
-          Update a profile first to trigger duplicate detection or review a flagged case from the
-          admin dashboard.
-        </p>
-        <div className="mt-6 flex gap-3">
-          <button
-            className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-semibold text-slate-700"
-            onClick={() => navigate("/settings")}
-            type="button"
-          >
-            Open Profile Settings
-          </button>
-          <button
-            className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white"
-            onClick={() => navigate("/dashboard")}
-            type="button"
-          >
-            Go To Dashboard
-          </button>
-        </div>
-      </div>
-    );
-  }
-
+const DuplicateCandidateReview: React.FC = () => {
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
-      <div className="rounded-3xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-100 px-8 py-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">
-            Potential duplication candidate
-          </p>
-          <h1 className="mt-3 text-3xl font-bold text-slate-900">Potential Duplicate Profile Found</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            We found an existing account that might belong to this candidate. Review the overlap
-            before continuing with the update flow.
-          </p>
-          <p className="mt-3 text-xs text-slate-400">
-            Case created on {formatDateLabel(duplicateCase.createdAt)}
-          </p>
+    <div className="min-h-screen bg-[#F8FAFC] p-8 font-sans text-slate-900">
+      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        
+        {/* Top Header */}
+        <div className="p-8 border-b border-slate-50">
+          <div className="flex items-center gap-2 text-[10px] font-bold text-blue-600 uppercase tracking-widest mb-2">
+            <div className="w-4 h-4 bg-blue-100 rounded flex items-center justify-center">
+              <span className="text-[8px]">T</span>
+            </div>
+            Ticket #86291-D
+          </div>
+          <h1 className="text-2xl font-bold text-slate-800">Duplicate Candidate Review</h1>
+          <p className="text-xs text-slate-400 mt-1">Created on October 24, 2024 at 10:45 AM</p>
         </div>
 
-        <div className="mx-8 mt-8 rounded-2xl border border-blue-100 bg-blue-50 p-6">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+        {/* Confidence Match Banner */}
+        <div className="mx-8 mt-8 p-6 bg-blue-50/50 border border-blue-100 rounded-xl">
+          <div className="flex items-center gap-2 text-slate-700 font-bold mb-4">
             <FiInfo className="text-blue-500" />
-            High confidence match ({duplicateCase.confidence}%)
+            <span className="text-sm">High Confidence Match (94%)</span>
           </div>
-          <div className="mt-4 grid gap-3 md:grid-cols-3">
-            {duplicateCase.reasons.map((reason) => (
-              <MatchReasonBadge key={reason} reason={reason} />
-            ))}
+          <div className="grid grid-cols-3 gap-4">
+            <MatchBadge icon={<FiMail />} label="Email Match" value="anne@gmail.com" />
+            <MatchBadge icon={<FiPhone />} label="Phone Match" value="0745637829" />
+            <MatchBadge icon={<FiUser />} label="Name Match" value="Anne Piyula" />
           </div>
         </div>
 
-        <div className="grid gap-6 p-8 md:grid-cols-2">
-          <CandidateCard
-            footerLabel={formatRelativeTime(duplicateCase.candidateSnapshot.updatedAt)}
-            heading="Updated Candidate"
-            isPrimary
-            profile={duplicateCase.candidateSnapshot}
-          />
-          <CandidateCard
-            footerLabel={formatRelativeTime(duplicateCase.matchedCandidateSnapshot.lastActiveAt)}
-            heading="Existing Profile"
-            profile={duplicateCase.matchedCandidateSnapshot}
-          />
+        {/* Comparison Section */}
+        <div className="p-8 grid grid-cols-2 gap-8">
+          {/* New Applicant */}
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-black text-blue-600 uppercase tracking-widest">New Applicant</span>
+              <span className="text-[10px] text-slate-400">Applied 2h ago</span>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-800 leading-tight">Anne Piyula Arulpirabakar</h2>
+              <p className="text-xs text-slate-500 mt-1 font-medium">Application Role</p>
+              <p className="text-sm font-semibold text-slate-700">Senior Systems Architect</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Recent Activity</p>
+              <div className="flex items-center gap-2 text-xs text-slate-600">
+                <div className="w-5 h-5 bg-slate-100 rounded flex items-center justify-center">
+                  <span className="text-[8px]">📄</span>
+                </div>
+                Submitted Resume
+              </div>
+            </div>
+          </div>
+
+          {/* Existing Profile */}
+          <div className="space-y-6">
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Existing Profile</span>
+              <span className="text-[10px] bg-slate-100 px-2 py-0.5 rounded text-slate-500 font-bold">ID: CH-9932</span>
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-slate-800 leading-tight">A.P. Arulpirabakar</h2>
+              <p className="text-xs text-slate-500 mt-1 font-medium">Current Status</p>
+              <p className="text-sm font-semibold text-slate-700">Hired (2022)</p>
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-slate-400 uppercase mb-2">Recent Activity</p>
+              <div className="flex items-center gap-2 text-xs text-slate-600">
+                <div className="w-5 h-5 bg-slate-100 rounded flex items-center justify-center">
+                  <span className="text-[8px]">💼</span>
+                </div>
+                Promoted to Lead Architect (Jan 2024)
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="mx-8 rounded-2xl border border-slate-100 bg-slate-50 p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-            Suggested next steps
-          </p>
-          <ul className="mt-4 space-y-3 text-sm text-slate-600">
-            <li>Review the overlapping profile fields and confirm whether both records belong to the same person.</li>
-            <li>Use the existing profile view if the original record should remain the primary source of truth.</li>
-            <li>Choose keep separate when this is a legitimate new submission.</li>
-          </ul>
+        {/* Action History */}
+        <div className="mx-8 p-6 border-t border-slate-50">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Action History</p>
+          <div className="space-y-4">
+            <HistoryItem 
+              icon={<FiInfo className="text-blue-500" />} 
+              title="System Flagged Duplicate" 
+              time="Oct 24, 10:45 AM • Confidence: 94%" 
+            />
+            <HistoryItem 
+              icon={<FiCheckCircle className="text-slate-400" />} 
+              title="Anne Piyula viewed Ticket" 
+              time="Oct 24, 11:12 AM" 
+            />
+          </div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 border-t border-slate-100 bg-emerald-50 px-8 py-6 md:flex-row md:justify-center">
-          <button
-            className="rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
-            onClick={() =>
-              navigate(`/profile?candidateId=${duplicateCase.matchedCandidateId}&fromDuplicate=1`)
-            }
-            type="button"
-          >
-            View Existing Profile
-          </button>
-          <button
-            className="rounded-xl bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
-            onClick={handleKeepSeparate}
-            disabled={isResolving}
-            type="button"
-          >
-            {isResolving ? "Saving decision..." : "Keep Separate"}
-          </button>
-          <button
-            className="rounded-xl bg-transparent px-6 py-3 text-sm font-semibold text-slate-700 transition hover:text-slate-900"
-            onClick={() => navigate(`/settings?candidateId=${duplicateCase.candidateId}`)}
-            type="button"
-          >
-            Back to Editing
-          </button>
+        {/* Bottom Action Footer */}
+        <div className="mt-8 p-10 bg-[#4ADE80] flex justify-center gap-6">
+          <button className="px-8 py-2.5 bg-slate-900 text-white text-xs font-bold rounded-lg hover:bg-slate-800 transition">Merge Profiles</button>
+          <button className="px-8 py-2.5 bg-slate-900/10 text-slate-900 text-xs font-bold rounded-lg hover:bg-slate-900/20 transition">Request Info</button>
+          <button className="px-8 py-2.5 bg-slate-900/10 text-slate-900 text-xs font-bold rounded-lg hover:bg-slate-900/20 transition">Keep Separate</button>
         </div>
       </div>
     </div>
   );
 };
 
-const MatchReasonBadge = ({ reason }: { reason: string }) => {
-  const icon =
-    reason.toLowerCase().includes("email") ? (
-      <FiMail />
-    ) : reason.toLowerCase().includes("phone") ? (
-      <FiPhone />
-    ) : (
-      <FiUser />
-    );
-
-  return (
-    <div className="flex items-center gap-3 rounded-xl border border-blue-100 bg-white p-4 text-sm text-slate-700">
-      <div className="rounded-xl bg-blue-50 p-2 text-blue-600">{icon}</div>
-      <span>{reason}</span>
-    </div>
-  );
-};
-
-const CandidateCard = ({
-  heading,
-  footerLabel,
-  profile,
-  isPrimary = false,
-}: {
-  heading: string;
-  footerLabel: string;
-  profile: DuplicateCase["candidateSnapshot"];
-  isPrimary?: boolean;
-}) => (
-  <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-    <div className="flex items-center justify-between">
-      <span
-        className={`rounded-full px-3 py-1 text-xs font-semibold ${
-          isPrimary ? "bg-blue-50 text-blue-700" : "bg-slate-100 text-slate-600"
-        }`}
-      >
-        {heading}
-      </span>
-      <span className="text-xs text-slate-400">{footerLabel}</span>
-    </div>
-
-    <div className="mt-6">
-      <h2 className="text-xl font-bold text-slate-900">{profile.fullName}</h2>
-      <p className="mt-1 text-sm font-medium text-blue-600">{profile.title}</p>
-      <p className="mt-3 text-sm text-slate-500">{profile.bio}</p>
-    </div>
-
-    <div className="mt-6 grid gap-4 text-sm text-slate-600">
-      <ProfileField icon={<FiMail />} label="Email" value={profile.email} />
-      <ProfileField icon={<FiPhone />} label="Phone" value={profile.phone || "Not provided"} />
-      <ProfileField icon={<FiUser />} label="Location" value={profile.location || "Not provided"} />
-    </div>
-
-    <div className="mt-6 flex flex-wrap gap-2">
-      {profile.skills.map((skill) => (
-        <span key={skill} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-          {skill}
-        </span>
-      ))}
-    </div>
-  </div>
-);
-
-const ProfileField = ({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-}) => (
-  <div className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3">
-    <div className="text-slate-400">{icon}</div>
+// Helper Components
+const MatchBadge = ({ icon, label, value }: any) => (
+  <div className="bg-white p-3 rounded-lg border border-blue-100 flex items-center gap-3">
+    <div className="text-blue-500">{icon}</div>
     <div>
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{label}</p>
-      <p className="mt-1 text-sm font-medium text-slate-700">{value}</p>
+      <p className="text-[8px] font-bold text-slate-400 uppercase leading-none">{label}</p>
+      <p className="text-[10px] font-bold text-slate-700">{value}</p>
     </div>
   </div>
 );
 
-export default DuplicationView;
+const HistoryItem = ({ icon, title, time }: any) => (
+  <div className="flex gap-3">
+    <div className="w-6 h-6 bg-slate-50 rounded-full flex items-center justify-center text-xs border border-slate-100">
+      {icon}
+    </div>
+    <div>
+      <p className="text-xs font-bold text-slate-700">{title}</p>
+      <p className="text-[10px] text-slate-400">{time}</p>
+    </div>
+  </div>
+);
+
+export default DuplicateCandidateReview;

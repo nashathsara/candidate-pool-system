@@ -1,0 +1,65 @@
+.cbf-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cbf-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .cbf-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+.cbf-field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.cbf-field input,
+.cbf-field select,
+.cbf-field textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #fff;
+  outline: none;
+}
+
+.cbf-field input:focus,
+.cbf-field select:focus,
+.cbf-field textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.cbf-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+.cbf-btn {
+  padding: 12px 24px;
+  background: #111827;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cbf-btn:hover {
+  background: #000;
+}
