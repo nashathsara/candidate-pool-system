@@ -375,9 +375,6 @@
   cursor: pointer;
   transition: background 0.2s;
   white-space: nowrap;
-  text-decoration: none;
-  display: inline-block;
-  text-align: center;
 }
 
 .action-btn:hover {

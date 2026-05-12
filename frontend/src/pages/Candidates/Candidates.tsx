@@ -1,7 +1,20 @@
-import { Link } from "react-router-dom";
-import { CandidateStatusBadge } from "../../components/candidate/CandidateStatusBadge/CandidateStatusBadge";
-import { useCandidates } from "../../hooks/useCandidates";
+import { useState } from "react";
 import "./Candidates.css";
+
+type CandidateStatusColor = "blue" | "gray" | "red";
+
+type Candidate = {
+  id: number;
+  initials: string;
+  name: string;
+  email: string;
+  skills: string[];
+  extraSkills: string;
+  location: string;
+  experience: string;
+  status: string;
+  statusColor: CandidateStatusColor;
+};
 
 const SearchIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" className="icon-svg">
@@ -41,20 +54,81 @@ const ProfileIcon = () => (
 );
 
 const Candidates = () => {
-  const { candidates, totalDisplay } = useCandidates();
+  const [candidates] = useState<Candidate[]>([
+    {
+      id: 1,
+      initials: "EJ",
+      name: "Shafin",
+      email: "shafin@example.com",
+      skills: ["React", "Node.js"],
+      extraSkills: "+3",
+      location: "Berlin, Germany",
+      experience: "6 Years",
+      status: "In Review",
+      statusColor: "blue",
+    },
+    {
+      id: 2,
+      initials: "MK",
+      name: "Thushainini",
+      email: "thushai@example.com",
+      skills: ["Python", "AWS"],
+      extraSkills: "+2",
+      location: "Austin, TX",
+      experience: "8 Years",
+      status: "New",
+      statusColor: "gray",
+    },
+    {
+      id: 3,
+      initials: "SL",
+      name: "Sarah",
+      email: "sarah@design.co",
+      skills: ["Figma", "UI/UX"],
+      extraSkills: "",
+      location: "London, UK",
+      experience: "4 Years",
+      status: "New",
+      statusColor: "gray",
+    },
+    {
+      id: 4,
+      initials: "DR",
+      name: "Heli",
+      email: "heli@stream.com",
+      skills: ["Go", "Kubernetes"],
+      extraSkills: "+5",
+      location: "Remote",
+      experience: "10 Years",
+      status: "Withdrawn",
+      statusColor: "red",
+    },
+    {
+      id: 5,
+      initials: "AL",
+      name: "Shavindi",
+      email: "shavindi@creative.net",
+      skills: ["Vue.js", "Tailwind"],
+      extraSkills: "",
+      location: "Singapore",
+      experience: "3 Years",
+      status: "In Review",
+      statusColor: "blue",
+    },
+  ]);
 
   return (
     <div className="candidates-page">
       <div className="page-top">
         <div className="title-section">
           <h1>Candidates</h1>
-          <span className="total-badge">{totalDisplay} Total</span>
+          <span className="total-badge">1,248 Total</span>
         </div>
         <div className="header-icons">
-          <button type="button" className="icon-btn" aria-label="Notifications">
+          <button className="icon-btn">
             <BellIcon />
           </button>
-          <button type="button" className="icon-btn profile-btn" aria-label="Account">
+          <button className="icon-btn profile-btn">
             <ProfileIcon />
           </button>
         </div>
@@ -84,21 +158,15 @@ const Candidates = () => {
           <span className="filter-pill">
             Status: In Review <span className="remove">×</span>
           </span>
-          <button type="button" className="clear-btn">
-            Clear All
-          </button>
+          <button className="clear-btn">Clear All</button>
         </div>
         <div className="action-buttons">
-          <button type="button" className="btn btn-secondary">
-            <span className="btn-icon">
-              <FilterIcon />
-            </span>
+          <button className="btn btn-secondary">
+            <span className="btn-icon"><FilterIcon /></span>
             Filters
           </button>
-          <button type="button" className="btn btn-secondary">
-            <span className="btn-icon">
-              <DownloadIcon />
-            </span>
+          <button className="btn btn-secondary">
+            <span className="btn-icon"><DownloadIcon /></span>
             Export
           </button>
         </div>
@@ -128,28 +196,25 @@ const Candidates = () => {
                 </td>
                 <td className="skills-cell">
                   <div className="skill-tags">
-                    {candidate.skills.slice(0, 3).map((skill) => (
-                      <span key={skill} className="skill-tag">
+                    {candidate.skills.map((skill, idx) => (
+                      <span key={idx} className="skill-tag">
                         {skill}
                       </span>
                     ))}
-                    {candidate.extraSkillsCount !== undefined &&
-                    candidate.extraSkillsCount > 0 ? (
-                      <span className="skill-tag extra">
-                        +{candidate.extraSkillsCount}
-                      </span>
-                    ) : null}
+                    {candidate.extraSkills && (
+                      <span className="skill-tag extra">{candidate.extraSkills}</span>
+                    )}
                   </div>
                 </td>
                 <td>{candidate.location}</td>
                 <td>{candidate.experience}</td>
                 <td>
-                  <CandidateStatusBadge status={candidate.status} />
+                  <span className={`status-badge status-${candidate.statusColor}`}>
+                    {candidate.status}
+                  </span>
                 </td>
                 <td className="action-cell">
-                  <Link to={`/candidates/${candidate.id}`} className="action-btn">
-                    Review Profile
-                  </Link>
+                  <button className="action-btn">Review Profile</button>
                 </td>
               </tr>
             ))}
@@ -158,19 +223,15 @@ const Candidates = () => {
       </div>
 
       <div className="pagination-section">
-        <span className="pagination-info">
-          Showing 1 to {candidates.length} of {totalDisplay} candidates
-        </span>
+        <span className="pagination-info">Showing 1 to 5 of 1,248 candidates</span>
         <div className="pagination-controls">
-          <button type="button" className="pagination-btn prev">
-            ‹
-          </button>
-          <button type="button" className="pagination-btn active">
-            1
-          </button>
-          <button type="button" className="pagination-btn next">
-            ›
-          </button>
+          <button className="pagination-btn prev">‹</button>
+          <button className="pagination-btn active">1</button>
+          <button className="pagination-btn">2</button>
+          <button className="pagination-btn">3</button>
+          <span className="pagination-dots">...</span>
+          <button className="pagination-btn">250</button>
+          <button className="pagination-btn next">›</button>
         </div>
       </div>
     </div>
