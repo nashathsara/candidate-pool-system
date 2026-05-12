@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // පේජ් එක මාරු කිරීමට අවශ්‍යයි
 import Button from '../../common/Button/Button';
 
 const Signup: React.FC = () => {
+  const navigate = useNavigate(); // Navigation initialize කිරීම
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -28,6 +30,7 @@ const Signup: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Backend එකට දත්ත යැවීම
       const response = await axios.post('http://localhost:5000/api/candidates/register', {
         fullName: formData.fullName,
         email: formData.email,
@@ -35,13 +38,16 @@ const Signup: React.FC = () => {
       });
 
       if (response.data.status === 'success') {
-        alert("Account created successfully!");
+        // ඊමේල් එක ගිය බව දන්වා වෙරිෆිකේෂන් පේජ් එකට යැවීම
+        alert("Verification link sent to your email!");
+        navigate('/email-verification'); 
       } else if (response.data.status === 'duplicate') {
         alert("This profile already exists in the system.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Signup Error:", error);
-      alert("Something went wrong. Please check your backend connection.");
+      const errorMessage = error.response?.data?.message || "Something went wrong. Please check your backend connection.";
+      alert(errorMessage);
     }
   };
 
@@ -93,7 +99,7 @@ const Signup: React.FC = () => {
         style={{ backgroundColor: colors.formBg }}
       >
         <div className="w-full flex justify-between items-center mb-20 text-sm">
-          <div className="font-bold text-lg">CandidateHub</div>
+          <div className="font-bold text-lg text-slate-900">CandidateHub</div>
           <div className="text-gray-500 font-semibold hover:text-black cursor-pointer transition-colors">Help Center</div>
         </div>
 
@@ -104,10 +110,10 @@ const Signup: React.FC = () => {
           </div>
           
           <div className="flex gap-4 mb-8">
-            <button type="button" className="flex-1 py-3 border rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition-all font-semibold">
+            <button type="button" className="flex-1 py-3 border border-slate-200 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition-all font-semibold text-slate-700">
               <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" className="w-5 h-5" /> Google
             </button>
-            <button type="button" className="flex-1 py-3 border rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition-all font-semibold">
+            <button type="button" className="flex-1 py-3 border border-slate-200 rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition-all font-semibold text-slate-700">
               <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" className="w-5 h-5" /> LinkedIn
             </button>
           </div>
@@ -128,7 +134,7 @@ const Signup: React.FC = () => {
                 value={formData.fullName}
                 onChange={handleChange}
                 placeholder="John Doe" 
-                className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
+                className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-800" 
                 style={{ backgroundColor: colors.inputAsh, borderColor: colors.inputBorder }} 
               />
             </div>
@@ -141,7 +147,7 @@ const Signup: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="john.doe@example.com" 
-                className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
+                className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-800" 
                 style={{ backgroundColor: colors.inputAsh, borderColor: colors.inputBorder }} 
               />
             </div>
@@ -154,7 +160,7 @@ const Signup: React.FC = () => {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••" 
-                className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
+                className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all text-slate-800" 
                 style={{ backgroundColor: colors.inputAsh, borderColor: colors.inputBorder }} 
               />
               <p className="text-xs font-medium text-gray-500 mt-2">Must be at least 8 characters.</p>
