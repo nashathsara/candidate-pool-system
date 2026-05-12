@@ -505,37 +505,4 @@
   }
 }
 
-/* Browse-jobs footer styling */
-.browse-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
-  padding: 24px 32px 36px;
-  color: #667085;
-  font-size: 0.95rem;
-}
-
-.browse-footer .footer-brand {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.browse-footer .footer-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.browse-footer .footer-links a {
-  color: #667085;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.browse-footer .footer-links a:hover {
-  color: #101f3d;
-}
 

@@ -1,6 +1,7 @@
 import './Home.css'
 import { Link } from 'react-router-dom'
 import NavigationBar from '../../components/NavigationBar/NavigationBar'
+import Footer from '../../components/Footer/Footer'
 
 function Home() {
   return (
@@ -171,18 +172,7 @@ function Home() {
         </div>
       </section>
 
-      <footer className="browse-footer">
-        <div className="footer-brand">
-          <strong>CandidateHub</strong>
-          <span>© 2024 CandidateHub Engineered for Excellence.</span>
-        </div>
-        <div className="footer-links">
-          <Link to="/help">HELP CENTER</Link>
-          <Link to="/terms">LEGAL</Link>
-          <Link to="/privacy">PRIVACY POLICY</Link>
-          <Link to="/contact">CONTACT SUPPORT</Link>
-        </div>
-      </footer>
+      <Footer />
     </div>
   )
 }
