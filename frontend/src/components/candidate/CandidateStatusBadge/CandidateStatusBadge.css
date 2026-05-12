@@ -1,0 +1,43 @@
+.csb-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.csb-gray {
+  background: #f3f4f6;
+  color: #4b5563;
+}
+
+.csb-green {
+  background: #d1fae5;
+  color: #047857;
+}
+
+.csb-navy {
+  background: #1e3a5f;
+  color: #fff;
+}
+
+.csb-sky {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.csb-blue {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.csb-red {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.csb-muted {
+  background: #f3f4f6;
+  color: #6b7280;
+}

@@ -5,6 +5,7 @@ import {
   FiCopy,
   FiSearch,
   FiBell,
+  FiInfo
 } from 'react-icons/fi';
 import { FaCircleCheck, FaUserCheck, FaArrowLeft } from 'react-icons/fa6';
 
@@ -63,7 +64,7 @@ const ProfileMerge: React.FC = () => {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-white">Profiles Successfully Merged</h2>
-                <p className="text-sm text-white/90 mt-0.5">
+                <p className=" text-sm text-white/90 mt-0.5">
                   Duplicate records for Marcus Sterling have been unified into a single master profile.
                 </p>
               </div>
@@ -176,16 +177,15 @@ const ProfileMerge: React.FC = () => {
               </Link>
             </div>
 
-            {/* Divider */}
-            <div className="border-t border-gray-200 my-6"></div>
-
-            {/* Audit Log */}
-            <div className="text-sm text-gray-500">
-              <p>
-                <span className="font-medium">Audit log updated:</span> ID #IDUPE-0921-Unified
-              </p>
-            </div>
           </div>
+          <div className="px-6 py-4  flex items-center justify-between" style={{ backgroundColor: '#f1f1f1' }}>
+                <div className="text-sm text-gray-500">
+                      <span className="font-medium">Audit log updated:</span> ID #IDUPE-0921-Unified
+                </div>
+                <button className="text-gray-400 hover:text-gray-600 transition-colors flex items-center">
+                          <FiInfo className="w-4 h-4" />
+                </button>
+            </div>
         </div>
       </div>
     </div>

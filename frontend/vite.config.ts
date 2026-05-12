@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-    strictPort: true,
+    strictPort: false,
   },
   css: {
     postcss: './postcss.config.cjs',  // Add this line to point to your PostCSS config

@@ -1,10 +1,9 @@
-﻿import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import { Search, Bell, Settings, MapPin } from "lucide-react";
 import "./BrowseJobs.css";
 import { fetchJobs } from "../../services/firebaseService";
-import type { QueryDocumentSnapshot } from "firebase/firestore";
 import { useAuth } from "../../hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 
 type Job = {
   id: string;
@@ -13,6 +12,8 @@ type Job = {
   jobType?: string;
   salary?: string;
   badge?: string;
+  description?: string;
+  department?: string;
 };
 
 type JobFilters = {
@@ -21,17 +22,30 @@ type JobFilters = {
   jobType?: string;
 };
 
+const PAGE_SIZE = 6;
+
 function BrowseJobs() {
   const navigate = useNavigate();
   const { user, loading, isSignedIn } = useAuth();
 
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [pageSize] = useState<number>(6);
-  const [page, setPage] = useState<number>(1);
-  const [lastVisible, setLastVisible] = useState<QueryDocumentSnapshot | null>(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [allJobs, setAllJobs] = useState<Job[]>([]);
   const [filters, setFilters] = useState<JobFilters>({});
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [loadingJobs, setLoadingJobs] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [showNotificationsDropdown, setShowNotificationsDropdown] = useState<boolean>(false);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const [lastFetchedCount, setLastFetchedCount] = useState<number>(0);
+
+  // Pagination logic linked to URL
+  const page = parseInt(searchParams.get("page") || "1", 10);
+  const setPage = (newPage: number) => {
+    setSearchParams((prev) => {
+      prev.set("page", newPage.toString());
+      return prev;
+    });
+  };
 
   const canLoad = useMemo(() => !loading && isSignedIn, [loading, isSignedIn]);
 
@@ -48,29 +62,77 @@ function BrowseJobs() {
       setLoadingJobs(true);
       setError("");
       try {
-        const { jobs: fetchedJobs, lastVisible: newLastVisible } = await fetchJobs(
-          filters,
-          pageSize,
-          lastVisible,
-        );
-        setJobs(fetchedJobs as Job[]);
-        setLastVisible(newLastVisible);
+        const { jobs } = await fetchJobs(filters, PAGE_SIZE, null);
+        setAllJobs(jobs as Job[]);
+        setLastFetchedCount((jobs as Job[]).length);
+        setPage(1);
       } catch (e) {
         const message = e instanceof Error ? e.message : "Failed to load jobs";
         setError(message);
+        setAllJobs([]);
+        setLastFetchedCount(0);
       } finally {
         setLoadingJobs(false);
       }
     };
 
-    load();
+    void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [canLoad, filters, page, pageSize]);
+  }, [canLoad, filters]);
+
+  // Effect to handle clicks outside the notifications dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setShowNotificationsDropdown(false);
+      }
+    };
+
+    if (showNotificationsDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showNotificationsDropdown]);
+
+  const normalizedSearch = useMemo(() => searchQuery.trim().toLowerCase(), [searchQuery]);
+
+  const searchFilteredJobs = useMemo(() => {
+    if (!normalizedSearch) return allJobs;
+
+    return allJobs.filter((job) => {
+      const haystack = [
+        job.title,
+        job.location,
+        job.jobType,
+        job.department,
+        job.badge,
+        job.description,
+        job.salary,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return haystack.includes(normalizedSearch);
+    });
+  }, [allJobs, normalizedSearch]);
+
+  // Reset pagination when search changes
+  useEffect(() => {
+    setPage(1);
+  }, [normalizedSearch]);
+
+  const totalPages = Math.max(1, Math.ceil(searchFilteredJobs.length / PAGE_SIZE));
+
+  const visibleJobs = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return searchFilteredJobs.slice(start, start + PAGE_SIZE);
+  }, [searchFilteredJobs, page]);
 
   const handleFindJobs = () => {
     setPage(1);
-    setLastVisible(null);
-    // triggers useEffect because page/lastVisible are dependencies indirectly (page is)
   };
 
   return (
@@ -82,20 +144,42 @@ function BrowseJobs() {
           </div>
 
           <nav className="header-nav">
-            <a href="/browse" className="nav-link active">
+            <Link to="/jobs" className={window.location.pathname === "/jobs" ? "nav-link active" : "nav-link"}>
               Browse Jobs
-            </a>
-            <a href="#">Applications</a>
-            <a href="/settings">Profile</a>
+            </Link>
+            <Link to="/applications" className={window.location.pathname === "/applications" ? "nav-link active" : "nav-link"}>
+              Applications
+            </Link>
+            <Link to="/profile" className={window.location.pathname === "/profile" ? "nav-link active" : "nav-link"}>
+              Profile
+            </Link>
           </nav>
 
           <div className="header-right">
-            <button type="button" className="icon-btn" aria-label="Notifications">
-              <Bell size={18} />
-            </button>
-            <button type="button" className="icon-btn" aria-label="Settings">
+            <div className="relative" ref={notificationsRef}>
+              <button
+                type="button"
+                className="icon-btn"
+                aria-label="Notifications"
+                onClick={() => setShowNotificationsDropdown((prev) => !prev)}
+              >
+                <Bell size={18} />
+              </button>
+              {showNotificationsDropdown && (
+                <div className="notifications-dropdown">
+                  <p className="dropdown-title">Notifications</p>
+                  <ul className="dropdown-list">
+                    <li>New job match found: Senior React Developer!</li>
+                    <li>Your application for UX Designer has been reviewed.</li>
+                    <li>System update: New features available.</li>
+                  </ul>
+                </div>
+              )}
+            </div>
+            <Link to="/settings" className="icon-btn" aria-label="Settings">
               <Settings size={18} />
-            </button>
+            </Link>
+
             <div className="avatar">{user?.email?.[0]?.toUpperCase() ?? "U"}</div>
           </div>
         </div>
@@ -115,17 +199,16 @@ function BrowseJobs() {
                 type="search"
                 placeholder="Search by title, keywords, or technology..."
                 aria-label="Search jobs"
-                onChange={(e) => {
-                  // This UI search isn't wired to Firestore filtering yet (Firestore needs query fields).
-                  // Keep it for future enhancement.
-                  void e;
-                }}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
             <select
               value={filters.department ?? ""}
-              onChange={(e) => setFilters((prev) => ({ ...prev, department: e.target.value || undefined }))}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, department: e.target.value || undefined }))
+              }
             >
               <option value="">Department</option>
               <option value="Engineering">Engineering</option>
@@ -135,7 +218,9 @@ function BrowseJobs() {
 
             <select
               value={filters.location ?? ""}
-              onChange={(e) => setFilters((prev) => ({ ...prev, location: e.target.value || undefined }))}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, location: e.target.value || undefined }))
+              }
             >
               <option value="">Location</option>
               <option value="Remote">Remote</option>
@@ -145,7 +230,9 @@ function BrowseJobs() {
 
             <select
               value={filters.jobType ?? ""}
-              onChange={(e) => setFilters((prev) => ({ ...prev, jobType: e.target.value || undefined }))}
+              onChange={(e) =>
+                setFilters((prev) => ({ ...prev, jobType: e.target.value || undefined }))
+              }
             >
               <option value="">Job Type</option>
               <option value="Full-time">Full-time</option>
@@ -161,7 +248,15 @@ function BrowseJobs() {
 
         <section className="jobs-summary">
           <p className="summary-title">
-            {loadingJobs ? "LOADING..." : `SHOWING ${jobs.length} OPEN POSITIONS`}
+            {loadingJobs ? "LOADING..." : `SHOWING ${visibleJobs.length} OPEN POSITIONS`}
+          </p>
+
+          <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
+            Debug: Fetched jobs: <strong>{lastFetchedCount}</strong> (filters:{" "}
+            <span>
+              {filters.department ?? "∅"}/{filters.location ?? "∅"}/{filters.jobType ?? "∅"}
+            </span>
+            )
           </p>
         </section>
 
@@ -171,53 +266,55 @@ function BrowseJobs() {
           </div>
         )}
 
+        {allJobs.length === 0 && !loadingJobs && !error && (
+          <div style={{ padding: 16, color: "#0f172a" }}>
+            No jobs returned from Firestore. Please check your <code>jobs</code> collection data.
+          </div>
+        )}
+
         <section className="jobs-grid">
-          {jobs.map((job) => (
+          {visibleJobs.map((job) => (
             <article className="job-card" key={job.id}>
               <div className="job-card-top">
                 <div className="job-icon-box">{job.badge ?? "🧠"}</div>
-                <span className="job-badge">{job.badge ?? "ENGINEERING"}</span>
+                <span className="job-badge">{job.badge ?? "GENERAL"}</span>
               </div>
 
               <div className="job-card-body">
-                <h2>{job.title ?? "Untitled position"}</h2>
+                <Link to={`/jobs/${job.id}`} className="job-title-link">
+                  <h2>{job.title ?? "Untitled position"}</h2>
+                </Link>
                 <div className="job-detail-row">
                   <MapPin size={16} className="location-icon" />
                   <span>{job.location ?? "Location not set"}</span>
                 </div>
                 <p className="job-type">{job.jobType ?? "Job type not set"}</p>
+                <p className="job-description">
+                  {job.description || "No description available for this position."}
+                </p>
               </div>
-
               <div className="job-card-footer">
                 <span className="job-salary">{job.salary ?? ""}</span>
-                <a href="#" className="details-link">
+                <Link to={`/jobs/${job.id}`} className="details-link">
                   View Details →
-                </a>
+                </Link>
               </div>
             </article>
           ))}
         </section>
 
         <section className="pagination-row">
-          <button type="button" className={`page-btn ${page === 1 ? "active" : ""}`} onClick={() => setPage(1)}>
-            1
-          </button>
-          <button
-            type="button"
-            className="page-btn"
-            onClick={() => setPage((p) => p + 1)}
-            disabled={!lastVisible}
-          >
-            2
-          </button>
-          <button
-            type="button"
-            className="page-btn"
-            onClick={() => setPage((p) => p + 2)}
-            disabled={!lastVisible}
-          >
-            3
-          </button>
+          {[1, 2, 3].map((num) => (
+            <button
+              key={num}
+              type="button"
+              className={`page-btn ${page === num ? "active" : ""}`}
+              onClick={() => setPage(num)}
+              disabled={totalPages < num}
+            >
+              {num}
+            </button>
+          ))}
         </section>
       </main>
     </div>

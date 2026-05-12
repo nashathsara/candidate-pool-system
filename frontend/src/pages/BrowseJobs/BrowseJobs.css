@@ -68,6 +68,11 @@
   background: #ffffff;
   color: #475569;
   cursor: pointer;
+
+  /* ensure clickability if anything overlaps */
+  position: relative;
+  z-index: 60;
+  pointer-events: auto;
 }
 
 .avatar {
@@ -80,12 +85,28 @@
   border: 1px solid #e6e8eb;
   color: #0f172a;
   font-weight: 700;
+
+  /* ensure clickability if anything overlaps */
+  position: relative;
+  z-index: 60;
+  pointer-events: auto;
 }
 
 .browse-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: 40px 24px 56px;
+}
+
+/* Ensure header controls are always clickable (avoid overlay blocking pointer events) */
+.browse-header {
+  pointer-events: auto;
+}
+
+.header-right {
+  position: relative;
+  z-index: 60;
+  pointer-events: auto;
 }
 
 .hero-section {
@@ -238,6 +259,11 @@
   color: #0f172a;
 }
 
+.job-title-link {
+  text-decoration: none;
+  color: inherit;
+}
+
 .job-detail-row {
   display: flex;
   align-items: center;
@@ -254,6 +280,18 @@
   margin: 0;
   color: #64748b;
   font-size: 0.95rem;
+}
+
+.job-description {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.5;
 }
 
 .job-card-footer {
@@ -273,6 +311,11 @@
   color: #0f172a;
   text-decoration: none;
   font-weight: 700;
+  transition: transform 0.2s ease;
+}
+
+.details-link:hover {
+  transform: translateX(4px);
 }
 
 .pagination-row {
@@ -408,4 +451,49 @@
     min-width: 40px;
     height: 40px;
   }
+}
+
+/* Notifications Dropdown */
+.relative {
+  position: relative;
+}
+
+.notifications-dropdown {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  width: 300px;
+  background: #ffffff;
+  border: 1px solid #e6e8eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  z-index: 100;
+}
+
+.dropdown-title {
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #111827;
+  margin-bottom: 12px;
+  letter-spacing: 0.05em;
+}
+
+.dropdown-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-list li {
+  padding: 10px 0;
+  font-size: 0.85rem;
+  color: #475569;
+  border-bottom: 1px solid #f1f5f9;
+  line-height: 1.4;
+}
+
+.dropdown-list li:last-child {
+  border-bottom: none;
 }
