@@ -1,8 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../common/Button/Button';
 
 const Signup: React.FC = () => {
+  const navigate = useNavigate();
   const colors = {
     brandNavy: "#102A38",
     blueTeal: "#2CCB7C",
@@ -10,6 +11,11 @@ const Signup: React.FC = () => {
     inputAsh: "#F1F5F9", // The "ash" background for input fields
     inputBorder: "#E2E8F0",
     textGray: "#718096"
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate('/EmailVerification');
   };
 
   return (
@@ -87,7 +93,7 @@ const Signup: React.FC = () => {
             <div className="flex-grow border-t border-gray-200"></div>
           </div>
 
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-bold mb-1.5 text-gray-700">Full Name</label>
               <input 
