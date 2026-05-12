@@ -13,6 +13,7 @@ import ApplicationSuccess from './pages/ApplicationSuccess/ApplicationSuccess';
 import BrowseJobs from './pages/BrowseJobs/BrowseJobs';
 import SignIn from './pages/Home/SignIn';
 import Signup from './pages/Admin/Signup';
+import TicketSubmitForm from "./pages/TicketSubmitForm/TicketSubmitForm";
 import Settings from './pages/Admin/Settings';
 
 
@@ -27,8 +28,13 @@ const AppRoutes = () => {
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/email-verification" element={<EmailVerification />} />
         {/* <Route path="/candidate/duplicate-check" element={<DuplicationView />} /> */}
-        <Route path="/application-success" element={<ApplicationSuccess />} />
+        <Route path="/application-success" element={<Navigate to="/browse" replace />} />
+        <Route path="/application-success/:jobId" element={<ApplicationSuccess />} />
+
+        {/* Case-insensitive-ish aliases (React Router paths are case-sensitive) */}
+        <Route path="/BrowseJobs" element={<Navigate to="/browse" replace />} />
         <Route path="/browse" element={<BrowseJobs />} />
+
         <Route path="/signin" element={<SignIn />} />
         
         <Route
@@ -77,6 +83,15 @@ const AppRoutes = () => {
             <MainLayout>
               <CandidateSettings />
             </MainLayout>}/>
+
+         <Route
+          path="/support"
+          element={
+            <MainLayout>
+              <TicketSubmitForm />
+            </MainLayout>
+          }
+        />
 
           <Route 
           path="/ticket-success" 

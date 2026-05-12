@@ -32,6 +32,14 @@ function SignIn() {
       await signInWithEmailPassword(email, password);
       navigate("/browse");
     } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("Sign in error:", err);
+      if (err && typeof err === "object" && "code" in err) {
+        // eslint-disable-next-line no-console
+        console.error("Firebase auth code:", (err as { code?: string }).code);
+        // eslint-disable-next-line no-console
+        console.error("Firebase auth customData:", (err as { customData?: unknown }).customData);
+      }
       const message = err instanceof Error ? err.message : "Sign in failed";
       setError(message);
     } finally {

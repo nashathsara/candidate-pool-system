@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { submitApplication } from "../../services/firebaseService";
 
@@ -19,6 +19,12 @@ function ApplicationSuccess() {
   const canSubmit = useMemo(() => isSignedIn && !loading && !!jobId, [isSignedIn, loading, jobId]);
 
   useEffect(() => {
+    // If we finished loading and are missing requirements, show an error instead of hanging
+    if (!loading && (!isSignedIn || !jobId)) {
+      setError(!isSignedIn ? "You must be signed in to submit an application." : "No Job ID found in URL.");
+      return;
+    }
+
     if (!canSubmit || submitting || submitted) return;
 
     const submit = async () => {
@@ -85,7 +91,7 @@ function ApplicationSuccess() {
         </div>
 
         <p className="support-copy">
-          Questions about your application? <a href="/support">Contact Support</a>
+          Questions about your application? <Link to="/support">Contact Support</Link>
         </p>
       </main>
 

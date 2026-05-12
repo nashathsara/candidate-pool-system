@@ -23,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/nashathsara/candidate-pool-system/issues"
   },
-  "homepage": "https://github.com/nashathsara/candidate-pool-system#readme"
+  "homepage": "https://github.com/nashathsara/candidate-pool-system#readme",
+  "dependencies": {
+    "firebase": "^12.13.0"
+  }
 }
