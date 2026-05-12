@@ -1,7 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import Button from '../../common/Button/Button';
 
 const Signup: React.FC = () => {
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: ''
+  });
+
   const colors = {
     brandNavy: "#102A38",
     blueTeal: "#2CCB7C",
@@ -11,8 +18,34 @@ const Signup: React.FC = () => {
     textGray: "#718096"
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await axios.post('http://localhost:5000/api/candidates/register', {
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password
+      });
+
+      if (response.data.status === 'success') {
+        alert("Account created successfully!");
+      } else if (response.data.status === 'duplicate') {
+        alert("This profile already exists in the system.");
+      }
+    } catch (error) {
+      console.error("Signup Error:", error);
+      alert("Something went wrong. Please check your backend connection.");
+    }
+  };
+
   return (
-    
     <div className="flex min-h-screen w-full font-sans">
       {/* LEFT PANEL: Brand Section */}
       <div 
@@ -28,7 +61,7 @@ const Signup: React.FC = () => {
         </p>
         
         {/* Features Grid */}
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-2 gap-6 mt-12">
           {/* Card 1 */}
           <div className="bg-white/10 p-6 rounded-xl border border-white/20">
             <div 
@@ -38,7 +71,6 @@ const Signup: React.FC = () => {
               ⚡
             </div>
             <h3 className="font-bold text-lg mb-1">Fast Tracking</h3>
-            {/* Corrected visibility: Switched from opacity-60 to opacity-90 for readable white text */}
             <p className="text-sm font-medium opacity-95 text-white">Get noticed by top recruiters instantly.</p>
           </div>
           {/* Card 2 */}
@@ -72,10 +104,10 @@ const Signup: React.FC = () => {
           </div>
           
           <div className="flex gap-4 mb-8">
-            <button className="flex-1 py-3 border rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition-all font-semibold">
+            <button type="button" className="flex-1 py-3 border rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition-all font-semibold">
               <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" alt="Google" className="w-5 h-5" /> Google
             </button>
-            <button className="flex-1 py-3 border rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition-all font-semibold">
+            <button type="button" className="flex-1 py-3 border rounded-lg flex items-center justify-center gap-3 hover:bg-gray-50 transition-all font-semibold">
               <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn" className="w-5 h-5" /> LinkedIn
             </button>
           </div>
@@ -86,11 +118,15 @@ const Signup: React.FC = () => {
             <div className="flex-grow border-t border-gray-200"></div>
           </div>
 
-          <form className="space-y-5">
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-bold mb-1.5 text-gray-700">Full Name</label>
               <input 
+                name="fullName"
                 type="text" 
+                required
+                value={formData.fullName}
+                onChange={handleChange}
                 placeholder="John Doe" 
                 className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
                 style={{ backgroundColor: colors.inputAsh, borderColor: colors.inputBorder }} 
@@ -99,7 +135,11 @@ const Signup: React.FC = () => {
             <div>
               <label className="block text-sm font-bold mb-1.5 text-gray-700">Email Address</label>
               <input 
+                name="email"
                 type="email" 
+                required
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="john.doe@example.com" 
                 className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
                 style={{ backgroundColor: colors.inputAsh, borderColor: colors.inputBorder }} 
@@ -108,7 +148,11 @@ const Signup: React.FC = () => {
             <div>
               <label className="block text-sm font-bold mb-1.5 text-gray-700">Password</label>
               <input 
+                name="password"
                 type="password" 
+                required
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="••••••••" 
                 className="w-full p-3 border rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition-all" 
                 style={{ backgroundColor: colors.inputAsh, borderColor: colors.inputBorder }} 
@@ -117,7 +161,7 @@ const Signup: React.FC = () => {
             </div>
             
             <div className="flex items-start gap-3 py-1">
-              <input type="checkbox" className="mt-1 accent-black" id="terms" />
+              <input type="checkbox" required className="mt-1 accent-black" id="terms" />
               <label htmlFor="terms" className="text-sm text-gray-500 leading-tight">
                 I agree to the <span className="text-black underline font-bold cursor-pointer">Terms of Service</span> and <span className="text-black underline font-bold cursor-pointer">Privacy Policy</span>.
               </label>
