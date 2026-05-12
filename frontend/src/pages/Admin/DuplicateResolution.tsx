@@ -130,7 +130,7 @@ const DuplicateResolution: React.FC = () => {
   );
 };
 
-// Helper Components for Cleaner Code
+// Helper Components
 const ProfileField = ({ label, value, isError, isMuted }: any) => (
   <div className="pb-4 border-b border-slate-50 flex flex-col">
     <span className="text-[10px] font-bold text-slate-400 uppercase mb-1">{label}</span>
