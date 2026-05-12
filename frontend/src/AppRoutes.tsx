@@ -15,7 +15,14 @@ import BrowseJobs from './pages/BrowseJobs/BrowseJobs';
 import SignIn from './pages/Home/SignIn';
 import Signup from './pages/Admin/Signup';
 import Settings from './pages/Admin/Settings';
+<<<<<<< HEAD
 import TicketSuccess from './pages/TicketSuccess/TicketSuccess';
+=======
+import AdminDashboardPage from "./pages/Admin/AdminDashboardPage";
+import CandidateDetails from "./pages/CandidateDetails/CandidateDetails";
+import ProfileCreate from "./pages/ProfileCreate/ProfileCreate";
+
+>>>>>>> f4e0c30c67eb3802daa50f825e20b6c3c9c78743
 
 const AppRoutes = () => {
   return (
@@ -31,6 +38,17 @@ const AppRoutes = () => {
         <Route path="/application-success" element={<ApplicationSuccess />} />
         <Route path="/browse" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/profile/create" element={<ProfileCreate />} />
+        <Route path="/profile" element={<ProfileView />} />
+        
+        <Route
+          path="/dashboard"
+          element={
+            <MainLayout>
+              <AdminDashboardPage />
+            </MainLayout>
+          }
+        />
         
         <Route
           path="/candidates"
