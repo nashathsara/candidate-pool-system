@@ -1,9 +1,11 @@
 import './Home.css'
 import { Link } from 'react-router-dom'
+import NavigationBar from '../../components/NavigationBar/NavigationBar'
 
 function Home() {
   return (
     <div className="home-page">
+      <NavigationBar />
       <header className="home-hero">
         <div className="home-hero-inner">
           <div className="home-hero-copy">

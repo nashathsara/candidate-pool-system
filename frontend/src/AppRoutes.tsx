@@ -37,6 +37,14 @@ const AppRoutes = () => {
         <Route path="/help" element={<HelpCenter />} />
         <Route path="/BrowseJobs" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/browse-jobs" element={<BrowseJobs />} />
+        <Route path="/applications" element={<div>Applications (Coming Soon)</div>} />
+        <Route path="/messages" element={<div>Messages (Coming Soon)</div>} />
+        <Route path="/create-profile" element={
+          <MainLayout>
+            <ProfileCreate />
+          </MainLayout>
+        } />
         
         <Route
           path="/dashboard"
