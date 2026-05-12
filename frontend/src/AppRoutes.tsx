@@ -15,21 +15,28 @@ import SignIn from './pages/Home/SignIn';
 import Signup from './pages/Admin/Signup';
 import Settings from './pages/Admin/Settings';
 import AdminDashboardPage from './pages/Admin/AdminDashboardPage';
-
+import CandidateDetails from "./pages/CandidateDetails/CandidateDetails";
+import ProfileCreate from "./pages/ProfileCreate/ProfileCreate";
+import Home from "./pages/Home/Home";
+import TicketSuccess from "./pages/TicketSuccess/TicketSuccess";
+import HelpCenter from "./pages/HelpCenter/HelpCenter";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
         {/* Public routes (without MainLayout) */}
+        <Route path="/" element={<Home />} />
+        <Route path="/Home" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin/settings" element={<Settings />} />
-        <Route path="/" element={<VerificationSuccess />} />
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/email-verification" element={<EmailVerification />} />
         {/* <Route path="/candidate/duplicate-check" element={<DuplicationView />} /> */}
-        <Route path="/application-success" element={<ApplicationSuccess />} />
-        <Route path="/browse" element={<BrowseJobs />} />
+        <Route path="/ApplicationSuccess" element={<ApplicationSuccess />} />
+        <Route path="/ticket-success" element={<TicketSuccess />} />
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/BrowseJobs" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
         
         <Route
@@ -94,6 +101,22 @@ const AppRoutes = () => {
             <MainLayout>
               <CandidateSettings />
             </MainLayout>}/>
+        <Route
+          path="/candidate-details"
+          element={
+            <MainLayout>
+              <CandidateDetails />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/profile-create"
+          element={
+            <MainLayout>
+              <ProfileCreate />
+            </MainLayout>
+          }
+        />
 
           <Route 
           path="/ticket-success" 
