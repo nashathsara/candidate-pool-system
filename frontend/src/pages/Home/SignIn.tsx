@@ -1,11 +1,50 @@
 import React, { useState } from 'react';
-import { FiMail, FiLock, FiGithub } from 'react-icons/fi';
+import { FiMail, FiLock } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaLinkedin } from 'react-icons/fa';
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState('');
+
+  const handleSignIn = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!selectedRole) {
+      alert('Please select your role');
+      return;
+    }
+    
+    if (!email || !password) {
+      alert('Please enter both email and password');
+      return;
+    }
+
+    // Handle sign-in logic based on role
+    console.log('Signing in as:', selectedRole, 'with email:', email);
+    
+    // Here you would typically:
+    // 1. Call your authentication API
+    // 2. Store user session/token
+    // 3. Redirect based on role
+    switch (selectedRole) {
+      case 'candidate':
+        // Redirect to candidate dashboard
+        window.location.href = '/candidate-dashboard';
+        break;
+      case 'hr':
+        // Redirect to HR dashboard
+        window.location.href = '/dashboard';
+        break;
+      case 'admin':
+        // Redirect to admin dashboard
+        window.location.href = '/dashboard';
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 font-sans">
@@ -30,6 +69,46 @@ const SignIn: React.FC = () => {
           </button>
         </div>
 
+        {/* Role Selection */}
+        <div className="mb-6">
+          <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-3">Select Your Role</label>
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedRole('candidate')}
+              className={`py-2 px-3 rounded-lg border text-xs font-medium transition ${
+                selectedRole === 'candidate'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              Candidate
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRole('hr')}
+              className={`py-2 px-3 rounded-lg border text-xs font-medium transition ${
+                selectedRole === 'hr'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              HR
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRole('admin')}
+              className={`py-2 px-3 rounded-lg border text-xs font-medium transition ${
+                selectedRole === 'admin'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              Admin
+            </button>
+          </div>
+        </div>
+
         <div className="relative mb-6 text-center">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-100"></div>
@@ -38,7 +117,7 @@ const SignIn: React.FC = () => {
         </div>
 
         {/* Email Login Form */}
-        <form className="space-y-5">
+        <form onSubmit={handleSignIn} className="space-y-5">
           <div>
             <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Email Address</label>
             <div className="relative">
@@ -75,7 +154,7 @@ const SignIn: React.FC = () => {
             <label htmlFor="remember" className="text-xs text-gray-600 font-medium cursor-pointer">Remember me</label>
           </div>
 
-          <button className="w-full bg-black text-white font-bold py-3 rounded-lg hover:bg-gray-800 transition shadow-lg shadow-gray-200 mt-2">
+          <button type="submit" className="w-full bg-black text-white font-bold py-3 rounded-lg hover:bg-gray-800 transition shadow-lg shadow-gray-200 mt-2">
             Sign In
           </button>
         </form>

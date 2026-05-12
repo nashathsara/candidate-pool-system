@@ -18,6 +18,7 @@ import AdminDashboardPage from './pages/Admin/AdminDashboardPage';
 import CandidateDetails from "./pages/CandidateDetails/CandidateDetails";
 import ProfileCreate from "./pages/ProfileCreate/ProfileCreate";
 import Home from "./pages/Home/Home";
+import CandidateDashboard from "./pages/CandidateDashboard/CandidateDashboard";
 
 import HelpCenter from "./pages/HelpCenter/HelpCenter";
 
@@ -38,6 +39,7 @@ const AppRoutes = () => {
         <Route path="/BrowseJobs" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/browse-jobs" element={<BrowseJobs />} />
+        <Route path="/candidate-dashboard" element={<CandidateDashboard />} />
         <Route path="/applications" element={<div>Applications (Coming Soon)</div>} />
         <Route path="/messages" element={<div>Messages (Coming Soon)</div>} />
         <Route path="/create-profile" element={
