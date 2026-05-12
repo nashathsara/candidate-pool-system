@@ -1,185 +1,77 @@
+
 import React from 'react';
-import './TicketSuccess.css';
-
-interface TeamMember {
-  name: string;
-  avatar: string;
-}
-
-interface ResolutionStep {
-  title: string;
-  description: string;
-  status: 'complete' | 'in-progress' | 'pending';
-}
 
 const TicketSuccess: React.FC = () => {
-  const ticketId = '#TKT-2024-8471';
-  const expectedResolution = '24-48 hours';
-  
-  const teamMembers: TeamMember[] = [
-    { name: 'John Doe', avatar: '👤' },
-    { name: 'Jane Smith', avatar: '👤' },
-    { name: 'Mike Johnson', avatar: '👤' },
-  ];
-
-  const resolutionSteps: ResolutionStep[] = [
-    {
-      title: 'Ticket Submitted',
-      description: 'Your request has been received and logged',
-      status: 'complete',
-    },
-    {
-      title: 'Under Review',
-      description: 'Our team is analyzing your profile information',
-      status: 'in-progress',
-    },
-    {
-      title: 'Duplicate Verification',
-      description: 'Identifying any conflicting duplicate profiles',
-      status: 'pending',
-    },
-    {
-      title: 'Resolution',
-      description: 'Final action taken and notification sent',
-      status: 'pending',
-    },
-  ];
-
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'complete':
-        return <span className="badge badge-complete">Completed</span>;
-      case 'in-progress':
-        return <span className="badge badge-in-progress">In Progress</span>;
-      case 'pending':
-        return <span className="badge badge-pending">Pending</span>;
-      default:
-        return null;
-    }
-  };
-
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'complete':
-        return <div className="status-icon icon-complete">✓</div>;
-      case 'in-progress':
-        return <div className="status-icon icon-in-progress">⟳</div>;
-      case 'pending':
-        return <div className="status-icon icon-pending">○</div>;
-      default:
-        return null;
-    }
-  };
-
   return (
-    <div className="ticket-success-container">
-      {/* Success Header */}
-      <div className="success-header">
-        <div className="checkmark-icon">✓</div>
-        <h1>Ticket Successfully Created!</h1>
-        <p>Your duplicate profile support request has been submitted and our team will review it shortly.</p>
-      </div>
-
-      {/* Main Card */}
-      <div className="ticket-card">
-        <div className="ticket-top">
-          <div className="ticket-pill">Support Ticket</div>
-          <h2 className="ticket-title">We received your request</h2>
-          <p className="ticket-subtitle">
-            Your duplicate profile support request was successfully submitted. You can track the status below.
+    <div className="min-h-screen bg-[#FBFBFB] flex flex-col items-center justify-center p-6 font-sans">
+      
+      <div className="w-full max-w-2xl text-center">
+        
+        {/* Success Header */}
+        <div className="mb-10">
+          <div className="w-16 h-16 bg-[#4FD1C5] rounded-xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+            <span className="text-white text-3xl">✓</span>
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Ticket Submitted Successfully</h1>
+          
+          {/* Change 1: Adjusted background to a darker light-blue and used 'rounded-md' for a less circular look */}
+          <div className="inline-block bg-[#BEE3F8] text-[#2C5282] px-4 py-1.5 rounded-md text-xs font-black tracking-wider uppercase">
+            Reference: #TKT-82951
+          </div>
+          
+          <p className="text-gray-500 text-sm mt-6 leading-relaxed px-10">
+            Thank you for reaching out. Our support team is currently reviewing your request. 
+            We typically respond within 24-48 hours.
           </p>
         </div>
 
-        {/* Ticket Info Grid */}
-        <div className="ticket-info-grid">
-          <div className="ticket-info-item">
-            <label>Ticket ID</label>
-            <div className="ticket-id">
-              <span>{ticketId}</span>
-              <button className="copy-btn" title="Copy ticket ID" type="button">📋</button>
-            </div>
-            <div className="ticket-meta">Keep this ID for future updates.</div>
-          </div>
-          <div className="ticket-info-item">
-            <label>Expected Resolution</label>
-            <div className="resolution-time">
-              <span className="resolution-badge">{expectedResolution}</span>
-            </div>
-            <div className="ticket-meta">Typically within 1–2 business days.</div>
-          </div>
-        </div>
+        {/* Main Action Box */}
+        <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+          <h2 className="text-xs font-extrabold text-gray-700 uppercase tracking-widest mb-6 text-left">
+            Next Steps & Helpful Links
+          </h2>
 
-
-
-
-        {/* Support Team Section */}
-        <div className="support-team-section">
-          <h3>Assigned Support Team</h3>
-          <div className="team-members">
-            {teamMembers.map((member, index) => (
-              <div key={index} className="team-avatar" title={member.name}>
-                {member.avatar}
+          {/* Change 2: Force side-by-side using 'flex' or 'grid' with explicit widths */}
+          <div className="flex flex-col md:flex-row gap-4 mb-8 w-full">
+            
+            {/* Dashboard Button */}
+            <button className="flex-1 flex items-center gap-4 p-4 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all text-left">
+              <div className="w-10 h-10 bg-gray-50 border border-gray-200 rounded-md flex items-center justify-center grayscale text-lg">
+                📊
               </div>
-            ))}
-          </div>
-          <p className="team-description">Dedicated support team assigned to your case</p>
-        </div>
-
-        {/* Resolution Timeline */}
-        <div className="resolution-timeline">
-          <h3>Resolution Timeline</h3>
-          <div className="timeline-steps">
-            {resolutionSteps.map((step, index) => (
-              <div key={index} className={`timeline-step ${step.status}`}>
-                <div className="step-icon-wrapper">
-                  {getStatusIcon(step.status)}
-                  {index < resolutionSteps.length - 1 && <div className="step-connector"></div>}
-                </div>
-                <div className="step-content">
-                  <div className="step-header">
-                    <h4>{step.title}</h4>
-                    {getStatusBadge(step.status)}
-                  </div>
-                  <p>{step.description}</p>
-                </div>
+              <div>
+                <p className="text-sm font-bold text-gray-900">Back to Dashboard</p>
+                <p className="text-[11px] text-gray-700 font-semibold">Return to candidate overview</p>
               </div>
-            ))}
+            </button>
+
+            {/* View Tickets Button */}
+            <button className="flex-1 flex items-center gap-4 p-4 rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-all text-left">
+              <div className="w-10 h-10 bg-gray-50 border border-gray-200 rounded-md flex items-center justify-center grayscale text-lg">
+                📋
+              </div>
+              <div>
+                <p className="text-sm font-bold text-gray-900">View My Tickets</p>
+                <p className="text-[11px] text-gray-700 font-semibold">Track the status of your request</p>
+              </div>
+            </button>
+          </div>
+
+          {/* Browse button section */}
+          <div className="max-w-xs mx-auto">
+            <button className="w-full py-2.5 bg-[#102A38] text-white text-xs font-bold rounded-lg hover:bg-black transition-all mb-3">
+              Browse More Help Topics
+            </button>
+            
+            <p className="text-[11px] text-gray-500">
+              Need urgent assistance? <span className="text-blue-600 cursor-pointer font-bold hover:underline">Check our system status page</span>
+            </p>
           </div>
         </div>
 
-        {/* Warning Box */}
-        <div className="warning-box">
-          <div className="warning-icon">⚠️</div>
-          <div className="warning-content">
-            <h4>What happens next?</h4>
-            <p>We'll review email notifications at each stage of the process. Our team will contact you if additional information is needed to resolve your duplicate profile issue.</p>
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="action-buttons">
-          <button className="btn btn-primary">
-            📊 Track Ticket Status
-          </button>
-          <button className="btn btn-secondary">
-            ← Return to Dashboard
-          </button>
-        </div>
-
-        {/* Additional Link */}
-        <div className="additional-link">
-          <a href="#submit-another">+ Submit Another Request</a>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <div className="ticket-footer">
-        <p>Need more assistance?</p>
-        <div className="footer-links">
-          <a href="#contact-support">📞 Contact Support</a>
-          <span className="separator">•</span>
-          <a href="#help-center">❓ Help Center</a>
-        </div>
+        <footer className="mt-12 text-[10px] text-gray-400 uppercase tracking-widest font-medium">
+           © 2024 WHS Solution Recruitment Suite. All rights reserved. Privacy Policy. Help Center
+        </footer>
       </div>
     </div>
   );

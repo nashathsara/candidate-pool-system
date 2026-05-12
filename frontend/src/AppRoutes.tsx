@@ -18,7 +18,7 @@ import AdminDashboardPage from './pages/Admin/AdminDashboardPage';
 import CandidateDetails from "./pages/CandidateDetails/CandidateDetails";
 import ProfileCreate from "./pages/ProfileCreate/ProfileCreate";
 import Home from "./pages/Home/Home";
-import TicketSuccess from "./pages/TicketSuccess/TicketSuccess";
+
 import HelpCenter from "./pages/HelpCenter/HelpCenter";
 
 const AppRoutes = () => {
@@ -34,7 +34,6 @@ const AppRoutes = () => {
         <Route path="/email-verification" element={<EmailVerification />} />
         {/* <Route path="/candidate/duplicate-check" element={<DuplicationView />} /> */}
         <Route path="/ApplicationSuccess" element={<ApplicationSuccess />} />
-        <Route path="/ticket-success" element={<TicketSuccess />} />
         <Route path="/help" element={<HelpCenter />} />
         <Route path="/BrowseJobs" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
