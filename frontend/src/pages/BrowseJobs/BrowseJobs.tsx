@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search } from 'lucide-react';
 import './BrowseJobs.css'
 
 const jobs = [
@@ -55,26 +57,46 @@ function BrowseJobs() {
   return (
     <div className="browse-page">
       <header className="browse-header">
-        <div className="brand-row">
-          <div className="brand-logo">CandidateHub</div>
-          <nav className="nav-links">
-            <a href="/browse" className="active">
-              Browse Jobs
-            </a>
-            <a href="#">Applications</a>
-            <a href="#">Profile & Settings</a>
-          </nav>
+        <div className="header-left">
+          <div className="logo-container">
+            <Briefcase className="logo-icon" size={28} />
+            <h1 className="logo">CandidateHub</h1>
+          </div>
         </div>
+        
+        <nav className="header-nav">
+          <Link to="/candidate-dashboard" className="nav-link">
+            <Briefcase size={18} />
+            Dashboard
+          </Link>
+          <Link to="/browse-jobs" className="nav-link active">
+            <Search size={18} />
+            Browse Jobs
+          </Link>
+          <Link to="/applications" className="nav-link">
+            <FileText size={18} />
+            Applications
+          </Link>
+          <Link to="/help" className="nav-link">
+            <HelpCircle size={18} />
+            Help Center
+          </Link>
+        </nav>
 
-        <div className="header-actions">
-          <button type="button" className="icon-btn">
-            <span className="icon">🔔</span>
-          </button>
-          <button type="button" className="icon-btn">
-            <span className="icon">⚙️</span>
-          </button>
-          <div className="profile-chip">
-            <span className="avatar">JS</span>
+        <div className="header-right">
+          <div className="notifications">
+            <Bell className="notification-bell" size={20} />
+            <span className="notification-badge">3</span>
+          </div>
+          <div className="user-profile">
+            <div className="user-avatar">
+              <User size={20} />
+            </div>
+            <div className="user-info">
+              <span className="user-name">John Doe</span>
+              <span className="user-role">Candidate</span>
+            </div>
+            <Settings className="settings-icon" size={18} />
           </div>
         </div>
       </header>
