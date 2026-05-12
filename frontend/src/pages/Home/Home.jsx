@@ -171,20 +171,16 @@ function Home() {
         </div>
       </section>
 
-      <footer className="home-footer">
-        <div className="home-footer-inner">
-          <div className="footer-left">
-            <div className="footer-brand">
-              Candidate<span>Hub</span>
-            </div>
-            <div className="footer-copy">© 2024 Candidate Pool System. All rights reserved.</div>
-          </div>
-
-          <div className="footer-links">
-            <Link to="/help">Help Center</Link>
-            <Link to="/terms">Terms</Link>
-            <Link to="/privacy">Privacy</Link>
-          </div>
+      <footer className="browse-footer">
+        <div className="footer-brand">
+          <strong>CandidateHub</strong>
+          <span>© 2024 CandidateHub Engineered for Excellence.</span>
+        </div>
+        <div className="footer-links">
+          <Link to="/help">HELP CENTER</Link>
+          <Link to="/terms">LEGAL</Link>
+          <Link to="/privacy">PRIVACY POLICY</Link>
+          <Link to="/contact">CONTACT SUPPORT</Link>
         </div>
       </footer>
     </div>
