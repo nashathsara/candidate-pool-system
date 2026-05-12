@@ -15,6 +15,9 @@ import BrowseJobs from './pages/BrowseJobs/BrowseJobs';
 import SignIn from './pages/Home/SignIn';
 import Signup from './pages/Admin/Signup';
 import Settings from './pages/Admin/Settings';
+import AdminDashboardPage from "./pages/Admin/AdminDashboardPage";
+import CandidateDetails from "./pages/CandidateDetails/CandidateDetails";
+import ProfileCreate from "./pages/ProfileCreate/ProfileCreate";
 
 
 const AppRoutes = () => {
@@ -31,6 +34,17 @@ const AppRoutes = () => {
         <Route path="/application-success" element={<ApplicationSuccess />} />
         <Route path="/browse" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/profile/create" element={<ProfileCreate />} />
+        <Route path="/profile" element={<ProfileView />} />
+        
+        <Route
+          path="/dashboard"
+          element={
+            <MainLayout>
+              <AdminDashboardPage />
+            </MainLayout>
+          }
+        />
         
         <Route
           path="/candidates"

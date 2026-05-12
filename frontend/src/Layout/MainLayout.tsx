@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-/** @deprecated Prefer importing from `src/layouts/MainLayout` or `src/layouts/AdminLayout`. */
-export { default } from "../layouts/AdminLayout";
-=======
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { 
@@ -103,4 +99,3 @@ const MainLayout = ({ children }: MainLayoutProps) => {
 };
 
 export default MainLayout;
->>>>>>> main
