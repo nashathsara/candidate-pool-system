@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import VerificationSuccess from "./pages/VerificationSuccess/VerificationSuccess";
 import EmailVerification from "./pages/EmailVerification/EmailVerification";
@@ -15,6 +14,7 @@ import BrowseJobs from './pages/BrowseJobs/BrowseJobs';
 import SignIn from './pages/Home/SignIn';
 import Signup from './pages/Admin/Signup';
 import Settings from './pages/Admin/Settings';
+import AdminDashboardPage from './pages/Admin/AdminDashboardPage';
 
 
 const AppRoutes = () => {
@@ -32,6 +32,14 @@ const AppRoutes = () => {
         <Route path="/browse" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
         
+        <Route
+          path="/dashboard"
+          element={
+            <MainLayout>
+              <AdminDashboardPage />
+            </MainLayout>
+          }
+        />
         <Route
           path="/candidates"
           element={
