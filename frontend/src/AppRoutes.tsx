@@ -15,7 +15,7 @@ import BrowseJobs from './pages/BrowseJobs/BrowseJobs';
 import SignIn from './pages/Home/SignIn';
 import Signup from './pages/Admin/Signup';
 import Settings from './pages/Admin/Settings';
-
+import TicketSuccess from './pages/TicketSuccess/TicketSuccess';
 
 const AppRoutes = () => {
   return (
@@ -87,9 +87,7 @@ const AppRoutes = () => {
               <CandidateSettings />
             </MainLayout>}/>
 
-          <Route 
-          path="/ticket-success" 
-          element={<div>Ticket Success (Coming Soon)</div>} />
+          <Route path="/ticket-success" element={<TicketSuccess />} />
   
           <Route path="/" element={<Navigate to="/signup" />} />
 

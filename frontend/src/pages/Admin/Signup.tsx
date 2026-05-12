@@ -23,7 +23,7 @@ const Signup: React.FC = () => {
           Empowering Your <br />
           <span style={{ color: colors.blueTeal }}>Next Career Move</span>
         </h1>
-        <p className="text-lg opacity-80 mb-10 max-w-md">
+        <p className="text-blue-100 text-sm mt-4 leading-relaxed font-medium opacity-90" >
           Join thousands of professionals finding their dream roles through TalentMatch’s precision matching system.
         </p>
         
