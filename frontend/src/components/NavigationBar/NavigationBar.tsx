@@ -39,9 +39,9 @@ const NavigationBar = () => {
         <button type="button" className="icon-btn" aria-label="Settings">
           <span className="icon">⚙️</span>
         </button>
-        <div className="profile-chip">
+        <Link to="/candidate-settings" className="profile-chip">
           <span className="avatar">JS</span>
-        </div>
+        </Link>
       </div>
     </header>
   );
