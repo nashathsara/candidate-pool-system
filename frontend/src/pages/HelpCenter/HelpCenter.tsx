@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search } from 'lucide-react';
 import './HelpCenter.css';
 
 interface FAQItem {
@@ -227,62 +229,20 @@ const HelpCenter: React.FC = () => {
     },
     {
       id: 4,
-      category: 'duplicates',
-      question: 'How do I resolve duplicate profiles?',
-      answer:
-        'Visit the "Candidates" section and look for duplicate profile alerts. Click on "Resolve Duplicates" to review the profiles and merge them. Select which information you want to keep from each profile.',
-    },
-    {
-      id: 5,
-      category: 'duplicates',
-      question: 'What happens when I merge profiles?',
-      answer:
-        'When you merge profiles, all information is consolidated into one primary account. Your job applications, preferences, and history are combined. The duplicate account will be archived.',
-    },
-    {
-      id: 6,
       category: 'account',
       question: 'How do I update my profile information?',
       answer:
         'Go to your profile page by clicking on your name in the top navigation. Click "Edit Profile" to update your personal information, resume, and preferences. Remember to save your changes.',
     },
     {
-      id: 7,
-      category: 'account',
-      question: 'Can I change my email address?',
-      answer:
-        'Yes, you can change your email in your account settings. Go to Settings > Account and click "Change Email". You\'ll need to verify the new email address before the change takes effect.',
-    },
-    {
-      id: 8,
-      category: 'tickets',
-      question: 'How do I submit a support ticket?',
-      answer:
-        'Click on "Contact Support" or navigate to the Support section. Fill out the form with details about your issue and click "Submit". You\'ll receive a ticket ID that you can use to track your request.',
-    },
-    {
-      id: 9,
-      category: 'tickets',
-      question: 'How long does it take to resolve a ticket?',
-      answer:
-        'Most tickets are resolved within 24-48 hours. The expected resolution time is displayed when you create a ticket. You\'ll receive email updates as your ticket progresses through our support process.',
-    },
-    {
-      id: 10,
+      id: 5,
       category: 'jobs',
       question: 'How do I apply for a job?',
       answer:
         'Browse available jobs in the "Browse Jobs" section. Click on a job listing to view details. Click the "Apply" button to submit your application. Make sure your profile is complete before applying.',
     },
     {
-      id: 11,
-      category: 'jobs',
-      question: 'Can I withdraw my application?',
-      answer:
-        'Yes, you can withdraw your application from your profile page under "My Applications". Click the withdrawal button next to the job you want to withdraw from. This action cannot be undone.',
-    },
-    {
-      id: 12,
+      id: 6,
       category: 'troubleshooting',
       question: 'I forgot my password. What should I do?',
       answer:
@@ -308,12 +268,58 @@ const HelpCenter: React.FC = () => {
   };
 
   return (
-    <div className="help-center-container">
-      {/* Header */}
-      <div className="help-header">
-        <h1>Help Center</h1>
-        <p>Find answers to your questions and get support</p>
-      </div>
+    <div className="browse-page">
+      <header className="browse-header">
+        <div className="header-left">
+          <div className="logo-container">
+            <Briefcase className="logo-icon" size={28} />
+            <h1 className="logo">CandidateHub</h1>
+          </div>
+        </div>
+        
+        <nav className="header-nav">
+          <Link to="/candidate-dashboard" className="nav-link">
+            <Briefcase size={18} />
+            Dashboard
+          </Link>
+          <Link to="/browse-jobs" className="nav-link">
+            <Search size={18} />
+            Browse Jobs
+          </Link>
+          <Link to="/applications" className="nav-link">
+            <FileText size={18} />
+            Applications
+          </Link>
+          <Link to="/help" className="nav-link active">
+            <HelpCircle size={18} />
+            Help Center
+          </Link>
+        </nav>
+
+        <div className="header-right">
+          <div className="notifications">
+            <Bell className="notification-bell" size={20} />
+            <span className="notification-badge">3</span>
+          </div>
+          <div className="user-profile">
+            <div className="user-avatar">
+              <User size={20} />
+            </div>
+            <div className="user-info">
+              <span className="user-name">John Doe</span>
+              <span className="user-role">Candidate</span>
+            </div>
+            <Settings className="settings-icon" size={18} />
+          </div>
+        </div>
+      </header>
+
+      <main className="help-content">
+        {/* Header */}
+        <div className="help-header">
+          <h1>Help Center</h1>
+          <p>Find answers to your questions and get support</p>
+        </div>
 
       {/* Search Bar */}
       <div className="search-section">
@@ -515,10 +521,11 @@ const HelpCenter: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <div className="help-footer">
-        <p>Last updated: May 11, 2024</p>
-        <p>Can't find the answer? <a href="#contact">Contact us</a></p>
-      </div>
+        <div className="help-footer">
+          <p>Last updated: May 11, 2024</p>
+          <p>Can't find the answer? <a href="#contact">Contact us</a></p>
+        </div>
+      </main>
     </div>
   );
 };
