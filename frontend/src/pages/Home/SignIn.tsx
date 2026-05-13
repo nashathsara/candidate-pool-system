@@ -2,54 +2,44 @@ import React, { useState } from 'react';
 import { FiMail, FiLock } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaLinkedin } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [selectedRole, setSelectedRole] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSignIn = (e: React.FormEvent) => {
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!selectedRole) {
-      alert('Please select your role');
-      return;
-    }
-    
-    if (!email || !password) {
-      alert('Please enter both email and password');
-      return;
-    }
+    setIsLoading(true);
+    setError('');
 
-    // Handle sign-in logic based on role
-    console.log('Signing in as:', selectedRole, 'with email:', email);
-    
-    // Here you would typically:
-    // 1. Call your authentication API
-    // 2. Store user session/token
-    // 3. Redirect based on role
-    switch (selectedRole) {
-      case 'candidate':
-        // Redirect to candidate dashboard
-        window.location.href = '/candidate-dashboard';
-        break;
-      case 'hr':
-        // Redirect to HR dashboard
-        window.location.href = '/dashboard';
-        break;
-      case 'admin':
-        // Redirect to admin dashboard
-        window.location.href = '/dashboard';
-        break;
-      default:
-        break;
+    try {
+      const response = await axios.post('http://localhost:5000/api/candidates/login', {
+        email,
+        password
+      });
+
+      if (response.data.status === 'success') {
+        navigate('/dashboard'); 
+      }
+    } catch (err: any) {
+      if (err.response?.data?.status === 'unverified') {
+        alert("Please verify your email first.");
+        navigate('/email-verification');
+      } else {
+        setError(err.response?.data?.message || "Sign in failed.");
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 font-sans">
-      {/* Header Logo */}
       <div className="mb-8 self-start ml-10">
         <h1 className="text-xl font-bold text-gray-800">CandidateHub</h1>
       </div>
@@ -60,7 +50,7 @@ const SignIn: React.FC = () => {
           <p className="text-gray-500 text-sm mt-1">Welcome back to the TalentPulse Portal</p>
         </div>
 
-        {/* Social Login Buttons */}
+        {/* Social Buttons */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <button className="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium text-sm">
             <FcGoogle className="text-lg" /> Google
@@ -117,16 +107,17 @@ const SignIn: React.FC = () => {
           <span className="relative bg-white px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">or email</span>
         </div>
 
-        {/* Email Login Form */}
-        <form onSubmit={handleSignIn} className="space-y-5">
+        {error && <p className="text-red-500 text-xs mb-4 text-center">{error}</p>}
+
+        <form className="space-y-5" onSubmit={handleSignIn}>
           <div>
             <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Email Address</label>
             <div className="relative">
               <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input 
                 type="email" 
-                placeholder="name@company.com"
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition text-sm"
+                required
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none transition text-sm"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -142,38 +133,28 @@ const SignIn: React.FC = () => {
               <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input 
                 type="password" 
-                placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition text-sm"
+                required
+                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none transition text-sm"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <input type="checkbox" id="remember" className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
-            <label htmlFor="remember" className="text-xs text-gray-600 font-medium cursor-pointer">Remember me</label>
-          </div>
-
-          <button type="submit" className="w-full bg-black text-white font-bold py-3 rounded-lg hover:bg-gray-800 transition shadow-lg shadow-gray-200 mt-2">
-            Sign In
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full bg-black text-white font-bold py-3 rounded-lg hover:bg-gray-800 transition disabled:bg-gray-400"
+          >
+            {isLoading ? "Signing In..." : "Sign In"}
           </button>
         </form>
 
         <p className="text-center text-xs text-gray-500 mt-8">
-          New to TalentMatch? <Link to="/signup" className="font-bold text-gray-900 hover:underline">Sign up</Link>
+          New to TalentMatch? <span onClick={() => navigate('/signup')} className="font-bold text-gray-900 hover:underline cursor-pointer">Sign up</span>
         </p>
       </div>
-
-      {/* Footer Links */}
-      <footer className="mt-20 text-center">
-        <p className="text-[10px] text-gray-400 mb-4">© 2024 WHS System. All rights reserved.</p>
-        <div className="flex gap-6 text-[10px] font-bold text-gray-400">
-          <a href="#" className="hover:text-gray-600 transition">Privacy Policy</a>
-          <a href="#" className="hover:text-gray-600 transition">Terms of Service</a>
-          <a href="#" className="hover:text-gray-600 transition">Help Center</a>
-        </div>
-      </footer>
+      {/* Footer... */}
     </div>
   );
 };
