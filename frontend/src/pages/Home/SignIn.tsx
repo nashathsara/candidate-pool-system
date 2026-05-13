@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FiMail, FiLock } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 import { FaLinkedin } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -160,7 +161,7 @@ const SignIn: React.FC = () => {
         </form>
 
         <p className="text-center text-xs text-gray-500 mt-8">
-          New to TalentMatch? <a href="#" className="font-bold text-gray-900 hover:underline">Sign up</a>
+          New to TalentMatch? <Link to="/signup" className="font-bold text-gray-900 hover:underline">Sign up</Link>
         </p>
       </div>
 
