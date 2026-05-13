@@ -33,7 +33,7 @@ const Settings: React.FC = () => {
                 <h3 className="font-bold text-base">Edit Profile</h3>
                 <p className="text-xs text-gray-400">Update your administrative profile details and contact information.</p>
               </div>
-              <span className="text-gray-400 text-lg grayscale">ⓘ</span>
+              <span className="text-black-400 text-lg grayscale">ⓘ</span>
             </div>
 
             <div className="grid grid-cols-2 gap-6">
