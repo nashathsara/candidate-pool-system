@@ -13,6 +13,7 @@ app.use(express.json());
 // 3. ඊළඟට routes සම්බන්ධ කරනවා
 app.use('/api/candidates', candidateRoutes);
 
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`========================================`);
