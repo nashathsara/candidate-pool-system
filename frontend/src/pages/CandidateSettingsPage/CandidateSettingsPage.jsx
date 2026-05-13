@@ -1,299 +1,195 @@
 import React from 'react';
-import { ArrowLeft, User, Lock, Shield, Edit, Save, X, Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search, BarChart3 } from 'lucide-react';
 import './CandidateSettingsPage.css';
 
 const CandidateSettingsPage = () => {
-  const [activeSection, setActiveSection] = React.useState('profile');
   const [showPassword, setShowPassword] = React.useState(false);
   const [showNewPassword, setShowNewPassword] = React.useState(false);
-  const [isEditing, setIsEditing] = React.useState(false);
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // Handle save logic here
+  const handleUpdateProfile = () => {
+    // Handle profile update logic here
   };
 
-  const handleCancel = () => {
-    setIsEditing(false);
-    // Handle cancel logic here
+  const handleUpdatePassword = () => {
+    // Handle password update logic here
+  };
+
+  const handleTogglePrivacy = () => {
+    // Handle privacy toggle logic here
   };
 
   return (
     <div className="candidate-settings">
       {/* Header */}
-      <header className="settings-header">
+      <header className="dashboard-header">
         <div className="header-left">
-          <button className="back-btn" onClick={() => window.history.back()}>
-            <ArrowLeft size={20} />
-            <span>Back</span>
-          </button>
-          <div className="header-title">
-            <h1>Settings</h1>
-            <p>Manage your account settings and preferences</p>
+          <div className="logo-container">
+            <Briefcase className="logo-icon" size={28} />
+            <h1 className="logo">CandidateHub</h1>
           </div>
         </div>
+        
+        <nav className="header-nav">
+          <Link to="/candidate-dashboard" className="nav-link">
+            <BarChart3 size={18} />
+            Dashboard
+          </Link>
+          <Link to="/browse-jobs" className="nav-link">
+            <Search size={18} />
+            Browse Jobs
+          </Link>
+          <Link to="/applications" className="nav-link">
+            <FileText size={18} />
+            Applications
+          </Link>
+          <Link to="/help" className="nav-link">
+            <HelpCircle size={18} />
+            Help Center
+          </Link>
+        </nav>
+
         <div className="header-right">
-          {isEditing ? (
-            <div className="edit-actions">
-              <button className="cancel-btn" onClick={handleCancel}>
-                <X size={16} />
-                Cancel
-              </button>
-              <button className="save-btn" onClick={handleSave}>
-                <Save size={16} />
-                Save Changes
-              </button>
+          <div className="notifications">
+            <Bell className="notification-bell" size={20} />
+            <span className="notification-badge">3</span>
+          </div>
+          <Link to="/candidate-settings" className="user-profile">
+            <div className="user-avatar">
+              <User size={20} />
             </div>
-          ) : (
-            <button className="edit-btn" onClick={() => setIsEditing(true)}>
-              <Edit size={16} />
-              Edit
-            </button>
-          )}
+            <div className="user-info">
+              <span className="user-name">John Doe</span>
+              <span className="user-role">Candidate</span>
+            </div>
+            <Settings className="settings-icon" size={18} />
+          </Link>
         </div>
       </header>
 
-      <div className="settings-content">
-        {/* Sidebar Navigation */}
-        <aside className="settings-sidebar">
-          <nav className="settings-nav">
-            <button 
-              className={`nav-item ${activeSection === 'profile' ? 'active' : ''}`}
-              onClick={() => setActiveSection('profile')}
-            >
-              <User size={18} />
-              <span>Edit Profile</span>
-              <ChevronRight size={16} className="nav-arrow" />
-            </button>
-            <button 
-              className={`nav-item ${activeSection === 'password' ? 'active' : ''}`}
-              onClick={() => setActiveSection('password')}
-            >
-              <Lock size={18} />
-              <span>Change Password</span>
-              <ChevronRight size={16} className="nav-arrow" />
-            </button>
-            <button 
-              className={`nav-item ${activeSection === 'privacy' ? 'active' : ''}`}
-              onClick={() => setActiveSection('privacy')}
-            >
-              <Shield size={18} />
-              <span>Account Privacy</span>
-              <ChevronRight size={16} className="nav-arrow" />
-            </button>
-          </nav>
-        </aside>
-
-        {/* Main Content */}
-        <main className="settings-main">
+      {/* Main Content */}
+      <main className="settings-main">
+        <div className="settings-container">
+          <h1 className="page-title">Profile Settings</h1>
+          
           {/* Edit Profile Section */}
-          {activeSection === 'profile' && (
-            <div className="settings-section">
-              <div className="section-header">
-                <h2>Edit Profile</h2>
-                <p>Update your personal information and contact details</p>
+          <section className="settings-section">
+            <h2 className="section-title">Edit Profile</h2>
+            <div className="section-content">
+              <div className="form-group">
+                <label>Full Name</label>
+                <input 
+                  type="text" 
+                  defaultValue="Alex Jordan" 
+                />
               </div>
               
-              <div className="profile-form">
-                <div className="form-row">
-                  <div className="form-group">
-                    <label>First Name</label>
-                    <input 
-                      type="text" 
-                      defaultValue="John" 
-                      disabled={!isEditing}
-                      className={!isEditing ? 'disabled' : ''}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Last Name</label>
-                    <input 
-                      type="text" 
-                      defaultValue="Doe" 
-                      disabled={!isEditing}
-                      className={!isEditing ? 'disabled' : ''}
-                    />
-                  </div>
-                </div>
-                
-                <div className="form-group">
-                  <label>Email Address</label>
-                  <input 
-                    type="email" 
-                    defaultValue="john.doe@example.com" 
-                    disabled={!isEditing}
-                    className={!isEditing ? 'disabled' : ''}
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label>Phone Number</label>
-                  <input 
-                    type="tel" 
-                    defaultValue="+1 (555) 123-4567" 
-                    disabled={!isEditing}
-                    className={!isEditing ? 'disabled' : ''}
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label>Location</label>
-                  <input 
-                    type="text" 
-                    defaultValue="San Francisco, CA" 
-                    disabled={!isEditing}
-                    className={!isEditing ? 'disabled' : ''}
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label>Professional Summary</label>
-                  <textarea 
-                    defaultValue="Experienced software developer with expertise in full-stack development and a passion for creating innovative solutions."
-                    disabled={!isEditing}
-                    className={!isEditing ? 'disabled' : ''}
-                    rows={4}
-                  />
-                </div>
+              <div className="form-group">
+                <label>Email Address</label>
+                <input 
+                  type="email" 
+                  defaultValue="alex.jordan@candidate.pulse" 
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Professional Bio</label>
+                <textarea 
+                  defaultValue="Senior Product Designer with over 8 years of experience creating user-centered digital products. Passionate about design systems, user research, and collaborative problem-solving. Currently leading design initiatives at a fast-growing tech startup."
+                  rows={4}
+                />
+              </div>
+              
+              <div className="form-actions">
+                <button className="btn-primary" onClick={handleUpdateProfile}>
+                  Update Profile
+                </button>
               </div>
             </div>
-          )}
+          </section>
 
           {/* Change Password Section */}
-          {activeSection === 'password' && (
-            <div className="settings-section">
-              <div className="section-header">
-                <h2>Change Password</h2>
-                <p>Update your password to keep your account secure</p>
+          <section className="settings-section">
+            <h2 className="section-title">Change Password</h2>
+            <div className="section-content">
+              <div className="form-group">
+                <label>Current Password</label>
+                <div className="password-input">
+                  <input 
+                    type={showPassword ? 'text' : 'password'} 
+                    defaultValue="••••••••"
+                  />
+                  <button 
+                    type="button" 
+                    className="password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                  </button>
+                </div>
               </div>
               
-              <div className="password-form">
-                <div className="form-group">
-                  <label>Current Password</label>
-                  <div className="password-input">
-                    <input 
-                      type={showPassword ? 'text' : 'password'} 
-                      placeholder="Enter current password"
-                    />
-                    <button 
-                      type="button" 
-                      className="password-toggle"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="form-group">
-                  <label>New Password</label>
-                  <div className="password-input">
-                    <input 
-                      type={showNewPassword ? 'text' : 'password'} 
-                      placeholder="Enter new password"
-                    />
-                    <button 
-                      type="button" 
-                      className="password-toggle"
-                      onClick={() => setShowNewPassword(!showNewPassword)}
-                    >
-                      {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="form-group">
-                  <label>Confirm New Password</label>
-                  <div className="password-input">
-                    <input 
-                      type={showNewPassword ? 'text' : 'password'} 
-                      placeholder="Confirm new password"
-                    />
-                  </div>
-                </div>
-                
-                <div className="password-requirements">
-                  <h4>Password Requirements:</h4>
-                  <ul>
-                    <li>At least 8 characters long</li>
-                    <li>Contains uppercase and lowercase letters</li>
-                    <li>Includes at least one number</li>
-                    <li>Contains at least one special character</li>
-                  </ul>
-                </div>
+              <div className="form-group">
+                <label>New Password</label>
+                <input 
+                  type={showNewPassword ? 'text' : 'password'} 
+                  placeholder="Min. 8 characters"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Confirm New Password</label>
+                <input 
+                  type={showNewPassword ? 'text' : 'password'} 
+                  placeholder="Re-type new password"
+                />
+              </div>
+              
+              <div className="form-actions">
+                <button className="btn-primary" onClick={handleUpdatePassword}>
+                  Update Password
+                </button>
               </div>
             </div>
-          )}
+          </section>
 
           {/* Account Privacy Section */}
-          {activeSection === 'privacy' && (
-            <div className="settings-section">
-              <div className="section-header">
-                <h2>Account Privacy</h2>
-                <p>Control your privacy settings and data sharing preferences</p>
-              </div>
-              
-              <div className="privacy-settings">
-                <div className="privacy-item">
-                  <div className="privacy-info">
-                    <h4>Profile Visibility</h4>
-                    <p>Control who can see your profile information</p>
-                  </div>
-                  <select className="privacy-select">
-                    <option>Public - Anyone can view</option>
-                    <option>Recruiters Only</option>
-                    <option>Private - Hidden from search</option>
-                  </select>
+          <section className="settings-section">
+            <h2 className="section-title">Account Privacy</h2>
+            <div className="section-content">
+              <div className="privacy-item">
+                <div className="privacy-info">
+                  <h4>Profile Visibility</h4>
+                  <p>Control if your profile is searchable within platform.</p>
                 </div>
-                
-                <div className="privacy-item">
-                  <div className="privacy-info">
-                    <h4>Contact Information</h4>
-                    <p>Share your contact details with recruiters</p>
-                  </div>
-                  <label className="toggle-switch">
-                    <input type="checkbox" defaultChecked />
-                    <span className="toggle-slider"></span>
-                  </label>
-                </div>
-                
-                <div className="privacy-item">
-                  <div className="privacy-info">
-                    <h4>Job Recommendations</h4>
-                    <p>Receive personalized job suggestions based on your profile</p>
-                  </div>
-                  <label className="toggle-switch">
-                    <input type="checkbox" defaultChecked />
-                    <span className="toggle-slider"></span>
-                  </label>
-                </div>
-                
-                <div className="privacy-item">
-                  <div className="privacy-info">
-                    <h4>Email Notifications</h4>
-                    <p>Get updates about your applications and profile views</p>
-                  </div>
-                  <label className="toggle-switch">
-                    <input type="checkbox" defaultChecked />
-                    <span className="toggle-slider"></span>
-                  </label>
-                </div>
-                
-                <div className="privacy-item">
-                  <div className="privacy-info">
-                    <h4>Data Analytics</h4>
-                    <p>Help us improve our services with anonymous usage data</p>
-                  </div>
-                  <label className="toggle-switch">
-                    <input type="checkbox" />
-                    <span className="toggle-slider"></span>
-                  </label>
-                </div>
+                <label className="toggle-switch">
+                  <input type="checkbox" defaultChecked onChange={handleTogglePrivacy} />
+                  <span className="toggle-slider"></span>
+                </label>
               </div>
             </div>
-          )}
-        </main>
-      </div>
+          </section>
+        </div>
+      </main>
+
+      {/* Footer */}
+      <footer className="settings-footer">
+        <div className="footer-content">
+          <div className="footer-left">
+            <div className="footer-logo">
+              <Briefcase className="logo-icon" size={20} />
+              <span>CandidateHub</span>
+            </div>
+            <p className="copyright">© 2024 CandidateHub. All rights reserved.</p>
+          </div>
+          <div className="footer-links">
+            <a href="#" className="footer-link">Privacy Policy</a>
+            <a href="#" className="footer-link">Terms of Service</a>
+            <a href="#" className="footer-link">Help Center</a>
+            <a href="#" className="footer-link">Contact Us</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
