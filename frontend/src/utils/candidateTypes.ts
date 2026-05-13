@@ -33,4 +33,9 @@ export interface CandidateRecord {
   phone?: string;
   availability?: string;
   activelyLooking?: boolean;
+  resumeUrl?: string;
+  cvUrl?: string;
+  resumeFile?: string;
+  resumeDownloadUrl?: string;
+  cvDownloadUrl?: string;
 }

@@ -321,6 +321,12 @@
   background: #f2f4f6;
 }
 
+.review-primary-btn:disabled,
+.review-link-row button:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
 .review-action-blue {
   color: #234fbd;
 }

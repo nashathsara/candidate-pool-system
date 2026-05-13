@@ -15,6 +15,10 @@ import {
   XCircle,
 } from "lucide-react";
 import { useCandidates } from "../../hooks/useCandidates";
+import {
+  getCandidateResumeDownloadUrl,
+  hasCandidateResume,
+} from "../../services/firebaseAdminService";
 import type { CandidateRecord, VerificationStatus } from "../../utils/candidateTypes";
 import "./CandidateDetails.css";
 
@@ -60,7 +64,9 @@ const CandidateDetails = () => {
   const { fetchById, updateCandidateStatus } = useCandidates();
   const [candidate, setCandidate] = useState<CandidateRecord | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isResumeOpening, setIsResumeOpening] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [resumeMessage, setResumeMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
@@ -144,6 +150,35 @@ const CandidateDetails = () => {
     }
   };
 
+  const handleResumeDownload = async () => {
+    if (!candidate) {
+      return;
+    }
+
+    setResumeMessage("");
+    setErrorMessage("");
+
+    if (!hasCandidateResume(candidate)) {
+      setResumeMessage("No resume uploaded for this candidate.");
+      return;
+    }
+
+    setIsResumeOpening(true);
+    try {
+      const resumeUrl = await getCandidateResumeDownloadUrl(candidate);
+      if (!resumeUrl) {
+        setResumeMessage("No resume uploaded for this candidate.");
+        return;
+      }
+
+      window.open(resumeUrl, "_blank", "noopener,noreferrer");
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Unable to open candidate resume.");
+    } finally {
+      setIsResumeOpening(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="review-page">
@@ -167,6 +202,8 @@ const CandidateDetails = () => {
   }
 
   const linkedinUrl = getLinkedInUrl(candidate);
+  const resumeAvailable = hasCandidateResume(candidate);
+  const resumeUnavailableMessage = "No resume uploaded for this candidate.";
 
   return (
     <div className="review-page">
@@ -180,10 +217,16 @@ const CandidateDetails = () => {
             <Mail size={16} />
             Email
           </a>
-          <a className="review-primary-btn" href="#resume">
+          <button
+            type="button"
+            className="review-primary-btn"
+            disabled={!resumeAvailable || isResumeOpening}
+            title={resumeAvailable ? "Open candidate resume" : resumeUnavailableMessage}
+            onClick={() => void handleResumeDownload()}
+          >
             <Download size={16} />
-            Resume
-          </a>
+            {isResumeOpening ? "Opening..." : "Resume"}
+          </button>
         </div>
       </header>
 
@@ -197,6 +240,12 @@ const CandidateDetails = () => {
       {errorMessage && (
         <div className="review-error" role="alert">
           {errorMessage}
+        </div>
+      )}
+
+      {resumeMessage && (
+        <div className="review-error" role="status">
+          {resumeMessage}
         </div>
       )}
 
@@ -248,9 +297,15 @@ const CandidateDetails = () => {
               LinkedIn Profile
               <ExternalLink size={15} />
             </a>
-            <button type="button" id="resume">
+            <button
+              type="button"
+              id="resume"
+              disabled={!resumeAvailable || isResumeOpening}
+              title={resumeAvailable ? "Open candidate resume" : resumeUnavailableMessage}
+              onClick={() => void handleResumeDownload()}
+            >
               <Download size={15} />
-              Download CV / Resume
+              {isResumeOpening ? "Opening Resume..." : "Download CV / Resume"}
             </button>
           </div>
         </section>

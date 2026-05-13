@@ -86,6 +86,28 @@ const parseSkills = (value: unknown) => {
   return [];
 };
 
+const getStringField = (value: unknown) => (typeof value === "string" && value.trim() ? value.trim() : undefined);
+
+const getResumeField = (value: unknown) => {
+  if (typeof value === "string") {
+    return getStringField(value);
+  }
+
+  if (!value || typeof value !== "object") {
+    return undefined;
+  }
+
+  const fileData = value as Record<string, unknown>;
+  return (
+    getStringField(fileData.downloadUrl) ||
+    getStringField(fileData.downloadURL) ||
+    getStringField(fileData.url) ||
+    getStringField(fileData.fullPath) ||
+    getStringField(fileData.path) ||
+    getStringField(fileData.name)
+  );
+};
+
 const getStatusTone = (status: string): ListStatusTone => {
   if (status === "Withdrawn" || status === "Rejected") {
     return "red";
@@ -152,7 +174,67 @@ const mapCandidate = (id: string, data: Record<string, unknown>): CandidateRecor
       typeof data.activelyLooking === "boolean"
         ? data.activelyLooking
         : data.status === "Actively Looking" || data.availability === "Available",
+    resumeUrl: getResumeField(data.resumeUrl),
+    cvUrl: getResumeField(data.cvUrl),
+    resumeFile: getResumeField(data.resumeFile),
+    resumeDownloadUrl: getResumeField(data.resumeDownloadUrl),
+    cvDownloadUrl: getResumeField(data.cvDownloadUrl),
   };
+};
+
+const resumeFieldPriority = [
+  "resumeDownloadUrl",
+  "cvDownloadUrl",
+  "resumeUrl",
+  "cvUrl",
+  "resumeFile",
+] as const;
+
+const isWebUrl = (value: string) => /^https?:\/\//i.test(value);
+
+export const getCandidateResumeSource = (candidate: CandidateRecord) => {
+  for (const fieldName of resumeFieldPriority) {
+    const value = candidate[fieldName];
+    if (value) {
+      return { fieldName, value };
+    }
+  }
+
+  return null;
+};
+
+export const hasCandidateResume = (candidate: CandidateRecord) => Boolean(getCandidateResumeSource(candidate));
+
+export const getCandidateResumeDownloadUrl = async (candidate: CandidateRecord) => {
+  const resumeSource = getCandidateResumeSource(candidate);
+  if (!resumeSource) {
+    return null;
+  }
+
+  if (isWebUrl(resumeSource.value)) {
+    return resumeSource.value;
+  }
+
+  if (!firebaseStorage) {
+    throw new Error("No resume uploaded for this candidate.");
+  }
+
+  const downloadUrl = await getDownloadURL(ref(firebaseStorage, resumeSource.value));
+
+  if (firestoreDb) {
+    await setDoc(
+      doc(firestoreDb, "candidates", candidate.id),
+      {
+        resumeDownloadUrl: downloadUrl,
+        updatedAt: new Date().toISOString(),
+      },
+      { merge: true },
+    ).catch((error) => {
+      console.warn("Resume download URL resolved but could not be saved to Firestore.", error);
+    });
+  }
+
+  return downloadUrl;
 };
 
 const cacheCandidates = (candidates: CandidateRecord[]) => {
