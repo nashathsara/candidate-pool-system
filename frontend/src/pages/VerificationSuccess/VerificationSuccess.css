@@ -3,7 +3,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #f5f7fa;
+  background: #fafafa;
 }
 
 .card {
@@ -16,17 +16,17 @@
 }
 
 .icon {
-  width: 80px;
-  height: 80px;
-  background: #10b981;
+  width: 64px;
+  height: 64px;
+  background: #22c55e;
   color: white;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 40px;
-  margin: 0 auto 30px;
-  font-weight: bold;
+  font-size: 32px;
+  margin: 0 auto 24px;
+  font-weight: normal;
 }
 
 h2 {
@@ -44,15 +44,15 @@ p {
 }
 
 .primary-btn {
-  background: #1f2937;
+  background: #111827;
   color: white;
-  padding: 12px 20px;
+  padding: 14px 20px;
   border: none;
   width: 100%;
-  border-radius: 8px;
+  border-radius: 6px;
   cursor: pointer;
-  margin-bottom: 12px;
-  font-size: 16px;
+  margin-bottom: 16px;
+  font-size: 15px;
   font-weight: 500;
   transition: background 0.3s ease;
 }
@@ -68,6 +68,7 @@ p {
   cursor: pointer;
   font-size: 14px;
   transition: color 0.3s ease;
+  text-decoration: none;
 }
 
 .link-btn:hover {
