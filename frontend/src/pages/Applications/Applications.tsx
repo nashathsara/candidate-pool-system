@@ -1,5 +1,5 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search } from 'lucide-react';
 import './Applications.css';
 
@@ -60,6 +60,7 @@ const calculateAge = (dob: string) => {
 };
 
 const CandidateApplicationView = () => {
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     fullName: 'John Doe',
     email: 'john.doe@example.com',
@@ -502,7 +503,7 @@ const CandidateApplicationView = () => {
           </span>
         </label>
 
-        <button className="submit-btn" type="button">
+        <button className="submit-btn" type="button" onClick={() => navigate('/ApplicationSuccess')}>
           Complete Registration →
         </button>
       </main>
