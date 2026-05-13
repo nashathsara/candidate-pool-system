@@ -1,11 +1,17 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search, BarChart3 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search, BarChart3, LogOut } from 'lucide-react';
 import './CandidateSettingsPage.css';
 
 const CandidateSettingsPage = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
   const [showNewPassword, setShowNewPassword] = React.useState(false);
+
+  const handleSignOut = () => {
+    // Add any logout logic here (clear tokens, etc.)
+    navigate('/SignIn');
+  };
 
   const handleUpdateProfile = () => {
     // Handle profile update logic here
@@ -64,6 +70,15 @@ const CandidateSettingsPage = () => {
             </div>
             <Settings className="settings-icon" size={18} />
           </Link>
+          <button 
+            type="button" 
+            className="signout-btn"
+            onClick={handleSignOut}
+            aria-label="Sign out"
+          >
+            <LogOut size={18} />
+            <span>Sign Out</span>
+          </button>
         </div>
       </header>
 

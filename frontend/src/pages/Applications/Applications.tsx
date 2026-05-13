@@ -1,6 +1,6 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search } from 'lucide-react';
+import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search, LogOut } from 'lucide-react';
 import './Applications.css';
 
 const INTERESTED_FIELDS = [
@@ -61,6 +61,12 @@ const calculateAge = (dob: string) => {
 
 const CandidateApplicationView = () => {
   const navigate = useNavigate()
+
+  const handleSignOut = () => {
+    // Add any logout logic here (clear tokens, etc.)
+    navigate('/SignIn');
+  };
+
   const [formData, setFormData] = useState({
     fullName: 'John Doe',
     email: 'john.doe@example.com',
@@ -162,6 +168,15 @@ const CandidateApplicationView = () => {
             </div>
             <Settings className="settings-icon" size={18} />
           </div>
+          <button 
+            type="button" 
+            className="signout-btn"
+            onClick={handleSignOut}
+            aria-label="Sign out"
+          >
+            <LogOut size={18} />
+            <span>Sign Out</span>
+          </button>
         </div>
       </header>
 

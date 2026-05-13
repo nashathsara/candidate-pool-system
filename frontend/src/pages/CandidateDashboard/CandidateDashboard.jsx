@@ -1,9 +1,16 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search, TrendingUp, Clock, CheckCircle, AlertCircle, Star, ArrowRight, Calendar, MessageSquare, BarChart3 } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search, TrendingUp, Clock, CheckCircle, AlertCircle, Star, ArrowRight, Calendar, MessageSquare, BarChart3, LogOut } from 'lucide-react';
 import './CandidateDashboard.css';
 
 const CandidateDashboard = () => {
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    // Add any logout logic here (clear tokens, etc.)
+    navigate('/SignIn');
+  };
+
   return (
     <div className="candidate-dashboard">
       {/* Enhanced Header */}
@@ -49,6 +56,15 @@ const CandidateDashboard = () => {
             </div>
             <Settings className="settings-icon" size={18} />
           </Link>
+          <button 
+            type="button" 
+            className="signout-btn"
+            onClick={handleSignOut}
+            aria-label="Sign out"
+          >
+            <LogOut size={18} />
+            <span>Sign Out</span>
+          </button>
         </div>
       </header>
 

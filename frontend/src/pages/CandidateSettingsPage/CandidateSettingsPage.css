@@ -156,6 +156,31 @@
   color: #111827;
 }
 
+.signout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 12px;
+  background: #f3f4f6;
+  color: #6c757d;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.signout-btn:hover {
+  background: #dc3545;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.signout-btn span {
+  font-size: 0.9rem;
+}
+
 /* Main Content */
 .settings-main {
   flex: 1;

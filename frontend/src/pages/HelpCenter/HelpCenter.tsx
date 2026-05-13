@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search, LogOut } from 'lucide-react';
 import './HelpCenter.css';
 
 interface FAQItem {
@@ -27,9 +27,15 @@ interface HelpArticle {
 }
 
 const HelpCenter: React.FC = () => {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+
+  const handleSignOut = () => {
+    // Add any logout logic here (clear tokens, etc.)
+    navigate('/SignIn');
+  };
 
   const helpCategories: HelpCategory[] = [
     {
@@ -311,6 +317,15 @@ const HelpCenter: React.FC = () => {
             </div>
             <Settings className="settings-icon" size={18} />
           </div>
+          <button 
+            type="button" 
+            className="signout-btn"
+            onClick={handleSignOut}
+            aria-label="Sign out"
+          >
+            <LogOut size={18} />
+            <span>Sign Out</span>
+          </button>
         </div>
       </header>
 
