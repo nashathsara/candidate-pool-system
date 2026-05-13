@@ -173,21 +173,16 @@ const CandidateSettingsPage = () => {
       </main>
 
       {/* Footer */}
-      <footer className="settings-footer">
-        <div className="footer-content">
-          <div className="footer-left">
-            <div className="footer-logo">
-              <Briefcase className="logo-icon" size={20} />
-              <span>CandidateHub</span>
-            </div>
-            <p className="copyright">© 2024 CandidateHub. All rights reserved.</p>
-          </div>
-          <div className="footer-links">
-            <a href="#" className="footer-link">Privacy Policy</a>
-            <a href="#" className="footer-link">Terms of Service</a>
-            <a href="#" className="footer-link">Help Center</a>
-            <a href="#" className="footer-link">Contact Us</a>
-          </div>
+      <footer className="browse-footer">
+        <div className="footer-brand">
+          <strong>WHS Solution</strong>
+          <span>© 2024 WHS Solution Engineered for Excellence.</span>
+        </div>
+        <div className="footer-links">
+          <a href="#">LEGAL</a>
+          <a href="#">PRIVACY POLICY</a>
+          <a href="#">HELP CENTER</a>
+          <a href="#">CONTACT SUPPORT</a>
         </div>
       </footer>
     </div>
