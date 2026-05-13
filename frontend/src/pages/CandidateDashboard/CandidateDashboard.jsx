@@ -39,7 +39,7 @@ const CandidateDashboard = () => {
             <Bell className="notification-bell" size={20} />
             <span className="notification-badge">3</span>
           </div>
-          <div className="user-profile">
+          <Link to="/candidate-settings" className="user-profile">
             <div className="user-avatar">
               <User size={20} />
             </div>
@@ -48,7 +48,7 @@ const CandidateDashboard = () => {
               <span className="user-role">Candidate</span>
             </div>
             <Settings className="settings-icon" size={18} />
-          </div>
+          </Link>
         </div>
       </header>
 

@@ -109,10 +109,12 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  cursor: pointer;
-  padding: 0.5rem;
+  padding: 0.5rem 1rem;
   border-radius: 12px;
+  cursor: pointer;
   transition: background 0.3s ease;
+  text-decoration: none;
+  color: inherit;
 }
 
 .user-profile:hover {

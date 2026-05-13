@@ -20,6 +20,7 @@ import ProfileCreate from "./pages/ProfileCreate/ProfileCreate";
 import Home from "./pages/Home/Home";
 import CandidateDashboard from "./pages/CandidateDashboard/CandidateDashboard";
 import Applications from "./pages/Applications/Applications";
+import CandidateSettingsPage from "./pages/CandidateSettingsPage/CandidateSettingsPage";
 
 import HelpCenter from "./pages/HelpCenter/HelpCenter";
 
@@ -43,6 +44,7 @@ const AppRoutes = () => {
         <Route path="/browse-jobs" element={<BrowseJobs />} />
         <Route path="/candidate-dashboard" element={<CandidateDashboard />} />
         <Route path="/applications" element={<Applications />} />
+        <Route path="/candidate-settings" element={<CandidateSettingsPage />} />
         <Route path="/messages" element={<div>Messages (Coming Soon)</div>} />
         <Route path="/create-profile" element={
           <MainLayout>
