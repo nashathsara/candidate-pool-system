@@ -16,7 +16,7 @@ function ApplicationSuccess() {
         </p>
 
         <div className="actions-row">
-          <button className="primary-button" onClick={() => navigate('/applications')}>Go to Dashboard →</button>
+          <button className="primary-button" onClick={() => navigate('/candidate-dashboard')}>Go to Dashboard →</button>
           <button className="secondary-button">View Submitted Profile</button>
         </div>
 
