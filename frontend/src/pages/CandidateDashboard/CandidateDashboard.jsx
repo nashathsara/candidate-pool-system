@@ -171,10 +171,7 @@ const CandidateDashboard = () => {
                   <CheckCircle size={16} className="completion-icon complete" />
                   <span>Work Experience</span>
                 </div>
-                <div className="completion-item">
-                  <CheckCircle size={16} className="completion-icon complete" />
-                  <span>Education</span>
-                </div>
+                
                 <div className="completion-item">
                   <AlertCircle size={16} className="completion-icon incomplete" />
                   <span>Skills & Certifications</span>
@@ -191,7 +188,7 @@ const CandidateDashboard = () => {
                     <Briefcase size={16} />
                   </div>
                   <div className="activity-content">
-                    <span className="activity-text">Applied to Senior Developer</span>
+                    <span className="activity-text">Applied to Senior Developer position</span>
                     <span className="activity-time">2 hours ago</span>
                   </div>
                 </div>
@@ -206,10 +203,10 @@ const CandidateDashboard = () => {
                 </div>
                 <div className="activity-item">
                   <div className="activity-icon">
-                    <Star size={16} />
+                    <TrendingUp size={16} />
                   </div>
                   <div className="activity-content">
-                    <span className="activity-text">Profile viewed by Tech Corp</span>
+                    <span className="activity-text">Profile strength increased</span>
                     <span className="activity-time">1 day ago</span>
                   </div>
                 </div>
