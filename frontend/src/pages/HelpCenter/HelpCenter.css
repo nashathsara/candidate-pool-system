@@ -380,110 +380,139 @@
 /* FAQ Section */
 .faq-section {
   background: white;
-  border-radius: 16px;
-  padding: 40px;
-  max-width: 800px;
+  border-radius: 20px;
+  padding: 50px;
+  max-width: 900px;
   margin: 0 auto 50px;
-  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
   animation: slideUp 0.6s ease-out;
+  border: 1px solid #f1f5f9;
 }
 
 .faq-section h2 {
-  font-size: 28px;
-  color: #2c3e50;
-  margin: 0 0 30px 0;
-  font-weight: 600;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  font-size: 32px;
+  color: #1e293b;
+  margin: 0 0 40px 0;
+  font-weight: 700;
+  text-align: center;
+  position: relative;
+  padding-bottom: 15px;
+}
+
+.faq-section h2::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+  border-radius: 2px;
 }
 
 .clear-filter-btn {
-  background: #ecf0f1;
+  background: #f1f5f9;
   border: none;
-  padding: 6px 12px;
-  border-radius: 4px;
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
-  color: #7f8c8d;
+  color: #3b82f6;
   transition: all 0.3s ease;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .clear-filter-btn:hover {
-  background: #bdc3c7;
-  color: #2c3e50;
+  background: #dbeafe;
+  color: #1d4ed8;
+  transform: translateY(-1px);
 }
 
 .faq-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .faq-item {
-  border: 1px solid #ecf0f1;
-  border-radius: 8px;
+  border: 2px solid #f1f5f9;
+  border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
+  background: #ffffff;
 }
 
 .faq-item:hover {
-  border-color: #1abc9c;
-  box-shadow: 0 2px 8px rgba(26, 188, 156, 0.1);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 20px rgba(59, 130, 246, 0.12);
+  transform: translateY(-2px);
 }
 
 .faq-question {
   width: 100%;
-  padding: 18px 20px;
-  background: #f8f9fa;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
   border: none;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 600;
-  color: #2c3e50;
+  color: #1e293b;
   text-align: left;
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
   transition: all 0.3s ease;
   outline: none;
+  position: relative;
 }
 
 .faq-question:hover {
-  background: #f0f3f5;
+  background: linear-gradient(135deg, #f1f5f9 0%, #dbeafe 100%);
 }
 
 .faq-item:has(.faq-question:focus) {
-  border-color: #1abc9c;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .faq-icon {
   flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  background: #1abc9c;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 700;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.faq-question:hover .faq-icon {
+  transform: rotate(90deg);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .faq-answer {
-  padding: 20px;
-  background: white;
-  border-top: 1px solid #ecf0f1;
-  animation: slideDown 0.3s ease-out;
+  padding: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border-top: 2px solid #f1f5f9;
+  animation: slideDown 0.4s ease-out;
 }
 
 .faq-answer p {
   margin: 0;
-  color: #555;
+  color: #475569;
   line-height: 1.8;
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 400;
 }
 
 .no-results {
@@ -497,13 +526,13 @@
 
 /* Contact Support Section */
 .contact-support-section {
-  background: linear-gradient(135deg, #2f80ed 0%, #6e4edb 100%);
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   border-radius: 22px;
   padding: 50px 40px;
   max-width: 1100px;
   margin: 0 auto 50px;
   color: white;
-  box-shadow: 0 20px 60px rgba(46, 117, 255, 0.18);
+  box-shadow: 0 20px 60px rgba(16, 185, 129, 0.18);
 }
 
 .support-wrapper {
@@ -611,7 +640,7 @@
 
 .btn-contact-support {
   background: white;
-  color: #2f80ed;
+  color: #10B981;
   border: none;
   padding: 16px 34px;
   border-radius: 12px;
@@ -625,7 +654,7 @@
 
 .btn-contact-support:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 42px rgba(43, 108, 255, 0.22);
+  box-shadow: 0 18px 42px rgba(16, 185, 129, 0.22);
 }
 
 .btn-contact-support:active {

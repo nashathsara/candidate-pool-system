@@ -269,6 +269,19 @@ const CandidateDashboard = () => {
           </div>
         </section>
       </main>
+
+      <footer className="browse-footer">
+        <div className="footer-brand">
+          <strong>WHS Solution</strong>
+          <span>© 2024 WHS Solution Engineered for Excellence.</span>
+        </div>
+        <div className="footer-links">
+          <a href="#">LEGAL</a>
+          <a href="#">PRIVACY POLICY</a>
+          <a href="#">HELP CENTER</a>
+          <a href="#">CONTACT SUPPORT</a>
+        </div>
+      </footer>
     </div>
   );
 };
