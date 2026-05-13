@@ -7,6 +7,10 @@
     "doc": "docs"
   },
   "scripts": {
+    "dev": "concurrently -n backend,frontend -c blue,green \"npm --prefix functions run dev\" \"npm --prefix frontend run dev\"",
+    "dev:backend": "npm --prefix functions run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,5 +24,8 @@
   "bugs": {
     "url": "https://github.com/nashathsara/candidate-pool-system/issues"
   },
-  "homepage": "https://github.com/nashathsara/candidate-pool-system#readme"
+  "homepage": "https://github.com/nashathsara/candidate-pool-system#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
 }

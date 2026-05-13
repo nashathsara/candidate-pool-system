@@ -24,6 +24,10 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { name: "Settings", path: "/settings", icon: <FiSettings className="h-5 w-5" /> },
   ];
 
+  const isActivePath = (path: string) =>
+    location.pathname === path ||
+    (path === "/candidates" && location.pathname === "/profile");
+
   return (
     <div className="min-h-screen bg-[#f7f9fb] text-[#191c1e]">
       <aside className="fixed left-0 top-0 z-20 flex h-screen w-[280px] flex-col justify-between border-r border-[#c6c6cd] bg-[#f2f4f6] px-4 py-6">
@@ -41,7 +45,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 key={item.path}
                 to={item.path}
                 className={`flex items-center gap-3 rounded px-4 py-3 text-base transition ${
-                  location.pathname === item.path
+                  isActivePath(item.path)
                     ? "bg-[#d0e1fb] text-[#54647a]"
                     : "text-[#45464d] hover:bg-white/70"
                 }`}

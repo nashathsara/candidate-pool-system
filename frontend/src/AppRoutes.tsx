@@ -35,7 +35,6 @@ const AppRoutes = () => {
         <Route path="/browse" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/profile/create" element={<ProfileCreate />} />
-        <Route path="/profile" element={<ProfileView />} />
         
         <Route
           path="/dashboard"

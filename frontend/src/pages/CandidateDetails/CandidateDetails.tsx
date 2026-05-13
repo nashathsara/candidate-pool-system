@@ -5,9 +5,16 @@ import { useCandidates } from "../../hooks/useCandidates";
 
 const CandidateDetails = () => {
   const { candidateId } = useParams<{ candidateId: string }>();
-  const { getById } = useCandidates();
+  const { getById, updateCandidateStatus } = useCandidates();
 
   const candidate = candidateId ? getById(candidateId) : undefined;
+
+  const handleStatusUpdate = (
+    nextStatus: "Viewed by Admin" | "Under Admin Review" | "Withdrawn"
+  ) => {
+    if (!candidateId) return;
+    updateCandidateStatus(candidateId, nextStatus);
+  };
 
   if (!candidate) {
     return (
@@ -40,13 +47,26 @@ const CandidateDetails = () => {
       </div>
 
       <div style={{ marginBottom: 16, display: "flex", flexWrap: "wrap", gap: 10 }}>
-        <button type="button" className="ad-review-btn" style={{ background: "#059669" }}>
-          Approve visibility
+        <button
+          type="button"
+          className="ad-review-btn"
+          style={{ background: "#059669" }}
+          onClick={() => handleStatusUpdate("Viewed by Admin")}
+        >
+          Update Status
         </button>
-        <button type="button" className="ad-filters-btn">
+        <button
+          type="button"
+          className="ad-filters-btn"
+          onClick={() => handleStatusUpdate("Under Admin Review")}
+        >
           Request changes
         </button>
-        <button type="button" className="ad-filters-btn">
+        <button
+          type="button"
+          className="ad-filters-btn"
+          onClick={() => handleStatusUpdate("Withdrawn")}
+        >
           Flag duplicate
         </button>
       </div>

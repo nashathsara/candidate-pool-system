@@ -1,9 +1,12 @@
 import { useCallback, useMemo, useSyncExternalStore } from "react";
-import type { CandidateRecord } from "../utils/candidateTypes";
+import type { CandidateRecord, VerificationStatus } from "../utils/candidateTypes";
 import {
   CANDIDATES_STORAGE_KEY,
   SEED_CANDIDATES,
 } from "../utils/candidateSeed";
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 let cache: CandidateRecord[] = [...SEED_CANDIDATES];
 let hydrated = false;
@@ -40,6 +43,27 @@ function persist(next: CandidateRecord[]) {
   emit();
 }
 
+async function syncCandidatePatch(
+  id: string,
+  patch: Partial<CandidateRecord>
+) {
+  try {
+    await fetch(`${API_BASE_URL}/candidates/${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        status: patch.status,
+        verificationStatus: patch.verificationStatus,
+        lastActiveLabel: patch.lastActiveLabel,
+      }),
+    });
+  } catch (error) {
+    console.warn("Candidate update saved locally only.", error);
+  }
+}
+
 function subscribe(cb: () => void) {
   listeners.add(cb);
   return () => listeners.delete(cb);
@@ -73,10 +97,50 @@ export function useCandidates() {
     [candidates]
   );
 
+  const updateCandidate = useCallback(
+    (id: string, patch: Partial<CandidateRecord>) => {
+      ensureHydrated();
+      const current = getSnapshot();
+      const next = current.map((candidate) =>
+        candidate.id === id ? { ...candidate, ...patch } : candidate
+      );
+      persist(next);
+      void syncCandidatePatch(id, patch);
+    },
+    []
+  );
+
+  const updateCandidateStatus = useCallback(
+    (id: string, verificationStatus: VerificationStatus) => {
+      const statusTone =
+        verificationStatus === "Viewed by Admin" ||
+        verificationStatus === "Profile Submitted"
+          ? "blue"
+          : verificationStatus === "Withdrawn"
+            ? "red"
+            : "gray";
+
+      updateCandidate(id, {
+        status: verificationStatus,
+        verificationStatus,
+        statusTone,
+        lastActiveLabel: "Just now",
+      });
+    },
+    [updateCandidate]
+  );
+
   const totalDisplay = useMemo(
     () => candidates.length.toLocaleString(),
     [candidates.length]
   );
 
-  return { candidates, addCandidate, getById, totalDisplay };
+  return {
+    candidates,
+    addCandidate,
+    getById,
+    totalDisplay,
+    updateCandidate,
+    updateCandidateStatus,
+  };
 }
