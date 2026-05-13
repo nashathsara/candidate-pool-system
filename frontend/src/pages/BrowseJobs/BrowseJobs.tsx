@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search, LogOut } from 'lucide-react';
+import { User, Briefcase, FileText, HelpCircle, Bell, Search, LogOut } from 'lucide-react';
 import './BrowseJobs.css'
 
 const jobs = [
@@ -103,7 +103,6 @@ function BrowseJobs() {
               <span className="user-name">John Doe</span>
               <span className="user-role">Candidate</span>
             </div>
-            <Settings className="settings-icon" size={18} />
           </div>
           <button 
             type="button" 

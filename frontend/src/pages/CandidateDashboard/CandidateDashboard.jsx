@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Settings, Search, TrendingUp, Clock, CheckCircle, AlertCircle, Star, ArrowRight, Calendar, MessageSquare, BarChart3, LogOut } from 'lucide-react';
+import { User, Briefcase, FileText, HelpCircle, Bell, Search, TrendingUp, Clock, CheckCircle, AlertCircle, Star, ArrowRight, Calendar, MessageSquare, BarChart3, LogOut } from 'lucide-react';
 import './CandidateDashboard.css';
 
 const CandidateDashboard = () => {
@@ -46,15 +46,16 @@ const CandidateDashboard = () => {
             <Bell className="notification-bell" size={20} />
             <span className="notification-badge">3</span>
           </div>
-          <Link to="/candidate-settings" className="user-profile">
-            <div className="user-avatar">
-              <User size={20} />
+          <Link to="/candidate-settings">
+            <div className="user-profile">
+              <div className="user-avatar">
+                <User size={20} />
+              </div>
+              <div className="user-info">
+                <span className="user-name">John Doe</span>
+                <span className="user-role">Candidate</span>
+              </div>
             </div>
-            <div className="user-info">
-              <span className="user-name">John Doe</span>
-              <span className="user-role">Candidate</span>
-            </div>
-            <Settings className="settings-icon" size={18} />
           </Link>
           <button 
             type="button" 
