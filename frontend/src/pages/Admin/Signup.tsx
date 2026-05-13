@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../common/Button/Button';
 
 const Signup: React.FC = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -35,9 +37,19 @@ const Signup: React.FC = () => {
       });
 
       if (response.data.status === 'success') {
-        alert("Account created successfully!");
+        navigate('/profile/create', {
+          state: {
+            candidateId: response.data.id,
+            fullName: formData.fullName,
+            email: formData.email,
+          },
+        });
       } else if (response.data.status === 'duplicate') {
-        alert("This profile already exists in the system.");
+        navigate('/candidate/duplicate-check', {
+          state: {
+            existingProfile: response.data.existingData,
+          },
+        });
       }
     } catch (error) {
       console.error("Signup Error:", error);

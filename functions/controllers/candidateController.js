@@ -17,8 +17,9 @@ const profileSettingsRef = doc(db, "candidateSettings", "profile");
 const defaultProfileSettings = {
   fullName: "Alex Jordan",
   email: "alex.jordan@candidate.pulse",
-  bio: "Senior Product Designer with 8+ years of experience in building scalable design systems and user-centric web applications.",
+  bio: "Recruitment administrator focused on maintaining a high-quality, verified candidate pool and supporting hiring teams with timely profile reviews.",
   profileVisibility: true,
+  profilePhoto: "",
 };
 
 const withId = (candidateDoc) => ({
@@ -177,6 +178,10 @@ const updateProfileSettings = async (req, res) => {
         typeof req.body.profileVisibility === "boolean"
           ? req.body.profileVisibility
           : defaultProfileSettings.profileVisibility,
+      profilePhoto:
+        typeof req.body.profilePhoto === "string"
+          ? req.body.profilePhoto
+          : defaultProfileSettings.profilePhoto,
       updatedAt: new Date().toISOString(),
     };
 

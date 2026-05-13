@@ -28,7 +28,16 @@ const checkDuplicates = async (candidate) => {
   );
 
   const snapshot = await getDocs(q);
-  return !snapshot.empty ? snapshot.docs[0].data() : null;
+
+  if (snapshot.empty) {
+    return null;
+  }
+
+  const duplicateDoc = snapshot.docs[0];
+  return {
+    id: duplicateDoc.id,
+    ...duplicateDoc.data(),
+  };
 };
 
 module.exports = { checkDuplicates };

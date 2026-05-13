@@ -1,6 +1,31 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { NavLink } from "react-router-dom";
 import "./CandidatePublicLayout.css";
+
+const SETTINGS_STORAGE_KEY = "candidate-hub:profile-settings";
+const PROFILE_SETTINGS_UPDATED_EVENT = "candidate-hub:profile-settings-updated";
+
+type StoredProfileSettings = {
+  fullName?: string;
+  profilePhoto?: string;
+};
+
+const readStoredProfile = (): StoredProfileSettings => {
+  try {
+    const rawValue = localStorage.getItem(SETTINGS_STORAGE_KEY);
+    return rawValue ? JSON.parse(rawValue) : {};
+  } catch {
+    return {};
+  }
+};
+
+const getInitials = (name = "Alex Jordan") =>
+  name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "CH";
 
 const BellIco = () => (
   <svg viewBox="0 0 24 24" fill="none" width="22" height="22">
@@ -21,6 +46,21 @@ export interface CandidatePublicLayoutProps {
 }
 
 const CandidatePublicLayout = ({ children }: CandidatePublicLayoutProps) => {
+  const [profileSettings, setProfileSettings] = useState<StoredProfileSettings>(() => readStoredProfile());
+
+  useEffect(() => {
+    const handleProfileUpdate = () => setProfileSettings(readStoredProfile());
+    window.addEventListener(PROFILE_SETTINGS_UPDATED_EVENT, handleProfileUpdate);
+    window.addEventListener("storage", handleProfileUpdate);
+
+    return () => {
+      window.removeEventListener(PROFILE_SETTINGS_UPDATED_EVENT, handleProfileUpdate);
+      window.removeEventListener("storage", handleProfileUpdate);
+    };
+  }, []);
+
+  const initials = getInitials(profileSettings.fullName);
+
   return (
     <div className="cpl-root">
       <header className="cpl-header">
@@ -55,9 +95,13 @@ const CandidatePublicLayout = ({ children }: CandidatePublicLayoutProps) => {
             <button type="button" className="cpl-icon-btn" aria-label="Settings">
               <GearIco />
             </button>
-            <span className="cpl-mini-avatar" aria-hidden>
-              AJ
-            </span>
+            {profileSettings.profilePhoto ? (
+              <img src={profileSettings.profilePhoto} alt="" className="cpl-mini-avatar cpl-mini-avatar-img" />
+            ) : (
+              <span className="cpl-mini-avatar" aria-hidden>
+                {initials}
+              </span>
+            )}
           </div>
         </div>
       </header>

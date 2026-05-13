@@ -93,6 +93,12 @@
   justify-content: center;
 }
 
+.cpl-mini-avatar-img {
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
 .cpl-main {
   flex: 1;
   max-width: 1100px;

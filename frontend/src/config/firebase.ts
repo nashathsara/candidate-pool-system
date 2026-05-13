@@ -11,6 +11,7 @@ import {
   getFirestore,
   type Firestore,
 } from "firebase/firestore";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 type FirebaseConfigKey =
   | "apiKey"
@@ -51,6 +52,10 @@ export const firebaseApp: FirebaseApp | null = isFirebaseConfigured
 
 export const firestoreDb: Firestore | null = firebaseApp
   ? getFirestore(firebaseApp)
+  : null;
+
+export const firebaseStorage: FirebaseStorage | null = firebaseApp
+  ? getStorage(firebaseApp)
   : null;
 
 export const firebaseAuth: Auth | null = firebaseApp ? getAuth(firebaseApp) : null;

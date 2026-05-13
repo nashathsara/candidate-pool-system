@@ -1,161 +1,274 @@
-import { useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
+  FiActivity,
   FiBriefcase,
   FiCheckCircle,
-  FiCpu,
+  FiEdit3,
+  FiEye,
+  FiEyeOff,
   FiMail,
   FiMapPin,
   FiPhone,
+  FiSettings,
+  FiTrash2,
+  FiUser,
   FiX,
 } from 'react-icons/fi';
+import {
+  defaultAdminProfile,
+  getAdminProfile,
+  updateAdminProfile,
+  type AdminProfileSettings,
+} from '../../services/firebaseAdminService';
 
 const SETTINGS_STORAGE_KEY = 'candidate-hub:profile-settings';
+const PROFILE_SETTINGS_UPDATED_EVENT = 'candidate-hub:profile-settings-updated';
 
-type ProfileSettings = {
-  fullName: string;
-  email: string;
-  bio: string;
+type LocationState = {
+  profile?: Partial<AdminProfileSettings>;
 };
 
-const defaultProfile: ProfileSettings = {
-  fullName: 'Alex Rivera',
-  email: 'alex.rivera@example.com',
-  bio: 'Leading the frontend migration from monolithic architecture to micro-frontends using React and Next.js. Reduced bundle sizes by 40% and improved Core Web Vitals across 12 product lines. Mentoring a team of 15 senior engineers and defining global UI standards.',
+const adminMeta = {
+  role: 'Admin Profile Manager',
+  location: 'Colombo, Sri Lanka',
+  phone: '+94 77 555 0100',
+  status: 'Active Admin',
 };
 
-const readProfileSettings = (): ProfileSettings => {
+const readProfileSettings = (): AdminProfileSettings => {
   try {
     const raw = localStorage.getItem(SETTINGS_STORAGE_KEY);
     return raw
-      ? { ...defaultProfile, ...(JSON.parse(raw) as Partial<ProfileSettings>) }
-      : defaultProfile;
+      ? { ...defaultAdminProfile, ...(JSON.parse(raw) as Partial<AdminProfileSettings>) }
+      : defaultAdminProfile;
   } catch {
-    return defaultProfile;
+    return defaultAdminProfile;
   }
 };
 
-const technicalSkills = [
-  'React 18',
-  'TypeScript',
-  'Next.js',
-  'Tailwind CSS',
-  'Node.js',
-  'GraphQL',
-  'AWS',
-  'Docker',
-  'Kubernetes',
-];
+const writeProfileSettings = (settings: AdminProfileSettings) => {
+  localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
+  window.dispatchEvent(new CustomEvent(PROFILE_SETTINGS_UPDATED_EVENT, { detail: settings }));
+};
+
+const getInitials = (name: string) =>
+  name
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('') || 'AD';
+
+const formatDate = (value?: string) => {
+  const date = value ? new Date(value) : new Date();
+  return new Intl.DateTimeFormat('en', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(Number.isNaN(date.getTime()) ? new Date() : date);
+};
 
 const ProfileView = () => {
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const locationState = location.state as LocationState | null;
   const [showToast, setShowToast] = useState(searchParams.get('updated') === '1');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [profile, setProfile] = useState<AdminProfileSettings>(() => ({
+    ...readProfileSettings(),
+    ...(locationState?.profile ?? {}),
+  }));
 
-  const profile = useMemo(() => readProfileSettings(), []);
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadProfile = async () => {
+      setErrorMessage('');
+      try {
+        const firebaseProfile = await getAdminProfile();
+        const nextProfile = {
+          ...firebaseProfile,
+          ...(locationState?.profile ?? {}),
+        };
+        if (isMounted) {
+          setProfile(nextProfile);
+          writeProfileSettings(nextProfile);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setErrorMessage(error instanceof Error ? error.message : 'Unable to load admin profile from Firebase.');
+          setProfile({
+            ...readProfileSettings(),
+            ...(locationState?.profile ?? {}),
+          });
+        }
+      }
+    };
+
+    void loadProfile();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [locationState?.profile]);
+
+  const initials = getInitials(profile.fullName);
+  const lastUpdated = formatDate(profile.updatedAt);
+
+  const deleteProfilePhoto = () => {
+    setErrorMessage('');
+    void updateAdminProfile({ ...profile, profilePhoto: '' })
+      .then((nextProfile) => {
+        setProfile(nextProfile);
+        writeProfileSettings(nextProfile);
+        setShowToast(true);
+      })
+      .catch((error) => {
+        setErrorMessage(error instanceof Error ? error.message : 'Firebase photo delete failed.');
+      });
+  };
 
   return (
-    <div className="min-h-screen bg-[#f7f9fb] px-4 py-5 pb-24">
-      <div className="mx-auto max-w-[920px] space-y-5">
-        <section className="rounded-lg border border-[#c6c6cd] bg-white p-6 shadow-[0_3px_6px_rgba(15,23,42,0.1)]">
-          <div className="flex items-start gap-8">
-            <img
-              src="https://i.pravatar.cc/300?img=12"
-              alt={profile.fullName}
-              className="h-[116px] w-[116px] rounded-md object-cover shadow-sm"
-            />
+    <div className="min-h-screen bg-[#f7f9fb] px-5 py-6 pb-24">
+      <div className="mx-auto max-w-6xl space-y-5">
+        {errorMessage && (
+          <div className="rounded-lg border border-rose-200 bg-rose-50 px-4 py-3 text-sm font-bold text-rose-700">
+            {errorMessage}
+          </div>
+        )}
+
+        <section className="rounded-lg border border-[#c6c6cd] bg-white p-7 shadow-[0_3px_8px_rgba(15,23,42,0.08)]">
+          <div className="flex flex-col gap-7 lg:flex-row lg:items-start">
+            <div className="h-36 w-36 overflow-hidden rounded-2xl border border-slate-200 bg-indigo-100 shadow-sm">
+              {profile.profilePhoto ? (
+                <img src={profile.profilePhoto} alt={profile.fullName} className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-4xl font-black text-indigo-700">
+                  {initials}
+                </div>
+              )}
+            </div>
 
             <div className="min-w-0 flex-1">
-              <h1 className="text-[26px] font-bold leading-tight text-[#191c1e]">
-                {profile.fullName}
-              </h1>
-              <p className="mt-1 text-[15px] text-[#45464d]">Senior Frontend Architect</p>
+              <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-slate-400">
+                    Admin Profile
+                  </p>
+                  <h1 className="mt-2 text-3xl font-bold leading-tight text-[#191c1e]">
+                    {profile.fullName}
+                  </h1>
+                  <p className="mt-1 text-base font-semibold text-[#45464d]">{adminMeta.role}</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700">
+                    {adminMeta.status}
+                  </span>
+                  <span className="rounded-full bg-slate-100 px-4 py-2 text-xs font-bold text-slate-600">
+                    Updated {lastUpdated}
+                  </span>
+                </div>
+              </div>
 
-              <div className="mt-5 space-y-3 text-[13px] text-[#45464d]">
-                <ProfileLine icon={<FiMapPin />} text="Chicago, IL" />
-                <ProfileLine icon={<FiMail />} text={profile.email} />
-                <ProfileLine icon={<FiPhone />} text="+1 (312) 555-0198" />
+              <div className="mt-6 grid gap-3 text-sm text-[#45464d] md:grid-cols-2 xl:grid-cols-4">
+                <InfoCard icon={<FiMapPin />} label="Location" value={adminMeta.location} />
+                <InfoCard icon={<FiMail />} label="Email" value={profile.email} />
+                <InfoCard icon={<FiPhone />} label="Phone" value={adminMeta.phone} />
+                <InfoCard icon={profile.profileVisibility ? <FiEye /> : <FiEyeOff />} label="Visibility" value={profile.profileVisibility ? 'Public' : 'Private'} />
               </div>
             </div>
-
-            <div className="text-right">
-              <span className="inline-flex min-w-[92px] justify-center rounded-sm bg-[#eaf2ff] px-4 py-2 text-[11px] font-bold text-[#2563eb]">
-                In Review
-              </span>
-              <p className="mt-3 text-[11px] font-semibold text-[#76777d]">Applied 4 days ago</p>
-            </div>
           </div>
         </section>
 
-        <section className="rounded-lg border border-[#c6c6cd] bg-white p-8 shadow-[0_3px_6px_rgba(15,23,42,0.1)]">
-          <h2 className="mb-6 flex items-center gap-2 text-xl font-semibold text-[#191c1e]">
-            <FiBriefcase className="h-5 w-5" />
-            Experience
-          </h2>
-
-          <div className="space-y-10">
-            <ExperienceItem
-              active
-              title="Senior Frontend Architect"
-              company="CloudScale Systems - Full-time"
-              period="2021 - Present"
-              description={profile.bio}
-            />
-            <ExperienceItem
-              title="Lead UI Engineer"
-              company="Velocity Dev Studio - Full-time"
-              period="2018 - 2021"
-              description="Architected a custom design system used by over 50 clients. Scaled the engineering team from 5 to 20 members while maintaining a rigorous code quality standard and 98% unit test coverage."
-            />
-          </div>
-        </section>
-
-        <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          <section className="min-h-[260px] rounded-lg border border-[#c6c6cd] bg-white p-8 shadow-[0_3px_6px_rgba(15,23,42,0.1)]">
-            <h2 className="mb-7 flex items-center gap-2 text-xl font-semibold text-[#191c1e]">
-              <FiCpu className="h-5 w-5" />
-              Education
-            </h2>
-            <EducationItem
-              degree="M.S. Computer Science"
-              school="Stanford University"
-              graduated="2018"
-            />
-            <div className="my-5 h-px bg-[#e6e8ea]" />
-            <EducationItem
-              degree="B.S. Software Engineering"
-              school="Georgia Institute of Technology"
-              graduated="2016"
-            />
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[1.2fr_0.8fr]">
+          <section className="rounded-lg border border-[#c6c6cd] bg-white p-7 shadow-[0_3px_8px_rgba(15,23,42,0.08)]">
+            <SectionTitle icon={<FiUser />} title="Professional Bio" />
+            <p className="mt-5 max-w-3xl text-sm leading-7 text-[#45464d]">{profile.bio}</p>
           </section>
 
-          <section className="min-h-[260px] rounded-lg border border-[#c6c6cd] bg-white p-8 shadow-[0_3px_6px_rgba(15,23,42,0.1)]">
-            <h2 className="mb-7 flex items-center gap-2 text-xl font-semibold text-[#191c1e]">
-              <FiCpu className="h-5 w-5" />
-              Technical Skills
-            </h2>
-            <div className="flex max-w-[260px] flex-wrap gap-3">
-              {technicalSkills.map((skill) => (
-                <span
-                  key={skill}
-                  className="rounded-lg bg-[#eceef0] px-4 py-2 text-[13px] font-semibold text-[#45464d]"
-                >
-                  {skill}
-                </span>
-              ))}
+          <section className="rounded-lg border border-[#c6c6cd] bg-white p-7 shadow-[0_3px_8px_rgba(15,23,42,0.08)]">
+            <SectionTitle icon={<FiBriefcase />} title="Account Information" />
+            <div className="mt-5 space-y-3">
+              <DetailRow label="Role" value={adminMeta.role} />
+              <DetailRow label="Status" value={adminMeta.status} />
+              <DetailRow label="Last Updated" value={lastUpdated} />
             </div>
           </section>
         </div>
+
+        <div className="grid grid-cols-1 gap-5 xl:grid-cols-[0.8fr_1.2fr]">
+          <section className="rounded-lg border border-[#c6c6cd] bg-white p-7 shadow-[0_3px_8px_rgba(15,23,42,0.08)]">
+            <SectionTitle icon={profile.profileVisibility ? <FiEye /> : <FiEyeOff />} title="Profile Visibility" />
+            <div className="mt-5 rounded-lg border border-slate-200 bg-slate-50 p-5">
+              <p className="text-lg font-bold text-slate-900">
+                {profile.profileVisibility ? 'Public Profile' : 'Private Profile'}
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-500">
+                {profile.profileVisibility
+                  ? 'Your admin profile is visible within the CandidateHub workspace.'
+                  : 'Your admin profile is hidden from general workspace visibility.'}
+              </p>
+            </div>
+          </section>
+
+          <section className="rounded-lg border border-[#c6c6cd] bg-white p-7 shadow-[0_3px_8px_rgba(15,23,42,0.08)]">
+            <SectionTitle icon={<FiActivity />} title="Recent Activity" />
+            <div className="mt-5 space-y-4">
+              <ActivityItem title="Admin profile updated" detail={`Profile settings saved on ${lastUpdated}.`} />
+              <ActivityItem title="Profile visibility checked" detail={`Current visibility is ${profile.profileVisibility ? 'public' : 'private'}.`} />
+              <ActivityItem title="Account ready" detail="Admin profile details are available for dashboard workflows." />
+            </div>
+          </section>
+        </div>
+
+        <section className="rounded-lg border border-[#c6c6cd] bg-white p-7 shadow-[0_3px_8px_rgba(15,23,42,0.08)]">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold text-[#191c1e]">Admin Profile Actions</h2>
+              <p className="mt-2 text-sm text-slate-500">
+                Manage your admin profile data and profile photo.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => navigate('/settings')}
+                className="inline-flex items-center gap-2 rounded border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:bg-slate-50"
+              >
+                <FiSettings />
+                Back to Settings
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate('/settings')}
+                className="inline-flex items-center gap-2 rounded bg-black px-5 py-2.5 text-sm font-bold text-white transition hover:bg-slate-800"
+              >
+                <FiEdit3 />
+                Edit Profile
+              </button>
+              <button
+                type="button"
+                disabled={!profile.profilePhoto}
+                onClick={deleteProfilePhoto}
+                className="inline-flex items-center gap-2 rounded border border-rose-100 bg-white px-5 py-2.5 text-sm font-bold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <FiTrash2 />
+                Delete Profile Photo
+              </button>
+            </div>
+          </div>
+        </section>
       </div>
 
       {showToast && (
-        <div className="fixed bottom-10 left-1/2 z-30 w-[380px] max-w-[calc(100vw-32px)] -translate-x-1/2 rounded-md bg-[#2f7a70] px-5 py-4 text-white shadow-2xl">
+        <div className="fixed bottom-10 left-1/2 z-30 w-[420px] max-w-[calc(100vw-32px)] -translate-x-1/2 rounded-md bg-[#2f7a70] px-5 py-4 text-white shadow-2xl">
           <div className="flex items-center gap-3">
             <FiCheckCircle className="h-5 w-5 shrink-0 text-[#89e4d6]" />
             <div className="min-w-0 flex-1">
               <p className="text-sm font-bold">Profile Updated Successfully</p>
-              <p className="text-[11px] text-white/75">
-                Duplicate resolution completed for Marcus Sterling.
-              </p>
+              <p className="text-[11px] text-white/75">Your admin profile is now up to date.</p>
             </div>
             <Link
               to="/settings"
@@ -178,55 +291,37 @@ const ProfileView = () => {
   );
 };
 
-const ProfileLine = ({ icon, text }: { icon: React.ReactNode; text: string }) => (
-  <div className="flex items-center gap-2">
-    <span className="text-[#191c1e]">{icon}</span>
-    <span>{text}</span>
+const SectionTitle = ({ icon, title }: { icon: React.ReactNode; title: string }) => (
+  <h2 className="flex items-center gap-2 text-xl font-semibold text-[#191c1e]">
+    <span className="text-[#1b3a4b]">{icon}</span>
+    {title}
+  </h2>
+);
+
+const InfoCard = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
+  <div className="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+    <div className="mb-1 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-slate-400">
+      <span>{icon}</span>
+      {label}
+    </div>
+    <p className="truncate text-sm font-semibold text-slate-700">{value || 'Not provided'}</p>
   </div>
 );
 
-const ExperienceItem = ({
-  active,
-  title,
-  company,
-  period,
-  description,
-}: {
-  active?: boolean;
-  title: string;
-  company: string;
-  period: string;
-  description: string;
-}) => (
-  <div className="relative grid grid-cols-[22px_1fr_auto] gap-4">
-    <div className="relative flex justify-center">
-      <span className={`mt-1 h-3 w-3 rounded-full ${active ? 'bg-black' : 'bg-[#d9dce0]'}`} />
-      <span className="absolute top-6 h-[calc(100%+28px)] w-px bg-[#e0e3e5] last:hidden" />
-    </div>
+const DetailRow = ({ label, value }: { label: string; value: string }) => (
+  <div className="flex items-center justify-between gap-4 border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
+    <span className="text-sm font-semibold text-slate-500">{label}</span>
+    <strong className="text-right text-sm text-slate-900">{value}</strong>
+  </div>
+);
+
+const ActivityItem = ({ title, detail }: { title: string; detail: string }) => (
+  <div className="flex gap-3">
+    <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#1b3a4b] shadow-[0_0_0_4px_#d0e1fb]" />
     <div>
-      <h3 className="text-base font-bold text-[#191c1e]">{title}</h3>
-      <p className="mt-1 text-[13px] font-semibold text-[#54647a]">{company}</p>
-      <p className="mt-4 max-w-[520px] text-[13px] leading-6 text-[#45464d]">
-        {description}
-      </p>
+      <p className="text-sm font-bold text-slate-900">{title}</p>
+      <p className="mt-1 text-sm leading-6 text-slate-500">{detail}</p>
     </div>
-    <span className="pt-1 text-[11px] font-semibold text-[#76777d]">{period}</span>
-  </div>
-);
-
-const EducationItem = ({
-  degree,
-  school,
-  graduated,
-}: {
-  degree: string;
-  school: string;
-  graduated: string;
-}) => (
-  <div>
-    <h3 className="text-[13px] font-bold text-[#191c1e]">{degree}</h3>
-    <p className="mt-1 text-[13px] font-semibold text-[#45464d]">{school}</p>
-    <p className="text-[13px] text-[#76777d]">Graduated {graduated}</p>
   </div>
 );
 

@@ -10,7 +10,9 @@ import Candidates from "./pages/Candidates/Candidates";
 import DuplicateResolution from './pages/Admin/DuplicateResolution';
 import CandidateSettings from './pages/Candidates/CandidateSettings';
 import DuplicationView from './pages/Candidates/DuplicationView';
+import PotentialDuplicateProfile from './pages/Candidates/PotentialDuplicateProfile';
 import ApplicationSuccess from './pages/ApplicationSuccess/ApplicationSuccess';
+import Applications from './pages/Applications/Applications';
 import BrowseJobs from './pages/BrowseJobs/BrowseJobs';
 import SignIn from './pages/Home/SignIn';
 import Signup from './pages/Admin/Signup';
@@ -30,8 +32,9 @@ const AppRoutes = () => {
         <Route path="/" element={<VerificationSuccess />} />
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/email-verification" element={<EmailVerification />} />
-        {/* <Route path="/candidate/duplicate-check" element={<DuplicationView />} /> */}
+        <Route path="/candidate/duplicate-check" element={<PotentialDuplicateProfile />} />
         <Route path="/application-success" element={<ApplicationSuccess />} />
+        <Route path="/applications" element={<Applications />} />
         <Route path="/browse" element={<BrowseJobs />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/profile/create" element={<ProfileCreate />} />
@@ -63,6 +66,14 @@ const AppRoutes = () => {
         />
         <Route
           path="/profile"
+          element={
+            <MainLayout>
+              <ProfileView />
+            </MainLayout>
+          }
+        />
+        <Route
+          path="/admin/profile"
           element={
             <MainLayout>
               <ProfileView />

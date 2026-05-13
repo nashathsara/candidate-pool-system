@@ -8,7 +8,10 @@ export type VerificationStatus =
   | "Not Yet Reviewed"
   | "In Review"
   | "New"
-  | "Withdrawn";
+  | "Withdrawn"
+  | "Shortlisted"
+  | "Rejected"
+  | "Contacted";
 
 export interface CandidateRecord {
   id: string;
@@ -28,5 +31,6 @@ export interface CandidateRecord {
   verificationStatus: VerificationStatus;
   lastActiveLabel: string;
   phone?: string;
+  availability?: string;
   activelyLooking?: boolean;
 }

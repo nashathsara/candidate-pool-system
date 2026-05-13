@@ -186,6 +186,14 @@ export const setActiveCandidateId = (candidateId: string) => {
   getBrowserStorage()?.setItem(ACTIVE_CANDIDATE_STORAGE_KEY, candidateId);
 };
 
+const createCandidateId = () => {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+
+  return `candidate-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+};
+
 export const getPreferredCandidate = async (requestedCandidateId?: string | null) => {
   const candidateId = requestedCandidateId || getActiveCandidateId();
 
@@ -240,4 +248,43 @@ export const updateCandidateProfile = async (
   }
 
   return nextCandidate;
+};
+
+export const createCandidateProfile = async (
+  values: CandidateFormValues,
+  extraFields: Partial<CandidateProfile> = {},
+) => {
+  const now = new Date().toISOString();
+  const candidate = sanitizeCandidate({
+    ...extraFields,
+    ...values,
+    id: extraFields.id ?? createCandidateId(),
+    fullName: values.fullName,
+    email: values.email,
+    status: (extraFields.status as CandidateStatus) ?? "New",
+    createdAt: extraFields.createdAt ?? now,
+    updatedAt: now,
+    lastActiveAt: now,
+  });
+
+  saveCandidateLocally(candidate);
+  setActiveCandidateId(candidate.id);
+
+  if (firestoreDb && isFirebaseConfigured) {
+    try {
+      const user = await ensureFirebaseAuthReady();
+      await setDoc(
+        doc(firestoreDb, "candidates", candidate.id),
+        {
+          ...candidate,
+          userId: user?.uid ?? candidate.userId ?? "",
+        },
+        { merge: true },
+      );
+    } catch (error) {
+      console.warn("Candidate saved locally because Firestore write failed.", error);
+    }
+  }
+
+  return candidate;
 };
