@@ -60,6 +60,46 @@ const SignIn: React.FC = () => {
           </button>
         </div>
 
+        {/* Role Selection */}
+        <div className="mb-6">
+          <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-3">Select Your Role</label>
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedRole('candidate')}
+              className={`py-2 px-3 rounded-lg border text-xs font-medium transition ${
+                selectedRole === 'candidate'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              Candidate
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRole('hr')}
+              className={`py-2 px-3 rounded-lg border text-xs font-medium transition ${
+                selectedRole === 'hr'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              HR
+            </button>
+            <button
+              type="button"
+              onClick={() => setSelectedRole('admin')}
+              className={`py-2 px-3 rounded-lg border text-xs font-medium transition ${
+                selectedRole === 'admin'
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              Admin
+            </button>
+          </div>
+        </div>
+
         <div className="relative mb-6 text-center">
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-100"></div>
