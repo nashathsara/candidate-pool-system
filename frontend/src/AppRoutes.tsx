@@ -6,16 +6,17 @@ import ProfileMerge from "./pages/ProfileMerge/ProfileMerge";
 import ProfileCancel from "./pages/ProfileCancel/ProfileCancel";
 import MainLayout from "./Layout/MainLayout";
 import Candidates from "./pages/Candidates/Candidates";
-import DuplicateResolution from './pages/Admin/DuplicateResolution';
-import CandidateSettings from './pages/Candidates/CandidateSettings';
-import DuplicationView from './pages/Candidates/DuplicationView';
-import ApplicationSuccess from './pages/ApplicationSuccess/ApplicationSuccess';
-import BrowseJobs from './pages/BrowseJobs/BrowseJobs';
-import SignIn from './pages/Home/SignIn';
-import Signup from './pages/Admin/Signup';
-import Settings from './pages/Admin/Settings';
-import AdminDashboardPage from './pages/Admin/AdminDashboardPage';
-import CandidateDetails from "./pages/CandidateDetails/CandidateDetails";
+import DuplicateResolution from "./pages/Admin/DuplicateResolution";
+import CandidateSettings from "./pages/Candidates/CandidateSettings";
+import DuplicationView from "./pages/Candidates/DuplicationView";
+import ApplicationSuccess from "./pages/ApplicationSuccess/ApplicationSuccess";
+import BrowseJobs from "./pages/BrowseJobs/BrowseJobs";
+import SignIn from "./pages/Home/SignIn";
+import Signup from "./pages/Admin/Signup";
+import TicketSubmitForm from "./pages/TicketSubmitForm/TicketSubmitForm";
+import Settings from "./pages/Admin/Settings";
+import TicketSuccess from "./pages/TicketSuccess/TicketSuccess";
+import AdminDashboardPage from "./pages/Admin/AdminDashboardPage";
 import ProfileCreate from "./pages/ProfileCreate/ProfileCreate";
 import Home from "./pages/Home/Home";
 import CandidateDashboard from "./pages/CandidateDashboard/CandidateDashboard";
@@ -36,22 +37,17 @@ const AppRoutes = () => {
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/EmailVerification" element={<EmailVerification />} />
         {/* <Route path="/candidate/duplicate-check" element={<DuplicationView />} /> */}
-        <Route path="/ApplicationSuccess" element={<ApplicationSuccess />} />
-        <Route path="/help" element={<HelpCenter />} />
-        <Route path="/BrowseJobs" element={<BrowseJobs />} />
-        <Route path="/signin" element={<SignIn />} />
+        <Route path="/application-success" element={<Navigate to="/browse" replace />} />
+        <Route path="/application-success/:jobId" element={<ApplicationSuccess />} />
+
+        {/* Case-insensitive-ish aliases (React Router paths are case-sensitive) */}
+        <Route path="/BrowseJobs" element={<Navigate to="/browse" replace />} />
         <Route path="/browse" element={<BrowseJobs />} />
-        <Route path="/browse-jobs" element={<BrowseJobs />} />
-        <Route path="/candidate-dashboard" element={<CandidateDashboard />} />
-        <Route path="/applications" element={<Applications />} />
-        <Route path="/candidate-settings" element={<CandidateSettingsPage />} />
-        <Route path="/messages" element={<div>Messages (Coming Soon)</div>} />
-        <Route path="/create-profile" element={
-          <MainLayout>
-            <ProfileCreate />
-          </MainLayout>
-        } />
-        
+
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/profile/create" element={<ProfileCreate />} />
+        <Route path="/profile" element={<ProfileView />} />
+
         <Route
           path="/dashboard"
           element={
@@ -60,6 +56,7 @@ const AppRoutes = () => {
             </MainLayout>
           }
         />
+
         <Route
           path="/candidates"
           element={
@@ -68,6 +65,7 @@ const AppRoutes = () => {
             </MainLayout>
           }
         />
+
         <Route
           path="/profile"
           element={
@@ -76,6 +74,7 @@ const AppRoutes = () => {
             </MainLayout>
           }
         />
+
         <Route
           path="/profile-merge"
           element={
@@ -84,6 +83,7 @@ const AppRoutes = () => {
             </MainLayout>
           }
         />
+
         <Route
           path="/profile-cancel"
           element={
@@ -92,7 +92,8 @@ const AppRoutes = () => {
             </MainLayout>
           }
         />
-         <Route
+
+        <Route
           path="/duplicates"
           element={
             <MainLayout>
@@ -100,7 +101,8 @@ const AppRoutes = () => {
             </MainLayout>
           }
         />
-         <Route
+
+        <Route
           path="/duplicates-admin"
           element={
             <MainLayout>
@@ -108,35 +110,28 @@ const AppRoutes = () => {
             </MainLayout>
           }
         />
+
         <Route
           path="/settings"
           element={
             <MainLayout>
               <CandidateSettings />
-            </MainLayout>}/>
-        <Route
-          path="/candidate-details"
-          element={
-            <MainLayout>
-              <CandidateDetails />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/profile-create"
-          element={
-            <MainLayout>
-              <ProfileCreate />
             </MainLayout>
           }
         />
 
-          <Route 
-          path="/ticket-success" 
-          element={<div>Ticket Success (Coming Soon)</div>} />
-  
-          <Route path="/" element={<Navigate to="/signup" />} />
+        <Route
+          path="/support"
+          element={
+            <MainLayout>
+              <TicketSubmitForm />
+            </MainLayout>
+          }
+        />
 
+        <Route path="/ticket-success" element={<TicketSuccess />} />
+
+        <Route path="/" element={<Navigate to="/signup" />} />
       </Routes>
     </BrowserRouter>
   );

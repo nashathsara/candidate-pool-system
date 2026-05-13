@@ -47,15 +47,24 @@ const SignIn: React.FC = () => {
       <div className="bg-white p-10 rounded-2xl shadow-sm border border-gray-100 w-full max-w-md">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
-          <p className="text-gray-500 text-sm mt-1">Welcome back to the TalentPulse Portal</p>
+          <p className="text-gray-500 text-sm mt-1">
+            Welcome back to the TalentPulse Portal
+          </p>
         </div>
 
         {/* Social Buttons */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <button className="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium text-sm">
+          <button
+            type="button"
+            onClick={handleGoogle}
+            className="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium text-sm"
+          >
             <FcGoogle className="text-lg" /> Google
           </button>
-          <button className="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium text-sm">
+          <button
+            type="button"
+            className="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium text-sm"
+          >
             <FaLinkedin className="text-[#0A66C2] text-lg" /> LinkedIn
           </button>
         </div>
@@ -104,14 +113,18 @@ const SignIn: React.FC = () => {
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-gray-100"></div>
           </div>
-          <span className="relative bg-white px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">or email</span>
+          <span className="relative bg-white px-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+            or email
+          </span>
         </div>
 
         {error && <p className="text-red-500 text-xs mb-4 text-center">{error}</p>}
 
         <form className="space-y-5" onSubmit={handleSignIn}>
           <div>
-            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Email Address</label>
+            <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+              Email Address
+            </label>
             <div className="relative">
               <FiMail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input 
@@ -120,14 +133,22 @@ const SignIn: React.FC = () => {
                 className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none transition text-sm"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
               />
             </div>
           </div>
 
           <div>
             <div className="flex justify-between items-center mb-1.5">
-              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider">Password</label>
-              <a href="#" className="text-[10px] font-bold text-blue-600 hover:underline">Forgot password?</a>
+              <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                Password
+              </label>
+              <a
+                href="#"
+                className="text-[10px] font-bold text-blue-600 hover:underline"
+              >
+                Forgot password?
+              </a>
             </div>
             <div className="relative">
               <FiLock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -137,6 +158,7 @@ const SignIn: React.FC = () => {
                 className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none transition text-sm"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
               />
             </div>
           </div>

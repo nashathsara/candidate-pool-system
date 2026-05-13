@@ -1,12 +1,5 @@
 import React from 'react';
-import { 
-  FiHome, 
-  FiUsers, 
-  FiCopy, 
-  FiSettings, 
-  FiSearch, 
-  FiHelpCircle, 
-  FiLogOut,
+import {
   FiBriefcase,
   FiBookOpen,
   FiCpu,
@@ -16,7 +9,7 @@ import {
   FiMapPin,
   FiShare2,
   FiCheckCircle,
-} from 'react-icons/fi';
+} from "react-icons/fi";
 
 const ProfileView: React.FC = () => {
   return (
@@ -174,13 +167,6 @@ const ProfileView: React.FC = () => {
 };
 
 // Helper Components
-const SidebarLink = ({ icon, label, active, small }: any) => (
-  <a href="#" className={`flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-all ${active ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:bg-gray-50 hover:text-gray-900'} ${small ? 'text-xs' : 'text-sm'}`}>
-    {React.cloneElement(icon, { className: active ? "w-5 h-5" : "w-5 h-5" })}
-    {label}
-  </a>
-);
-
 const IconInfo = ({ icon, text }: any) => (
   <div className="flex items-center gap-2 text-xs font-bold text-gray-500">
     <span className="text-gray-300">{React.cloneElement(icon, { className: "w-4 h-4" })}</span>
