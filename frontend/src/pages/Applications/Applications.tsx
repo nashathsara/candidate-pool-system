@@ -189,8 +189,8 @@ const CandidateApplicationView = () => {
       // Generate a unique application ID
       const applicationId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       
-      // Prepare candidate data with CV embedded as Base64
-      const candidateData = {
+      // Prepare application data with CV embedded as Base64
+      const applicationData = {
         applicationId: applicationId,
         fullName: formData.fullName,
         email: formData.email.toLowerCase(),
@@ -220,12 +220,12 @@ const CandidateApplicationView = () => {
         source: 'direct_application'
       };
 
-      // Save to Firestore
+      // Save to Firestore - CHANGED from 'candidates' to 'applications'
       console.log('Saving to Firestore...');
-      const candidatesCollection = collection(db, 'candidates');
-      const docRef = await addDoc(candidatesCollection, candidateData);
+      const applicationsCollection = collection(db, 'applications');
+      const docRef = await addDoc(applicationsCollection, applicationData);
       
-      console.log('Candidate registered with ID:', docRef.id);
+      console.log('Application submitted with ID:', docRef.id);
       
       setSubmitSuccess(true);
       

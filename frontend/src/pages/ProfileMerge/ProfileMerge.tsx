@@ -212,6 +212,7 @@ const ProfileMerge: React.FC = () => {
             {/* Action Buttons - Centered and same row with shadow */}
             <div className="flex justify-center gap-6 mb-6">
               <Link
+                // CHANGED: from 'candidate-profile' to 'application-profile' to match the collection change
                 to={`/candidate-profile/${mergedProfile?.id || ''}`}
                 className="flex items-center justify-center gap-2 px-8 py-3 min-w-[220px] transition-all duration-200 text-sm font-medium rounded-md shadow-md"
                 style={{ backgroundColor: '#3ec9b6', color: 'white' }}

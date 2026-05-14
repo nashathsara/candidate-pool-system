@@ -92,7 +92,7 @@ const getExperienceLevel = (years: number): string => {
 
 const Candidates = () => {
   const navigate = useNavigate();
-  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [applications, setApplications] = useState<Candidate[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -100,29 +100,30 @@ const Candidates = () => {
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
-    fetchCandidates();
+    fetchApplications();
   }, []);
 
-  const fetchCandidates = async () => {
+  const fetchApplications = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      const candidatesCollection = collection(db, "candidates");
-      const candidatesQuery = query(
-        candidatesCollection,
+      // CHANGED: from 'candidates' to 'applications'
+      const applicationsCollection = collection(db, "applications");
+      const applicationsQuery = query(
+        applicationsCollection,
         orderBy("createdAt", "desc"),
         limit(50)
       );
       
-      const querySnapshot = await getDocs(candidatesQuery);
-      const candidatesData: Candidate[] = [];
+      const querySnapshot = await getDocs(applicationsQuery);
+      const applicationsData: Candidate[] = [];
       
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const experienceYears = data.experienceYears || 0;
         
-        candidatesData.push({
+        applicationsData.push({
           id: doc.id,
           initials: getInitials(data.fullName || ""),
           name: data.fullName || "Unknown",
@@ -141,12 +142,12 @@ const Candidates = () => {
         });
       });
       
-      setCandidates(candidatesData);
-      setTotalCount(candidatesData.length);
+      setApplications(applicationsData);
+      setTotalCount(applicationsData.length);
       
     } catch (err) {
-      console.error("Error fetching candidates:", err);
-      setError("Failed to load candidates. Please try again later.");
+      console.error("Error fetching applications:", err);
+      setError("Failed to load applications. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -156,38 +157,38 @@ const Candidates = () => {
     setSearchTerm(e.target.value);
   };
 
-  const filteredCandidates = candidates.filter(candidate => {
+  const filteredApplications = applications.filter(application => {
     const matchesSearch = searchTerm === "" || 
-      candidate.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      candidate.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      candidate.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
+      application.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      application.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      application.skills.some(skill => skill.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesStatus = filterStatus === "all" || 
-      candidate.status.toLowerCase() === filterStatus.toLowerCase();
+      application.status.toLowerCase() === filterStatus.toLowerCase();
     
     return matchesSearch && matchesStatus;
   });
 
-  const handleReviewProfile = (candidateId: string) => {
-    navigate(`/candidate-profile/${candidateId}`);
+  const handleReviewProfile = (applicationId: string) => {
+    navigate(`/candidate-profile/${applicationId}`);
   };
 
-  const handleViewCV = (candidate: Candidate) => {
-    if (candidate.cvData && candidate.cvData.content) {
+  const handleViewCV = (application: Candidate) => {
+    if (application.cvData && application.cvData.content) {
       const win = window.open();
       if (win) {
         win.document.write(`
           <!DOCTYPE html>
           <html>
           <head>
-            <title>${candidate.name} - CV</title>
+            <title>${application.name} - CV</title>
             <style>
               body { margin: 0; padding: 0; height: 100vh; overflow: hidden; }
               embed { width: 100%; height: 100%; border: none; }
             </style>
           </head>
           <body>
-            <embed src="${candidate.cvData.content}" type="application/pdf" width="100%" height="100%" />
+            <embed src="${application.cvData.content}" type="application/pdf" width="100%" height="100%" />
           </body>
           </html>
         `);
@@ -198,11 +199,11 @@ const Candidates = () => {
     }
   };
 
-  const handleDownloadCV = (candidate: Candidate) => {
-    if (candidate.cvData && candidate.cvData.content) {
+  const handleDownloadCV = (application: Candidate) => {
+    if (application.cvData && application.cvData.content) {
       const link = document.createElement("a");
-      link.href = candidate.cvData.content;
-      link.download = candidate.cvData.fileName || `${candidate.name}_CV.pdf`;
+      link.href = application.cvData.content;
+      link.download = application.cvData.fileName || `${application.name}_CV.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -222,7 +223,7 @@ const Candidates = () => {
           fontSize: "18px",
           color: "#666"
         }}>
-          Loading candidates...
+          Loading applications...
         </div>
       </div>
     );
@@ -241,7 +242,7 @@ const Candidates = () => {
         }}>
           {error}
           <button 
-            onClick={fetchCandidates}
+            onClick={fetchApplications}
             style={{
               marginLeft: "10px",
               padding: "5px 10px",
@@ -263,7 +264,7 @@ const Candidates = () => {
     <div className="candidates-page">
       <div className="page-top">
         <div className="title-section">
-          <h1>Candidates</h1>
+          <h1>Applications</h1>
           <span className="total-badge">{totalCount} Total</span>
         </div>
         <div className="header-icons">
@@ -347,60 +348,60 @@ const Candidates = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredCandidates.length > 0 ? (
-              filteredCandidates.map((candidate) => (
-                <tr key={candidate.id}>
+            {filteredApplications.length > 0 ? (
+              filteredApplications.map((application) => (
+                <tr key={application.id}>
                   <td className="name-cell">
-                    <div className="candidate-badge">{candidate.initials}</div>
+                    <div className="candidate-badge">{application.initials}</div>
                     <div className="candidate-info">
-                      <div className="candidate-name">{candidate.name}</div>
-                      <div className="candidate-email">{candidate.email}</div>
-                      {candidate.phone && (
-                        <div className="candidate-phone">{candidate.phone}</div>
+                      <div className="candidate-name">{application.name}</div>
+                      <div className="candidate-email">{application.email}</div>
+                      {application.phone && (
+                        <div className="candidate-phone">{application.phone}</div>
                       )}
                     </div>
                   </td>
                   <td className="skills-cell">
                     <div className="skill-tags">
-                      {candidate.skills.slice(0, 3).map((skill, idx) => (
+                      {application.skills.slice(0, 3).map((skill, idx) => (
                         <span key={idx} className="skill-tag">
                           {skill}
                         </span>
                       ))}
-                      {candidate.skills.length > 3 && (
-                        <span className="skill-tag extra">+{candidate.skills.length - 3}</span>
+                      {application.skills.length > 3 && (
+                        <span className="skill-tag extra">+{application.skills.length - 3}</span>
                       )}
                     </div>
-                    {candidate.interestedField && (
+                    {application.interestedField && (
                       <div className="interested-field">
-                        {candidate.interestedField.split("/")[0]}
+                        {application.interestedField.split("/")[0]}
                       </div>
                     )}
                   </td>
                   <td>
-                    <div>{candidate.location}</div>
-                    {candidate.availability && (
+                    <div>{application.location}</div>
+                    {application.availability && (
                       <div className="availability-info">
-                        Available: {candidate.availability}
+                        Available: {application.availability}
                       </div>
                     )}
                   </td>
-                  <td>{candidate.experience}</td>
+                  <td>{application.experience}</td>
                   <td>
-                    <span className={`status-badge status-${candidate.statusColor}`}>
-                      {candidate.status}
+                    <span className={`status-badge status-${application.statusColor}`}>
+                      {application.status}
                     </span>
                   </td>
                   <td className="action-cell">
                     <button 
                       className="action-btn"
-                      onClick={() => handleReviewProfile(candidate.id)}
+                      onClick={() => handleReviewProfile(application.id)}
                     >
                       Review Profile
                     </button>
                     <button 
                       className="action-btn-secondary"
-                      onClick={() => handleDownloadCV(candidate)}
+                      onClick={() => handleDownloadCV(application)}
                     >
                       Download
                     </button>
@@ -410,10 +411,9 @@ const Candidates = () => {
             ) : (
               <tr>
                 <td colSpan={6} style={{ textAlign: "center", padding: "40px" }}>
-                  No candidates found
+                  No applications found
                 </td>
               </tr>
-
             )}
           </tbody>
         </table>
@@ -421,7 +421,7 @@ const Candidates = () => {
 
       <div className="pagination-section">
         <span className="pagination-info">
-          Showing {filteredCandidates.length} of {totalCount} candidates
+          Showing {filteredApplications.length} of {totalCount} applications
         </span>
       </div>
     </div>
