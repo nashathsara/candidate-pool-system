@@ -11,7 +11,7 @@ const EmailVerification: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Auth Status එක බලනවා
+    // 1. Auth Status 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user);
