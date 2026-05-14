@@ -14,6 +14,7 @@ const createCandidateProfile = async (req, res) => {
     console.log("1. Registration started for:", req.body.email);
     const { email, password } = req.body;
 
+    // 1) Check duplicates
     const newCandidate = new Candidate(req.body);
     const existingDuplicate = await checkDuplicates(newCandidate);
 
@@ -21,84 +22,58 @@ const createCandidateProfile = async (req, res) => {
       return res.status(200).json({
         status: "duplicate",
         message: "Exact match found in the system.",
-        existingData: existingDuplicate
+        existingData: existingDuplicate,
       });
     }
 
-    // Redirect URL
+    // 2) Create user (ADMIN SDK)
+    const userRecord = await auth.createUser({
+      email,
+      password,
+      displayName: fullName,
+    });
+
+    // 3) Generate verification link (ADMIN SDK)
     const actionCodeSettings = {
-      url: 'http://localhost:5173/verified', 
+      url: "http://localhost:5173/verified",
       handleCodeInApp: false,
     };
 
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    // Generate email verification link
+    const verificationLink = await auth.generateEmailVerificationLink(
+      email,
+      actionCodeSettings
+    );
 
-    await sendEmailVerification(user, actionCodeSettings);
-    console.log("2. Verification email triggered with redirect settings");
-
-    const docRef = await addDoc(collection(db, "candidates"), {
+    // 4) Save candidate to Firestore (ADMIN SDK)
+    const docRef = await db.collection("candidates").add({
       ...newCandidate,
-      uid: user.uid,
-      isVerified: false 
+      uid: userRecord.uid,
+      isVerified: false,
+      verificationLink, // optional: keep or remove
     });
 
-    res.status(201).json({
+    return res.status(201).json({
       status: "success",
-      message: "Candidate profile created and verification email sent!",
-      id: docRef.id
+      message: "Candidate profile created and verification link generated!",
+      id: docRef.id,
+      verificationLink, // optional: remove in production
     });
-
   } catch (error) {
-    console.log("❌ REGISTRATION ERROR:", error.message);
-    if (error.code === 'auth/email-already-in-use') {
+    console.log("❌ CRITICAL ERROR:", error.message);
+    console.error("Signup Error:", error.message);
+
+    // firebase-admin errors
+    if (error && error.code === "auth/email-already-exists") {
       return res.status(400).json({
         status: "error",
-        message: "This email is already registered."
-      });
-    }
-    res.status(500).json({ status: "error", message: error.message });
-  }
-};
-
-//  (Sign In) ---
-const signInCandidate = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    console.log("Attempting sign in for:", email);
-
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    if (!user.emailVerified) {
-      console.log("❌ Sign in blocked: Email not verified");
-      return res.status(403).json({
-        status: "unverified",
-        message: "Please verify your email before signing in."
+        message: "This email is already registered in Firebase Authentication.",
       });
     }
 
-    console.log("✅ Sign in successful for:", email);
-    res.status(200).json({
-      status: "success",
-      message: "Welcome back!",
-      user: {
-        uid: user.uid,
-        email: user.email
-      }
-    });
-
-  } catch (error) {
-    console.log("❌ SIGNIN ERROR:", error.message);
-    let message = "Invalid email or password.";
-    
-    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-      message = "Invalid login credentials.";
-    }
-
-    res.status(401).json({
+    return res.status(500).json({
       status: "error",
-      message: message
+      message: error.message || "Internal server error",
     });
   }
 };
