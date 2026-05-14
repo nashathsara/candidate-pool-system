@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiUser, FiLock, FiEye, FiSettings, FiBriefcase } from 'react-icons/fi';
+import { FiUser, FiLock, FiEye, FiSettings } from 'react-icons/fi';
 
 const CandidateSettings: React.FC = () => {
   const [profileVisibility, setProfileVisibility] = useState(true);

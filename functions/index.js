@@ -1,18 +1,23 @@
 const express = require('express');
-const { body, validationResult } = require('express-validator');
-const nodemailer = require('nodemailer');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const OpenAI = require('openai/index.js');
+const cors = require('cors');
+require('dotenv').config();
+const candidateRoutes = require('./routes/candidateRoutes');
 
+// 1. මුලින්ම app එක හදාගන්න ඕනේ (Initialize)
 const app = express();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// ============ Configuration ============
-const PORT = process.env.PORT || 3000;
+// 2. ඊට පස්සේ තමයි middleware පාවිච්චි කරන්නේ
+app.use(cors({ origin: true }));
+app.use(express.json());
+
+// 3. ඊළඟට routes සම්බන්ධ කරනවා
+app.use('/api/candidates', candidateRoutes);
+
+
+const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-    console.log('\n========================================');
-    console.log('🚀 Candidate Pool System API is running!');
-    console.log('========================================');
+  console.log(`========================================`);
+  console.log(`🚀 Candidate Pool System API is running!`);
+  console.log(`========================================`);
 });
