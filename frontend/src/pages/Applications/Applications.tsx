@@ -1,6 +1,6 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Search, LogOut } from 'lucide-react';
+import { User, Briefcase, FileText, HelpCircle, Bell, Search, Settings, LogOut } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../../config/firebase';
 import './Applications.css';
@@ -59,7 +59,6 @@ const calculateAge = (dob: string) => {
   return String(age);
 };
 
-// Helper function to convert file to Base64
 const fileToBase64 = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -77,7 +76,7 @@ const CandidateApplicationView = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleSignOut = () => {
-    navigate('/SignIn');
+    navigate('/signin');
   };
 
   const [formData, setFormData] = useState({
@@ -259,12 +258,12 @@ const CandidateApplicationView = () => {
   };
 
   return (
-    <div className="browse-page">
+    <div className="applications-page">
       <header className="browse-header">
         <div className="header-left">
           <div className="logo-container">
             <Briefcase className="logo-icon" size={28} />
-            <h1 className="logo">CandidateHub</h1>
+            <h1 className="logo">Applications</h1>
           </div>
         </div>
         
@@ -273,7 +272,7 @@ const CandidateApplicationView = () => {
             <Briefcase size={18} />
             Dashboard
           </Link>
-          <Link to="/browse-jobs" className="nav-link">
+          <Link to="/browse" className="nav-link">
             <Search size={18} />
             Browse Jobs
           </Link>
@@ -292,7 +291,10 @@ const CandidateApplicationView = () => {
             <Bell className="notification-bell" size={20} />
             <span className="notification-badge">3</span>
           </div>
-          <div className="user-profile">
+          <Link to="/settings" className="icon-btn" aria-label="Settings">
+            <Settings size={18} />
+          </Link>
+          <Link to="/candidate-dashboard" className="user-profile">
             <div className="user-avatar">
               <User size={20} />
             </div>
@@ -300,7 +302,7 @@ const CandidateApplicationView = () => {
               <span className="user-name">Guest User</span>
               <span className="user-role">Candidate</span>
             </div>
-          </div>
+          </Link>
           <button 
             type="button" 
             className="signout-btn"

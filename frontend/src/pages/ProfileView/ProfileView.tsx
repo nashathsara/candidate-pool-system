@@ -13,8 +13,6 @@ import {
   FiDollarSign,
   FiClock,
   FiArrowLeft,
-  FiBriefcase,
-  FiTrendingUp,
   FiAward,
   FiCode
 } from 'react-icons/fi';
@@ -809,36 +807,5 @@ const extractProjectsFromText = (text: string) => {
   );
 };
 
-// Helper Components
-const IconInfo = ({ icon, text }: any) => (
-  <div className="flex items-center gap-2 text-xs font-bold text-gray-500">
-    <span className="text-gray-300">{React.cloneElement(icon, { className: "w-4 h-4" })}</span>
-    {text}
-  </div>
-);
-
-const ExperienceItem = ({ title, company, period, desc }: any) => (
-  <div className="relative pl-8 before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-blue-500 before:rounded-full after:absolute after:left-[2.5px] after:top-6 after:bottom-[-2.5rem] after:w-[1px] after:bg-gray-100 last:after:hidden">
-    <div className="flex justify-between items-start mb-1">
-      <h4 className="text-lg font-black text-gray-900">{title}</h4>
-      <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{period}</span>
-    </div>
-    <p className="text-sm text-blue-500 font-bold mb-3 italic">{company}</p>
-    <p className="text-sm text-gray-500 leading-relaxed font-medium">{desc}</p>
-  </div>
-);
-
-const ProgressBar = ({ label, value, color }: any) => (
-  <div className="mb-6 last:mb-0">
-    <div className="flex justify-between mb-2">
-      <span className="text-xs font-black uppercase tracking-wider text-gray-400">{label}</span>
-      <span className="text-xs font-black text-gray-900">{value}%</span>
-    </div>
-    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-      <div className={`${color} h-full rounded-full transition-all duration-500`} style={{ width: `${value}%` }}></div>
-    </div>
-    <p className="text-[9px] font-black text-gray-300 uppercase mt-1 tracking-tighter">Fit Score</p>
-  </div>
-);
 
 export default ProfileView;

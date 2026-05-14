@@ -1,14 +1,12 @@
 const { db, auth } = require("../config/firebase");
 const { 
   createUserWithEmailAndPassword, 
-  sendEmailVerification,
-  signInWithEmailAndPassword 
+  sendEmailVerification
 } = require("firebase/auth");
 const { collection, addDoc, query, where, getDocs, doc, updateDoc } = require("firebase/firestore");
 const Candidate = require("../models/Candidate");
 const { checkDuplicates } = require("../services/duplicateDetection");
 
-// (Registration) ---
 const createCandidateProfile = async (req, res) => {
   try {
     console.log("1. Registration started for:", req.body.email);
@@ -61,45 +59,78 @@ const createCandidateProfile = async (req, res) => {
   }
 };
 
-//  (Sign In) ---
 const signInCandidate = async (req, res) => {
   try {
     const { email, password } = req.body;
     console.log("Attempting sign in for:", email);
 
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    if (!user.emailVerified) {
-      console.log("❌ Sign in blocked: Email not verified");
-      return res.status(403).json({
-        status: "unverified",
-        message: "Please verify your email before signing in."
-      });
+    const apiKey = process.env.FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY;
+    if (!apiKey) {
+      throw new Error("Firebase API key not configured on the server.");
     }
 
-    console.log("✅ Sign in successful for:", email);
-    res.status(200).json({
-      status: "success",
-      message: "Welcome back!",
-      user: {
-        uid: user.uid,
-        email: user.email
+    const signInUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`;
+    const signInResponse = await fetch(signInUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, returnSecureToken: true })
+    });
+
+    const signInData = await signInResponse.json();
+
+    if (!signInResponse.ok) {
+      const errorCode = signInData.error?.message;
+      let message = 'Invalid email or password.';
+
+      if (errorCode === 'EMAIL_NOT_FOUND' || errorCode === 'INVALID_PASSWORD') {
+        message = 'Invalid login credentials.';
+      } else if (errorCode === 'USER_DISABLED') {
+        message = 'User account has been disabled.';
       }
+
+      console.log('❌ SIGNIN ERROR:', errorCode || signInData);
+      return res.status(401).json({ status: 'error', message });
+    }
+
+    const idToken = signInData.idToken;
+    const lookupUrl = `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${apiKey}`;
+    const lookupResponse = await fetch(lookupUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken })
+    });
+
+    const lookupData = await lookupResponse.json();
+    if (!lookupResponse.ok) {
+      console.log('❌ SIGNIN LOOKUP ERROR:', lookupData);
+      return res.status(500).json({ status: 'error', message: 'Unable to verify user account.' });
+    }
+
+    const userRecord = lookupData.users?.[0];
+    if (!userRecord) {
+      return res.status(404).json({ status: 'error', message: 'User not found.' });
+    }
+
+    if (!userRecord.emailVerified) {
+      console.log('❌ Sign in blocked: Email not verified');
+      return res.status(403).json({ status: 'unverified', message: 'Please verify your email before signing in.' });
+    }
+
+    console.log('✅ Sign in successful for:', email);
+    res.status(200).json({
+      status: 'success',
+      message: 'Welcome back!',
+      user: {
+        uid: userRecord.localId,
+        email: userRecord.email
+      },
+      idToken
     });
 
   } catch (error) {
-    console.log("❌ SIGNIN ERROR:", error.message);
-    let message = "Invalid email or password.";
-    
-    if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-      message = "Invalid login credentials.";
-    }
-
-    res.status(401).json({
-      status: "error",
-      message: message
-    });
+    console.log('❌ SIGNIN ERROR:', error);
+    const message = error?.message || 'Invalid email or password.';
+    res.status(500).json({ status: 'error', message });
   }
 };
 

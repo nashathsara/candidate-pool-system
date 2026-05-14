@@ -5,7 +5,8 @@ import { FaLinkedin } from 'react-icons/fa';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { auth } from "../../config/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { API_BASE_URL } from "../../services/api";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -21,21 +22,42 @@ const handleSignIn = async (e: React.FormEvent) => {
   setError('');
 
   try {
-    // ✅ 1. මුලින්ම Firebase Auth එක හරහා Frontend එකේ Session එක හදනවා
-    await signInWithEmailAndPassword(auth, email, password);
+    // First sign in locally with Firebase Auth
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-    // ✅ 2. ඊට පස්සේ Backend එකට දැනුම් දෙනවා (Verified ද කියලා බලන්න)
-    const response = await axios.post('http://localhost:5000/api/candidates/login', {
+    if (!user.emailVerified) {
+      setError('Please verify your email before signing in.');
+      await signOut(auth);
+      return;
+    }
+
+    // Then notify backend so it can perform any server-side checks
+    const response = await axios.post(`${API_BASE_URL}/api/candidates/login`, {
       email,
       password
     });
 
     if (response.data.status === 'success') {
-      navigate('/settings'); // කෙලින්ම Settings පේජ් එකට යන්න
+      navigate('/settings');
+      return;
     }
+
+    await signOut(auth);
+    setError(response.data.message || 'Unable to sign in.');
   } catch (err: any) {
-    console.error("Sign in failed:", err.message);
-    setError("Invalid email or password. Please verify your email.");
+    console.error("Sign in failed:", err);
+    const backendMessage = err?.response?.data?.message;
+    const networkHint = err?.message === 'Network Error'
+      ? `Unable to reach backend at ${API_BASE_URL}. Make sure the server is running.`
+      : null;
+    const message = backendMessage || networkHint || err?.message || 'Invalid email or password. Please verify your email.';
+    setError(message);
+    try {
+      await signOut(auth);
+    } catch {
+      // ignore sign out errors
+    }
   } finally {
     setIsLoading(false);
   }

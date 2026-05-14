@@ -173,32 +173,6 @@ const Candidates = () => {
     navigate(`/candidate-profile/${applicationId}`);
   };
 
-  const handleViewCV = (application: Candidate) => {
-    if (application.cvData && application.cvData.content) {
-      const win = window.open();
-      if (win) {
-        win.document.write(`
-          <!DOCTYPE html>
-          <html>
-          <head>
-            <title>${application.name} - CV</title>
-            <style>
-              body { margin: 0; padding: 0; height: 100vh; overflow: hidden; }
-              embed { width: 100%; height: 100%; border: none; }
-            </style>
-          </head>
-          <body>
-            <embed src="${application.cvData.content}" type="application/pdf" width="100%" height="100%" />
-          </body>
-          </html>
-        `);
-        win.document.close();
-      }
-    } else {
-      alert("No CV available for this candidate");
-    }
-  };
-
   const handleDownloadCV = (application: Candidate) => {
     if (application.cvData && application.cvData.content) {
       const link = document.createElement("a");

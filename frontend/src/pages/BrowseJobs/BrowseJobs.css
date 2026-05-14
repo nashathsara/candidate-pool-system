@@ -44,12 +44,20 @@
   color: #64748b;
   text-decoration: none;
   font-weight: 600;
-  transition: color 0.2s ease;
+  transition: all 0.2s ease;
+  padding: 10px 14px;
+  border-radius: 14px;
 }
 
-.header-nav a.active,
 .header-nav a:hover {
   color: #0f172a;
+  background: #f8fafc;
+}
+
+.header-nav a.active {
+  color: #ffffff;
+  background: #0f172a;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 
 .header-right {
@@ -312,6 +320,12 @@
   text-decoration: none;
   font-weight: 700;
   transition: transform 0.2s ease;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
 }
 
 .details-link:hover {
@@ -496,4 +510,242 @@
 
 .dropdown-list li:last-child {
   border-bottom: none;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 700px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #f1f5f9;
+  border: none;
+  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #475569;
+  transition: all 0.2s ease;
+  z-index: 10;
+}
+
+.modal-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 32px 32px 24px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.job-icon-box-large {
+  width: 60px;
+  height: 60px;
+  min-width: 60px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #0f172a;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.modal-header-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.job-badge-large {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.12);
+  color: #0f766e;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.modal-header-text h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.2;
+  word-wrap: break-word;
+}
+
+.modal-body {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.modal-detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detail-label {
+  font-weight: 700;
+  color: #0f172a;
+  font-size: 0.95rem;
+}
+
+.detail-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.modal-description-section {
+  margin-top: 12px;
+}
+
+.modal-description-section h3 {
+  margin: 0 0 12px 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.modal-description-section p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.modal-footer {
+  padding: 24px 32px;
+  border-top: 1px solid #f1f5f9;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.apply-btn {
+  padding: 12px 32px;
+  border: none;
+  border-radius: 12px;
+  background: #10b981;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.apply-btn:hover {
+  background: #059669;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+}
+
+.apply-btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-content {
+    max-height: 95vh;
+  }
+
+  .modal-header {
+    padding: 20px 20px 16px;
+    gap: 16px;
+  }
+
+  .modal-body {
+    padding: 20px;
+    gap: 18px;
+  }
+
+  .modal-footer {
+    padding: 16px 20px;
+  }
+
+  .job-icon-box-large {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+
+  .modal-header-text h2 {
+    font-size: 1.25rem;
+  }
+
+  .apply-btn {
+    padding: 10px 24px;
+    font-size: 0.9rem;
+    width: 100%;
+  }
 }
