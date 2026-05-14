@@ -2,10 +2,11 @@ const { auth, db, admin } = require("../config/firebase");
 const Candidate = require("../models/Candidate");
 const { checkDuplicates } = require("../services/duplicateDetection");
 
+// (Registration) ---
 const createCandidateProfile = async (req, res) => {
   try {
     console.log("1. Registration started for:", req.body.email);
-    const { email, password, fullName } = req.body;
+    const { email, password } = req.body;
 
     // 1) Check duplicates
     const newCandidate = new Candidate(req.body);
