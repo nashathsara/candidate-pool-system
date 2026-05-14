@@ -1,0 +1,618 @@
+.ticket-success-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+/* Success Header */
+.success-header {
+  text-align: center;
+  margin-bottom: 40px;
+  animation: slideDown 0.6s ease-out;
+}
+
+.checkmark-icon {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  color: white;
+  margin: 0 auto 20px;
+  box-shadow: 0 8px 24px rgba(26, 188, 156, 0.3);
+  animation: scaleIn 0.5s ease-out;
+}
+
+.success-header h1 {
+  font-size: 32px;
+  color: #2c3e50;
+  margin: 20px 0 10px;
+  font-weight: 600;
+}
+
+.success-header p {
+  font-size: 16px;
+  color: #7f8c8d;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Ticket Card */
+.ticket-card {
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.12);
+  padding: 36px;
+  max-width: 720px;
+  width: 100%;
+  animation: slideUp 0.6s ease-out;
+  position: relative;
+  overflow: hidden;
+}
+
+.ticket-card::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: radial-gradient(circle at 10% 0%, rgba(26, 188, 156, 0.25), transparent 55%),
+    radial-gradient(circle at 90% 15%, rgba(52, 152, 219, 0.25), transparent 45%);
+  pointer-events: none;
+}
+
+.ticket-top {
+  position: relative;
+  z-index: 1;
+  margin-bottom: 26px;
+}
+
+.ticket-pill {
+  display: inline-block;
+  background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+  color: white;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  box-shadow: 0 10px 25px rgba(26, 188, 156, 0.25);
+}
+
+.ticket-title {
+  margin: 14px 0 8px 0;
+  font-size: 28px;
+  color: #2c3e50;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.ticket-subtitle {
+  margin: 0;
+  color: #7f8c8d;
+  line-height: 1.6;
+  font-size: 15px;
+  max-width: 620px;
+}
+
+.ticket-meta {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #7f8c8d;
+}
+
+.resolution-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #eaf6ff;
+  color: #3498db;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+
+/* Ticket Info Grid */
+.ticket-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.ticket-info-item label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.ticket-id {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ticket-id span {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1abc9c;
+  letter-spacing: 0.5px;
+}
+
+.copy-btn {
+  background: #ecf0f1;
+  border: none;
+  padding: 6px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+  background: #bdc3c7;
+  transform: scale(1.1);
+}
+
+.resolution-time {
+  font-size: 20px;
+  font-weight: 700;
+  color: #3498db;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Support Team Section */
+.support-team-section {
+  margin-bottom: 40px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.support-team-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 15px;
+}
+
+.team-members {
+  display: flex;
+  gap: -8px;
+  margin-bottom: 12px;
+}
+
+.team-avatar {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  border: 3px solid white;
+  margin-left: -8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.team-avatar:first-child {
+  margin-left: 0;
+}
+
+.team-avatar:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.team-description {
+  font-size: 13px;
+  color: #7f8c8d;
+}
+
+/* Resolution Timeline */
+.resolution-timeline {
+  margin-bottom: 30px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.resolution-timeline h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.timeline-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.timeline-step {
+  display: flex;
+  gap: 20px;
+  padding: 16px 0;
+  position: relative;
+}
+
+.step-icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  min-width: 40px;
+  flex-shrink: 0;
+}
+
+.status-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+}
+
+.icon-complete {
+  background: #1abc9c;
+  color: white;
+}
+
+.icon-in-progress {
+  background: #3498db;
+  color: white;
+  animation: spin 2s linear infinite;
+}
+
+.icon-pending {
+  background: #bdc3c7;
+  color: #7f8c8d;
+  border: 2px solid #ecf0f1;
+}
+
+.step-connector {
+  width: 2px;
+  flex: 1;
+  background: #ecf0f1;
+  margin-top: 8px;
+  position: relative;
+}
+
+.timeline-step:last-child .step-connector {
+  display: none;
+}
+
+.timeline-step.complete .step-connector {
+  background: #1abc9c;
+}
+
+.timeline-step.in-progress .step-connector {
+  background: #3498db;
+}
+
+.step-content {
+  flex: 1;
+  padding-top: 2px;
+}
+
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.step-header h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-complete {
+  background: #d4edda;
+  color: #155724;
+}
+
+.badge-in-progress {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.badge-pending {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.step-content p {
+  font-size: 13px;
+  color: #7f8c8d;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Warning Box */
+.warning-box {
+  background: #fff3cd;
+  border-left: 4px solid #ffc107;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 30px;
+  display: flex;
+  gap: 15px;
+}
+
+.warning-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.warning-content h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #856404;
+  margin: 0 0 6px 0;
+}
+
+.warning-content p {
+  font-size: 13px;
+  color: #856404;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #1abc9c 0%, #16a085 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(26, 188, 156, 0.3);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(26, 188, 156, 0.4);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  background: #2c3e50;
+  color: white;
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+}
+
+.btn-secondary:hover {
+  background: #1a252f;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(44, 62, 80, 0.4);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
+}
+
+/* Additional Link */
+.additional-link {
+  text-align: center;
+  padding-top: 20px;
+  border-top: 1px solid #ecf0f1;
+}
+
+.additional-link a {
+  font-size: 14px;
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.additional-link a:hover {
+  color: #2980b9;
+  text-decoration: underline;
+}
+
+/* Footer */
+.ticket-footer {
+  text-align: center;
+  margin-top: 30px;
+  padding: 20px;
+  color: #7f8c8d;
+  font-size: 13px;
+}
+
+.ticket-footer p {
+  margin: 0 0 12px 0;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.footer-links a {
+  color: #3498db;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #2980b9;
+  text-decoration: underline;
+}
+
+.separator {
+  color: #bdc3c7;
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ticket-success-container {
+    padding: 20px;
+  }
+
+  .ticket-card {
+    padding: 25px;
+  }
+
+  .ticket-info-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .success-header h1 {
+    font-size: 24px;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+  }
+
+  .btn {
+    min-width: auto;
+  }
+
+  .checkmark-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .ticket-success-container {
+    padding: 15px;
+  }
+
+  .ticket-card {
+    padding: 20px;
+  }
+
+  .success-header h1 {
+    font-size: 20px;
+  }
+
+  .success-header p {
+    font-size: 14px;
+  }
+
+  .ticket-id span {
+    font-size: 16px;
+  }
+
+  .resolution-time {
+    font-size: 16px;
+  }
+
+  .checkmark-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 28px;
+  }
+}
