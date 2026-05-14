@@ -1,4 +1,4 @@
-# 🧠 Candidate Pool System
+#  Candidate Pool System
 
 A **production-ready** smart candidate pool system with AI-powered duplicate detection, ticket management, admin controls, and candidate journey tracking.
 
