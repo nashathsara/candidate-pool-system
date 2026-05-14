@@ -188,7 +188,7 @@ class AIDuplicateDetector {
       }
     }
     
-    const reason = this.generatePriorityReason(matchedFields, finalScore, a, b);
+    const reason = this.generatePriorityReason(matchedFields, finalScore, a);
     this.cache.set(cacheKey, finalScore);
     
     return { score: finalScore, reason, matchedFields };
@@ -368,7 +368,7 @@ Duplicate score (0-100):`;
     }
   }
 
-  private static generatePriorityReason(matchedFields: string[], score: number, a: ApplicationData, b: ApplicationData): string {
+  private static generatePriorityReason(matchedFields: string[], score: number, a: ApplicationData): string {
     if (matchedFields.includes('CV filename (same document)')) {
       return `🔴 CRITICAL: Same CV file uploaded (${a.cvFileName}) - These are the same person despite different names!`;
     }
@@ -552,7 +552,6 @@ const DuplicateResolution: React.FC = () => {
     const keepId = mergeStrategy.keepName === 'application1' ? id1 : id2;
     const removeId = keepId === id1 ? id2 : id1;
     const keepApplication = keepId === id1 ? application1 : application2;
-    const removeApplication = keepId === id1 ? application2 : application1;
     
     // Merge data based on user strategy
     const mergedData: any = {};

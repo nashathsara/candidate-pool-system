@@ -9,9 +9,10 @@ import Candidates from "./pages/Candidates/Candidates";
 import ViewCV from './components/ViewCV';
 import DuplicateResolution from "./pages/Admin/DuplicateResolution";
 import CandidateSettings from "./pages/Candidates/CandidateSettings";
-import DuplicationView from "./pages/Candidates/DuplicationView";
 import ApplicationSuccess from "./pages/ApplicationSuccess/ApplicationSuccess";
 import BrowseJobs from "./pages/BrowseJobs/BrowseJobs";
+import CandidateDashboard from "./pages/CandidateDashboard/CandidateDashboard";
+import HelpCenter from "./pages/HelpCenter/HelpCenter";
 import SignIn from "./pages/Home/SignIn";
 import Signup from "./pages/Admin/Signup";
 import TicketSubmitForm from "./pages/TicketSubmitForm/TicketSubmitForm";
@@ -20,11 +21,7 @@ import TicketSuccess from "./pages/TicketSuccess/TicketSuccess";
 import AdminDashboardPage from "./pages/Admin/AdminDashboardPage";
 import ProfileCreate from "./pages/ProfileCreate/ProfileCreate";
 import Home from "./pages/Home/Home";
-import CandidateDashboard from "./pages/CandidateDashboard/CandidateDashboard";
 import Applications from "./pages/Applications/Applications";
-import CandidateSettingsPage from "./pages/CandidateSettingsPage/CandidateSettingsPage";
-
-import HelpCenter from "./pages/HelpCenter/HelpCenter";
 // Wrapper component to extract candidateId from URL params
 const ViewCVWrapper = () => {
   const { candidateId } = useParams<{ candidateId: string }>();
@@ -53,14 +50,18 @@ const AppRoutes = () => {
         <Route path="/admin/settings" element={<Settings />} />
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/EmailVerification" element={<EmailVerification />} />
-        {/* <Route path="/candidate/duplicate-check" element={<DuplicationView />} /> */}
         <Route path="/applications" element={<Applications />} />
         <Route path="/application-success" element={<Navigate to="/browse" replace />} />
         <Route path="/application-success/:jobId" element={<ApplicationSuccess />} />
 
         {/* Case-insensitive-ish aliases (React Router paths are case-sensitive) */}
         <Route path="/BrowseJobs" element={<Navigate to="/browse" replace />} />
+        <Route path="/browse-jobs" element={<Navigate to="/browse" replace />} />
+        <Route path="/jobs" element={<Navigate to="/browse" replace />} />
         <Route path="/browse" element={<BrowseJobs />} />
+        <Route path="/profile" element={<Navigate to="/candidate-dashboard" replace />} />
+        <Route path="/candidate-dashboard" element={<CandidateDashboard />} />
+        <Route path="/help" element={<HelpCenter />} />
 
         <Route path="/signin" element={<SignIn />} />
         <Route path="/profile/create" element={<ProfileCreate />} />
