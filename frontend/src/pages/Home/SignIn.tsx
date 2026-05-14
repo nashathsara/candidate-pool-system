@@ -4,6 +4,8 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaLinkedin } from 'react-icons/fa';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { auth } from "../../config/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -12,31 +14,32 @@ const SignIn: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+  
+const handleSignIn = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError('');
 
-    try {
-      const response = await axios.post('http://localhost:5000/api/candidates/login', {
-        email,
-        password
-      });
+  try {
+    // ✅ 1. මුලින්ම Firebase Auth එක හරහා Frontend එකේ Session එක හදනවා
+    await signInWithEmailAndPassword(auth, email, password);
 
-      if (response.data.status === 'success') {
-        navigate('/dashboard'); 
-      }
-    } catch (err: any) {
-      if (err.response?.data?.status === 'unverified') {
-        alert("Please verify your email first.");
-        navigate('/email-verification');
-      } else {
-        setError(err.response?.data?.message || "Sign in failed.");
-      }
-    } finally {
-      setIsLoading(false);
+    // ✅ 2. ඊට පස්සේ Backend එකට දැනුම් දෙනවා (Verified ද කියලා බලන්න)
+    const response = await axios.post('http://localhost:5000/api/candidates/login', {
+      email,
+      password
+    });
+
+    if (response.data.status === 'success') {
+      navigate('/settings'); // කෙලින්ම Settings පේජ් එකට යන්න
     }
-  };
+  } catch (err: any) {
+    console.error("Sign in failed:", err.message);
+    setError("Invalid email or password. Please verify your email.");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4 font-sans">
