@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedRole, setSelectedRole] = useState<'candidate' | 'hr' | 'admin'>('candidate');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -20,7 +21,8 @@ const SignIn: React.FC = () => {
     try {
       const response = await axios.post('http://localhost:5000/api/candidates/login', {
         email,
-        password
+        password,
+        role: selectedRole
       });
 
       if (response.data.status === 'success') {
