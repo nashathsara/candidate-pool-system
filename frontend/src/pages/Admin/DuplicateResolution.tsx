@@ -177,7 +177,7 @@ class AIDuplicateDetector {
     let finalScore = ruleScore.score;
     let matchedFields = ruleScore.matchedFields;
     
-    if (this.USE_GEMINI && this.GEMINI_API_KEY && this.GEMINI_API_KEY !== "YOUR_GEMINI_API_KEY") {
+   if (this.USE_GEMINI && this.GEMINI_API_KEY) {
       try {
         const aiScore = await this.getGeminiDuplicateScore(a, b);
         if (aiScore !== null) {
