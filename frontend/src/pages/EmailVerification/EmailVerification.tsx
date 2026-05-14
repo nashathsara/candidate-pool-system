@@ -15,14 +15,21 @@ const EmailVerification: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (timer <= 0) return;
-    if (!isResendDisabled) return;
+    // 1. Auth Status 
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setCurrentUser(user);
+        console.log("User detected:", user.email);
+      }
+    });
 
-    const interval = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          setIsResendDisabled(false);
-          return 0;
+    // 2. Automatic Check: 3 seconds
+    const checkInterval = setInterval(async () => {
+      if (auth.currentUser) {
+        await auth.currentUser.reload();
+        if (auth.currentUser.emailVerified) {
+          clearInterval(checkInterval);
+          navigate('/verified');
         }
         return prev - 1;
       });

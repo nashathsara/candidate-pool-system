@@ -1,4 +1,10 @@
-const { auth, db, admin } = require("../config/firebase");
+const { auth, db } = require("../config/firebase");
+const { 
+  createUserWithEmailAndPassword, 
+  sendEmailVerification,
+  signInWithEmailAndPassword 
+} = require("firebase/auth");
+const { collection, addDoc, query, where, getDocs, doc, updateDoc } = require("firebase/firestore");
 const Candidate = require("../models/Candidate");
 const { checkDuplicates } = require("../services/duplicateDetection");
 
@@ -72,4 +78,91 @@ const createCandidateProfile = async (req, res) => {
   }
 };
 
-module.exports = { createCandidateProfile };
+// candidateController.js
+// 1. දැනට ලොග් වී සිටින යූසර්ගේ විස්තර ලබා ගැනීම
+// const getCandidateProfile = async (req, res) => {
+//   try {
+//     const { uid } = req.params;
+//     const q = query(collection(db, "candidates"), where("uid", "==", uid));
+//     const snapshot = await getDocs(q);
+
+//     if (snapshot.empty) {
+//       return res.status(404).json({ status: "error", message: "User not found" });
+//     }
+
+//     const userData = snapshot.docs[0].data();
+//     const docId = snapshot.docs[0].id;
+
+//     res.status(200).json({ status: "success", data: { ...userData, docId } });
+//   } catch (error) {
+//     res.status(500).json({ status: "error", message: error.message });
+//   }
+// };
+
+// // 2. විස්තර Update කිරීම (නිවැරදි කළ ක්‍රමය)
+// const updateCandidateProfile = async (req, res) => {
+//   try {
+//     const { docId } = req.params;
+//     const updateData = req.body;
+
+//     // db.collection පාවිච්චි කරන්නේ නැතුව මේ විදිහට ලියන්න:
+//     const candidateRef = doc(db, "candidates", docId);
+//     await updateDoc(candidateRef, updateData);
+
+//     res.status(200).json({ status: "success", message: "Profile updated successfully" });
+//   } catch (error) {
+//     console.error("Update Error:", error.message);
+//     res.status(500).json({ status: "error", message: error.message });
+//   }
+// };
+
+// candidateController.js
+
+// candidateController.js
+
+// 1. යූසර්ගේ ඊමේල් එක හරහා විස්තර ලබා ගැනීම (Get Profile)
+// candidateController.js
+// candidateController.js
+
+const getCandidateProfile = async (req, res) => {
+  try {
+    const { email } = req.params; 
+    const q = query(collection(db, "candidates"), where("email", "==", email));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      return res.status(404).json({ status: "error", message: "User not found" });
+    }
+
+    const userData = snapshot.docs[0].data();
+    res.status(200).json({ 
+      status: "success", 
+      data: { ...userData, docId: snapshot.docs[0].id } 
+    });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+const updateCandidateProfile = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const updateData = req.body;
+
+    const q = query(collection(db, "candidates"), where("email", "==", email));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      return res.status(404).json({ status: "error", message: "User not found." });
+    }
+
+    const docId = snapshot.docs[0].id;
+    const candidateRef = doc(db, "candidates", docId);
+    await updateDoc(candidateRef, updateData);
+
+    res.status(200).json({ status: "success", message: "Profile updated successfully!" });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+module.exports = { createCandidateProfile, signInCandidate, getCandidateProfile, updateCandidateProfile };
