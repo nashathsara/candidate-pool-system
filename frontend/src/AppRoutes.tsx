@@ -55,7 +55,7 @@ const AppRoutes = () => {
         <Route path="/EmailVerification" element={<EmailVerification />} />
         {/* <Route path="/candidate/duplicate-check" element={<DuplicationView />} /> */}
         <Route path="/applications" element={<Applications />} />
-        <Route path="/application-success" element={<ApplicationSuccess/>} />
+        <Route path="/application-success" element={<Navigate to="/browse" replace />} />
         <Route path="/application-success/:jobId" element={<ApplicationSuccess />} />
 
         {/* Case-insensitive-ish aliases (React Router paths are case-sensitive) */}
