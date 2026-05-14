@@ -1,7 +1,3 @@
-
-
-
-
 import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -24,7 +20,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const navigationItems = [
     { name: "Dashboard", path: "/dashboard", icon: <FiHome className="w-5 h-5" /> },
     { name: "Candidates", path: "/candidates", icon: <FiUsers className="w-5 h-5" /> },
-    { name: "Duplicates", path: "/duplicates", icon: <FiCopy className="w-5 h-5" /> },
+    { name: "Duplicates", path: "/duplicates-admin", icon: <FiCopy className="w-5 h-5" /> },
     { name: "Settings", path: "/settings", icon: <FiSettings className="w-5 h-5" /> },
   ];
 

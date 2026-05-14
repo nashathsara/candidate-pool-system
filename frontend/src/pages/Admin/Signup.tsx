@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // පේජ් එක මාරු කිරීමට අවශ්‍යයි
+import { useNavigate,Link } from 'react-router-dom'; // පේජ් එක මාරු කිරීමට අවශ්‍යයි
 import Button from '../../common/Button/Button';
 
 const Signup: React.FC = () => {
