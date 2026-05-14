@@ -79,9 +79,26 @@ The Candidate Pool System addresses **11 critical gaps** identified in candidate
 
 ## 🛠 Tech Stack
 
-### Option 1: Base Configuration (Lightweight)
-### Option 2: Advanced AI & Enterprise
-### Option 3: Lean AI Stack (Recommended)
+### Frontend
+- **React 19** - UI Framework
+- **TypeScript** - Type safety
+- **Vite** - Build tool and dev server
+- **TailwindCSS** - Styling
+- **React Router DOM** - Client-side routing
+- **Axios** - HTTP client
+- **Lucide React** - Icon library
+- **Firebase** - Backend services
+
+### Backend
+- **Node.js** - Runtime environment
+- **Express.js** - Web framework
+- **Firebase** - Database and authentication
+- **OpenAI** - AI-powered features
+- **Google Generative AI** - AI integration
+- **Nodemailer** - Email services
+- **CORS** - Cross-origin resource sharing
+- **Express Validator** - Input validation
+- **Dotenv** - Environment variables
 
 ## 📁 Project Structure
 
@@ -230,3 +247,121 @@ candidate-pool-system/
 └── package.json
 
 ```
+
+---
+
+## 🚀 How to Run
+
+### Prerequisites
+- **Node.js** (v18 or higher)
+- **npm** or **yarn**
+- **Firebase account** (for database and authentication)
+- **OpenAI API key** (for AI features)
+- **Google Generative AI API key** (optional)
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/nashathsara/candidate-pool-system.git
+   cd candidate-pool-system
+   ```
+
+2. **Install Backend Dependencies**
+   ```bash
+   cd functions
+   npm install
+   ```
+
+3. **Install Frontend Dependencies**
+   ```bash
+   cd ../frontend
+   npm install
+   ```
+
+### Environment Setup
+
+1. **Backend Environment Variables**
+   
+   Create a `.env` file in the `functions/` directory:
+   ```env
+   PORT=5000
+   FIREBASE_API_KEY=your_firebase_api_key
+   FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   FIREBASE_PROJECT_ID=your_project_id
+   FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+   FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   FIREBASE_APP_ID=your_app_id
+   OPENAI_API_KEY=your_openai_api_key
+   GOOGLE_AI_API_KEY=your_google_ai_api_key
+   EMAIL_HOST=smtp.gmail.com
+   EMAIL_PORT=587
+   EMAIL_USER=your_email@gmail.com
+   EMAIL_PASSWORD=your_email_password
+   ```
+
+2. **Frontend Environment Variables**
+   
+   Create a `.env` file in the `frontend/` directory:
+   ```env
+   VITE_API_URL=http://localhost:5000
+   VITE_FIREBASE_API_KEY=your_firebase_api_key
+   VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your_project_id
+   VITE_FIREBASE_STORAGE_BUCKET=your_project.appspot.com
+   VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+   VITE_FIREBASE_APP_ID=your_app_id
+   ```
+
+### Running the Project
+
+1. **Start the Backend Server**
+   ```bash
+   cd functions
+   npm run dev
+   ```
+   The backend will run on `http://localhost:5000`
+
+2. **Start the Frontend Development Server**
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+   The frontend will run on `http://localhost:5173` (or another port as specified by Vite)
+
+3. **Access the Application**
+   
+   Open your browser and navigate to `http://localhost:5173`
+
+### Production Build
+
+1. **Build the Frontend**
+   ```bash
+   cd frontend
+   npm run build
+   ```
+
+2. **Preview Production Build**
+   ```bash
+   npm run preview
+   ```
+
+3. **Start Backend in Production Mode**
+   ```bash
+   cd functions
+   npm start
+   ```
+
+### Development Scripts
+
+**Backend (functions/)**
+- `npm run dev` - Start development server
+- `npm start` - Start production server
+
+**Frontend (frontend/)**
+- `npm run dev` - Start Vite development server
+- `npm run build` - Build for production
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
+
+---
