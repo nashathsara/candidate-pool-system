@@ -41,9 +41,12 @@ const Signup: React.FC = () => {
       if (response.data.status === 'success') {
         // Verification link sent - user should check email
         alert("Verification link sent to your email! Please check your inbox.");
-        navigate('/EmailVerification', { replace: true }); 
+        navigate('/EmailVerification', { replace: true });
       } else if (response.data.status === 'duplicate') {
-        alert("This profile already exists in the system.");
+        alert(
+          "This email is already registered. Please sign in or reset your password if you forgot it."
+        );
+        navigate('/signin');
       }
     } catch (error: any) {
       console.error("Signup Error:", error);

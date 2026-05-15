@@ -1,9 +1,5 @@
-const { db, auth } = require("../config/firebase");
-const { 
-  createUserWithEmailAndPassword, 
-  sendEmailVerification
-} = require("firebase/auth");
-const { collection, addDoc, query, where, getDocs, doc, updateDoc } = require("firebase/firestore");
+const { db } = require("../config/firebase");
+const { collection, addDoc, query, where, getDocs, doc, getDoc, updateDoc } = require("firebase/firestore");
 const Candidate = require("../models/Candidate");
 const { checkDuplicates } = require("../services/duplicateDetection");
 
@@ -23,22 +19,59 @@ const createCandidateProfile = async (req, res) => {
       });
     }
 
-    // Redirect URL
+    // Create the user using Firebase Identity Toolkit REST API
+    const apiKey = process.env.FIREBASE_API_KEY || process.env.VITE_FIREBASE_API_KEY;
+    if (!apiKey) {
+      throw new Error("Firebase API key not configured on the server.");
+    }
+
+    const signUpUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${apiKey}`;
+    const signUpResponse = await fetch(signUpUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, returnSecureToken: true })
+    });
+
+    const signUpData = await signUpResponse.json();
+    if (!signUpResponse.ok) {
+      const errorCode = signUpData.error?.message;
+      if (errorCode === 'EMAIL_EXISTS') {
+        return res.status(400).json({
+          status: 'error',
+          message: 'This email is already registered.'
+        });
+      }
+      throw new Error(signUpData.error?.message || 'Unable to create user account.');
+    }
+
+    const localId = signUpData.localId;
+    const idToken = signUpData.idToken;
+
+    // Send email verification via REST API
     const actionCodeSettings = {
-      url: 'http://localhost:5173/verified', 
+      url: 'http://localhost:5173/verified',
       handleCodeInApp: false,
     };
-
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    await sendEmailVerification(user, actionCodeSettings);
-    console.log("2. Verification email triggered with redirect settings");
+    const sendOobCodeUrl = `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`;
+    const sendOobResponse = await fetch(sendOobCodeUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        requestType: 'VERIFY_EMAIL',
+        idToken,
+        returnSecureToken: true
+      })
+    });
+    const sendOobData = await sendOobResponse.json();
+    if (!sendOobResponse.ok) {
+      console.log('❌ VERIFICATION EMAIL ERROR:', sendOobData);
+      throw new Error('Unable to send verification email.');
+    }
 
     const docRef = await addDoc(collection(db, "candidates"), {
       ...newCandidate,
-      uid: user.uid,
-      isVerified: false 
+      uid: localId,
+      isVerified: false
     });
 
     res.status(201).json({
@@ -116,15 +149,56 @@ const signInCandidate = async (req, res) => {
       return res.status(403).json({ status: 'unverified', message: 'Please verify your email before signing in.' });
     }
 
-    console.log('✅ Sign in successful for:', email);
+    let role = 'candidate';
+    if (userRecord.customAttributes) {
+      try {
+        const attrs = JSON.parse(userRecord.customAttributes);
+        if (attrs.role) {
+          role = attrs.role;
+        }
+      } catch (parseError) {
+        console.log('⚠️ Unable to parse customAttributes for user role:', parseError.message);
+      }
+    }
+
+    if (userRecord.email) {
+      try {
+        // Check adminProfiles collection first
+        const adminQuery = query(collection(db, 'adminProfiles'), where('email', '==', userRecord.email));
+        const adminSnapshot = await getDocs(adminQuery);
+        if (!adminSnapshot.empty) {
+          const adminData = adminSnapshot.docs[0].data();
+          if (adminData.role) {
+            role = adminData.role;
+            console.log('✅ Found user in adminProfiles with role:', role);
+          }
+        } else {
+          // If not admin, check candidates collection
+          const candidatesQuery = query(collection(db, 'candidates'), where('email', '==', userRecord.email));
+          const candidatesSnapshot = await getDocs(candidatesQuery);
+          if (!candidatesSnapshot.empty) {
+            const candidateData = candidatesSnapshot.docs[0].data();
+            if (candidateData.userRole) {
+              role = candidateData.userRole;
+              console.log('✅ Found user in candidates with role:', role);
+            }
+          }
+        }
+      } catch (docError) {
+        console.log('⚠️ Error reading user doc for role:', docError.message);
+      }
+    }
+
+    console.log('✅ Sign in successful for:', email, 'role:', role);
     res.status(200).json({
       status: 'success',
       message: 'Welcome back!',
+      role,
       user: {
         uid: userRecord.localId,
-        email: userRecord.email
+        email: userRecord.email,
       },
-      idToken
+      idToken,
     });
 
   } catch (error) {
@@ -223,4 +297,50 @@ const updateCandidateProfile = async (req, res) => {
     res.status(500).json({ status: "error", message: error.message });
   }
 };
-module.exports = { createCandidateProfile, signInCandidate, getCandidateProfile, updateCandidateProfile };
+
+// Set user role (admin endpoint)
+const setUserRole = async (req, res) => {
+  try {
+    const { email, userRole } = req.body;
+
+    if (!email || !userRole) {
+      return res.status(400).json({ 
+        status: "error", 
+        message: "Email and userRole are required." 
+      });
+    }
+
+    const validRoles = ['admin', 'recruiter', 'hiring_manager', 'candidate'];
+    if (!validRoles.includes(userRole)) {
+      return res.status(400).json({ 
+        status: "error", 
+        message: `Invalid role. Must be one of: ${validRoles.join(', ')}` 
+      });
+    }
+
+    const q = query(collection(db, 'candidates'), where('email', '==', email));
+    const snapshot = await getDocs(q);
+
+    if (snapshot.empty) {
+      return res.status(404).json({ 
+        status: "error", 
+        message: "Candidate not found." 
+      });
+    }
+
+    const docId = snapshot.docs[0].id;
+    const candidateRef = doc(db, 'candidates', docId);
+    await updateDoc(candidateRef, { userRole });
+
+    console.log(`✅ Set role for ${email} to ${userRole}`);
+    res.status(200).json({ 
+      status: "success", 
+      message: `User role updated to ${userRole}` 
+    });
+  } catch (error) {
+    console.log('❌ SET ROLE ERROR:', error);
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+module.exports = { createCandidateProfile, signInCandidate, getCandidateProfile, updateCandidateProfile, setUserRole };

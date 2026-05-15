@@ -6,7 +6,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../config/firebase";
 import { API_BASE_URL } from "../../services/api";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 
 const SignIn: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -17,14 +17,62 @@ const SignIn: React.FC = () => {
 
   const navigate = useNavigate();
 
-  const handleGoogle = () => {
-    // TODO: implement Google OAuth
-    console.log("Google Sign In Clicked");
+  const getFriendlyErrorMessage = (err: any) => {
+    const firebaseCode = err?.code;
+    if (!firebaseCode) return null;
+
+    switch (firebaseCode) {
+      case "auth/invalid-credential":
+        return "Sign in failed because the credentials are invalid. Please verify your email and password.";
+      case "auth/user-not-found":
+        return "No account was found with that email. Please sign up first.";
+      case "auth/wrong-password":
+        return "Incorrect password. Please try again or reset your password.";
+      case "auth/invalid-email":
+        return "Please enter a valid email address.";
+      case "auth/user-disabled":
+        return "This account has been disabled. Contact support if you need help.";
+      case "auth/too-many-requests":
+        return "Too many sign-in attempts. Please wait and try again later.";
+      default:
+        return null;
+    }
+  };
+
+  const handleGoogle = async () => {
+    setIsLoading(true);
+    setError("");
+
+    try {
+      const provider = new GoogleAuthProvider();
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      if (!user.email) {
+        setError("Unable to get email from Google account.");
+        return;
+      }
+
+      // Google sign-in successful, redirect to candidate dashboard
+      localStorage.setItem("userRole", "candidate");
+      navigate("/candidate-dashboard");
+    } catch (err: any) {
+      console.error("Google Sign-In Error:", err);
+      
+      if (err.code === "auth/popup-closed-by-user") {
+        setError("Google sign-in was cancelled.");
+      } else if (err.code === "auth/network-request-failed") {
+        setError("Network error. Please check your connection and try again.");
+      } else {
+        setError("Google sign-in failed. Please try again or use email/password.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleLinkedIn = () => {
-    // TODO: implement LinkedIn OAuth
-    console.log("LinkedIn Sign In Clicked");
+    setError("LinkedIn sign-in is coming soon. Please use Google or email/password for now.");
   };
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -33,17 +81,7 @@ const SignIn: React.FC = () => {
     setError("");
 
     try {
-      // Firebase local sign-in
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      if (!user.emailVerified) {
-        setError("Please verify your email before signing in.");
-        await signOut(auth);
-        return;
-      }
-
-      // Backend login (server-side checks)
+      // Backend login first to ensure credentials and verification state are valid.
       const response = await axios.post(`${API_BASE_URL}/api/candidates/login`, {
         email,
         password,
@@ -51,11 +89,39 @@ const SignIn: React.FC = () => {
       });
 
       if (response.data?.status === "success") {
+        const rawRole = response.data?.role as string | undefined;
+        const normalizedRole = rawRole
+          ? rawRole.toString().trim().toLowerCase().replace(/\s+/g, "_")
+          : "candidate";
+        const role = ["admin", "recruiter", "hiring_manager"].includes(normalizedRole)
+          ? normalizedRole
+          : "candidate";
+
+        localStorage.setItem("userRole", role);
+
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        if (!user.emailVerified) {
+          setError("Please verify your email before signing in.");
+          await signOut(auth);
+          return;
+        }
+
+        if (role !== "candidate") {
+          navigate("/dashboard");
+          return;
+        }
+
         navigate("/candidate-dashboard");
         return;
       }
 
-      await signOut(auth);
+      if (response.data?.status === "unverified") {
+        navigate("/EmailVerification", { replace: true });
+        return;
+      }
+
       setError(response.data?.message || "Unable to sign in.");
     } catch (err: unknown) {
       console.error("Sign in failed:", err);
@@ -72,13 +138,18 @@ const SignIn: React.FC = () => {
       // If user exists but email not verified, guide to verification page
       const backendStatus = axiosErr?.response?.data?.status;
       if (backendStatus === "unverified") {
-        // User already has Firebase account but email not verified
-        // They should complete email verification first
         navigate("/EmailVerification", { replace: true });
         return;
       }
 
-      setError(backendMessage || networkHint || axiosErr?.message || "Invalid email or password. Please verify your email.");
+      const firebaseFriendlyMessage = getFriendlyErrorMessage(err as any);
+      setError(
+        firebaseFriendlyMessage ||
+          backendMessage ||
+          networkHint ||
+          axiosErr?.message ||
+          "Invalid email or password. Please verify your email."
+      );
 
       try {
         await signOut(auth);
@@ -102,7 +173,7 @@ const SignIn: React.FC = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
-          <p className="text-gray-500 text-sm mt-1">Welcome back to the TalentPulse Portal</p>
+          <p className="text-gray-500 text-sm mt-1">Welcome back to the Candidate Hub Portal</p>
         </div>
 
         {/* Social Buttons */}
@@ -110,7 +181,8 @@ const SignIn: React.FC = () => {
           <button
             type="button"
             onClick={handleGoogle}
-            className="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium text-sm"
+            disabled={isLoading}
+            className="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FcGoogle className="text-lg" />
             Google
@@ -119,7 +191,8 @@ const SignIn: React.FC = () => {
           <button
             type="button"
             onClick={handleLinkedIn}
-            className="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium text-sm"
+            disabled={isLoading}
+            className="flex items-center justify-center gap-2 border border-gray-200 py-2.5 rounded-lg hover:bg-gray-50 transition font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <FaLinkedin className="text-[#0A66C2] text-lg" />
             LinkedIn
@@ -204,7 +277,7 @@ const SignIn: React.FC = () => {
 
         {/* Signup */}
         <p className="text-center text-xs text-gray-500 mt-8">
-          New to TalentMatch?{" "}
+          New to Candidate Hub?{" "}
           <span
             onClick={() => navigate("/signup")}
             className="font-bold text-gray-900 hover:underline cursor-pointer"

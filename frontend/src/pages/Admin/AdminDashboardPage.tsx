@@ -1,10 +1,10 @@
-import AdminDashboard from "../../components/admin/AdminDashboard/AdminDashboard";
+import AdminDashboardWrapper from "../../components/admin/AdminDashboard/AdminDashboardWrapper";
 import { useCandidates } from "../../hooks/useCandidates";
 
 const AdminDashboardPage = () => {
   const { candidates } = useCandidates();
 
-  return <AdminDashboard pipelineCandidates={candidates} />;
+  return <AdminDashboardWrapper pipelineCandidates={candidates} />;
 };
 
 export default AdminDashboardPage;

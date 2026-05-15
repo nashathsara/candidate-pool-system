@@ -96,13 +96,13 @@ const MainLayout = ({ children }: MainLayoutProps) => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 ml-64 bg-gray-50">
-        <div className="p-8">
-          <div className="page-content">{children}</div>
+      <main className="flex-1 ml-64 bg-gray-50 flex flex-col min-h-screen">
+        <div className="flex-1 p-8 overflow-auto">
+          {children}
         </div>
 
         {/* Footer */}
-        <footer className="mt-auto py-6 px-8 text-center text-gray-400 text-xs border-t border-gray-200">
+        <footer className="py-6 px-8 text-center text-gray-400 text-xs border-t border-gray-200 bg-white">
           <div className="flex justify-between items-center">
             <div className="footer-left text-left">
               <strong className="text-gray-500">Candidate pool</strong>

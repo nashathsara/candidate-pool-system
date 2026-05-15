@@ -82,8 +82,12 @@ const AdminLayout = ({ children, headerTitle }: AdminLayoutProps) => {
   const navigationItems = [
     { name: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
     { name: "Candidates", path: "/candidates", icon: <CandidatesIcon /> },
-    { name: "Duplicates", path: "/duplicates", icon: <DuplicatesIcon /> },
-    { name: "Settings", path: "/settings", icon: <SettingsIcon /> },
+    { name: "Interviews", path: "/interviews", icon: <DuplicatesIcon /> },
+    { name: "Duplicates", path: "/duplicates-admin", icon: <DuplicatesIcon /> },
+    { name: "Automation", path: "/automation", icon: <SettingsIcon /> },
+    { name: "Actions", path: "/actions", icon: <BellIcon /> },
+    { name: "Outcomes", path: "/outcomes", icon: <DashboardIcon /> },
+    { name: "Settings", path: "/admin/settings", icon: <SettingsIcon /> },
   ];
 
   return (

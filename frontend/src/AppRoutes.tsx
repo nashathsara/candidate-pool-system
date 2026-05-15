@@ -1,5 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from "react-router-dom";
-import { useAuth } from "./hooks/useAuth";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
+import {
+  RequireAuth,
+  RequireAdminRole,
+  RequireRecruiterOrAdmin,
+  RequirePermission,
+} from "./components/RouteGuards";
 import VerificationSuccess from "./pages/VerificationSuccess/VerificationSuccess";
 import EmailVerification from "./pages/EmailVerification/EmailVerification";
 import ProfileView from "./pages/ProfileView/ProfileView";
@@ -23,6 +28,11 @@ import AdminDashboardPage from "./pages/Admin/AdminDashboardPage";
 import ProfileCreate from "./pages/ProfileCreate/ProfileCreate";
 import Home from "./pages/Home/Home";
 import Applications from "./pages/Applications/Applications";
+import InterviewManagementPage from "./pages/Admin/InterviewManagementPage";
+import AutomationPage from "./pages/Admin/AutomationPage";
+import OutcomePage from "./pages/Admin/OutcomePage";
+import ActionsPage from "./pages/Admin/ActionsPage";
+import AdminSetup from "./pages/Admin/AdminSetup";
 // Wrapper component to extract candidateId from URL params
 const ViewCVWrapper = () => {
   const { candidateId } = useParams<{ candidateId: string }>();
@@ -39,21 +49,6 @@ const ViewCVWrapper = () => {
   return <ViewCV candidateId={candidateId} />;
 };
 
-const RequireAuth = ({ children }: { children: React.ReactElement }) => {
-  const { isSignedIn, loading } = useAuth();
-  const location = useLocation();
-
-  if (loading) {
-    return null;
-  }
-
-  if (!isSignedIn) {
-    return <Navigate to="/signin" replace state={{ from: location }} />;
-  }
-
-  return children;
-};
-
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -67,6 +62,7 @@ const AppRoutes = () => {
         <Route path="/signup" element={<Signup />} />
         <Route path="/EmailVerification" element={<EmailVerification />} />
         <Route path="/verified" element={<VerificationSuccess />} />
+        <Route path="/admin-setup" element={<AdminSetup />} />
         
         {/* ============ CANDIDATE FLOW ============ */}
         {/* Profile Setup */}
@@ -147,29 +143,36 @@ const AppRoutes = () => {
           }
         />
         
-        {/* ============ ADMIN FLOW ============ */}
+        {/* ============ ADMIN FLOW (WITH RBAC) ============ */}
+        {/* Dashboard - Admin/Recruiter/Hiring Manager only */}
         <Route
           path="/dashboard"
           element={
             <RequireAuth>
-              <MainLayout>
-                <AdminDashboardPage />
-              </MainLayout>
+              <RequireRecruiterOrAdmin>
+                <MainLayout>
+                  <AdminDashboardPage />
+                </MainLayout>
+              </RequireRecruiterOrAdmin>
             </RequireAuth>
           }
         />
         
+        {/* Candidate Management - Admin/Recruiter only */}
         <Route
           path="/candidates"
           element={
             <RequireAuth>
-              <MainLayout>
-                <Candidates />
-              </MainLayout>
+              <RequireRecruiterOrAdmin>
+                <MainLayout>
+                  <Candidates />
+                </MainLayout>
+              </RequireRecruiterOrAdmin>
             </RequireAuth>
           }
         />
         
+        {/* Candidate Profile - Admin/Recruiter/Hiring Manager */}
         <Route
           path="/candidate-profile/:id"
           element={
@@ -181,6 +184,7 @@ const AppRoutes = () => {
           }
         />
         
+        {/* CV Viewer - Admin/Recruiter/Hiring Manager */}
         <Route
           path="/view-cv/:candidateId"
           element={
@@ -192,22 +196,90 @@ const AppRoutes = () => {
           }
         />
         
+        {/* Duplicate Resolution - Admin/Recruiter only */}
         <Route
           path="/duplicates-admin"
           element={
             <RequireAuth>
-              <MainLayout>
-                <DuplicateResolution />
-              </MainLayout>
+              <RequireRecruiterOrAdmin>
+                <MainLayout>
+                  <RequirePermission requiredPermission="canViewDuplicates">
+                    <DuplicateResolution />
+                  </RequirePermission>
+                </MainLayout>
+              </RequireRecruiterOrAdmin>
             </RequireAuth>
           }
         />
         
+        {/* Interview Management - Admin/Recruiter/Hiring Manager */}
+        <Route
+          path="/interviews"
+          element={
+            <RequireAuth>
+              <RequireRecruiterOrAdmin>
+                <MainLayout>
+                  <RequirePermission requiredPermission="canManageInterviews">
+                    <InterviewManagementPage />
+                  </RequirePermission>
+                </MainLayout>
+              </RequireRecruiterOrAdmin>
+            </RequireAuth>
+          }
+        />
+        
+        {/* Automation - Admin only */}
+        <Route
+          path="/automation"
+          element={
+            <RequireAuth>
+              <RequireAdminRole>
+                <MainLayout>
+                  <AutomationPage />
+                </MainLayout>
+              </RequireAdminRole>
+            </RequireAuth>
+          }
+        />
+        
+        {/* Outcomes - Admin/Recruiter/Hiring Manager */}
+        <Route
+          path="/outcomes"
+          element={
+            <RequireAuth>
+              <RequireRecruiterOrAdmin>
+                <MainLayout>
+                  <RequirePermission requiredPermission="canViewReports">
+                    <OutcomePage />
+                  </RequirePermission>
+                </MainLayout>
+              </RequireRecruiterOrAdmin>
+            </RequireAuth>
+          }
+        />
+        
+        {/* Actions - Admin/Recruiter only */}
+        <Route
+          path="/actions"
+          element={
+            <RequireAuth>
+              <RequireRecruiterOrAdmin>
+                <MainLayout>
+                  <ActionsPage />
+                </MainLayout>
+              </RequireRecruiterOrAdmin>
+            </RequireAuth>
+          }
+        />
+        
+        {/* Admin Settings - Admin only */}
         <Route
           path="/admin/settings"
           element={
             <RequireAuth>
-              <Settings />
+              <RequireAdminRole>
+                <Settings />
+              </RequireAdminRole>
             </RequireAuth>
           }
         />

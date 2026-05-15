@@ -23,6 +23,8 @@ class Candidate {
     this.isVerified = data.isVerified || false; 
     this.isVisible = data.isVisible !== undefined ? data.isVisible : true;
 
+    // User role for RBAC (admin, recruiter, hiring_manager, candidate)
+    this.userRole = data.userRole || 'candidate';
     
     const now = new Date().toISOString();
     this.createdAt = now;

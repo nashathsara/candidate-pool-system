@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../../config/firebase.js';
 import { signOut } from 'firebase/auth';
@@ -7,6 +7,19 @@ import './CandidateDashboard.css';
 
 const CandidateDashboard = () => {
   const navigate = useNavigate();
+  const [displayName, setDisplayName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState(null);
+
+  const { API_BASE_URL } = (function(){
+    try {
+      // dynamic import fallback for the API base
+      // eslint-disable-next-line global-require
+      const api = require('../../services/api');
+      return api;
+    } catch (e) {
+      return { API_BASE_URL: 'http://localhost:5000' };
+    }
+  })();
 
   const handleSignOut = async () => {
     try {
@@ -16,6 +29,60 @@ const CandidateDashboard = () => {
     }
     navigate('/', { replace: true });
   };
+
+  // derive friendly name from email
+  const friendlyFromEmail = (email = '') => {
+    if (!email) return 'User';
+    const prefix = email.split('@')[0];
+    return prefix.replace(/[._\-]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+  };
+
+  useEffect(() => {
+    let mounted = true;
+
+    const fetchProfile = async (email) => {
+      if (!email) return;
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/candidates/profile/${encodeURIComponent(email)}`);
+        const data = await res.json();
+        if (!mounted) return;
+        if (data?.status === 'success' && data.data) {
+          const d = data.data;
+          setDisplayName(d.fullName || d.name || auth.currentUser?.displayName || friendlyFromEmail(email));
+          setAvatarUrl(d.avatar || d.photoURL || auth.currentUser?.photoURL || null);
+        } else {
+          setDisplayName(auth.currentUser?.displayName || friendlyFromEmail(email));
+          setAvatarUrl(auth.currentUser?.photoURL || null);
+        }
+      } catch (err) {
+        // fallback to auth user
+        setDisplayName(auth.currentUser?.displayName || friendlyFromEmail(email));
+        setAvatarUrl(auth.currentUser?.photoURL || null);
+      }
+    };
+
+    const current = auth.currentUser;
+    if (current?.email) {
+      fetchProfile(current.email);
+    }
+
+    // Listen for localStorage changes (candidate profile updates) to refresh name/avatar
+    const onStorage = (e) => {
+      try {
+        if (e.key && e.key.includes('candidates')) {
+          const currentEmail = auth.currentUser?.email;
+          if (currentEmail) fetchProfile(currentEmail);
+        }
+      } catch (ignored) {}
+    };
+
+    window.addEventListener('storage', onStorage);
+
+    return () => {
+      mounted = false;
+      window.removeEventListener('storage', onStorage);
+    };
+  }, []);
 
   return (
     <div className="candidate-dashboard">
@@ -58,10 +125,15 @@ const CandidateDashboard = () => {
           <Link to="/candidate-dashboard">
             <div className="user-profile">
               <div className="user-avatar">
-                <User size={20} />
+                {avatarUrl ? (
+                  // eslint-disable-next-line jsx-a11y/img-redundant-alt
+                  <img src={avatarUrl} alt="avatar" className="rounded-full w-8 h-8 object-cover" />
+                ) : (
+                  <User size={20} />
+                )}
               </div>
               <div className="user-info">
-                <span className="user-name">John Doe</span>
+                <span className="user-name">{displayName || 'Candidate'}</span>
                 <span className="user-role">Candidate</span>
               </div>
             </div>
@@ -84,7 +156,7 @@ const CandidateDashboard = () => {
         <section className="welcome-section">
           <div className="welcome-content">
             <div className="welcome-text">
-              <h2 className="welcome-title">Welcome back, John! 👋</h2>
+              <h2 className="welcome-title">Welcome back, {displayName || 'there'}! 👋</h2>
               <p className="welcome-subtitle">Your profile is 85% complete. Complete it to increase your visibility to recruiters.</p>
             </div>
             <div className="progress-bar">

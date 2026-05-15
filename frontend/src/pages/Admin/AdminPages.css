@@ -1,0 +1,65 @@
+.automation-page,
+.outcome-page,
+.actions-page,
+.interview-management-page {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.automation-page h1,
+.outcome-page h1,
+.actions-page h1,
+.interview-management-page h1 {
+  margin: 0 0 8px 0;
+  font-size: 28px;
+  color: #333;
+}
+
+.page-description {
+  margin: 0 0 24px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.automation-sections,
+.outcome-sections,
+.actions-sections {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.automation-section,
+.outcome-section,
+.actions-section {
+  width: 100%;
+}
+
+.interview-page-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 1000px) {
+  .interview-page-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.interview-schedule-section,
+.interview-tracker-section {
+  width: 100%;
+}
+
+.page-error {
+  background: #ffebee;
+  border: 1px solid #f44336;
+  color: #c62828;
+  padding: 16px;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 500;
+}

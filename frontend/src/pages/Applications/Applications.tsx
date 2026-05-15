@@ -4,6 +4,7 @@ import { User, Briefcase, FileText, HelpCircle, Bell, Search, Settings, LogOut }
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '../../config/firebase';
 import { signOut } from 'firebase/auth';
+import { useAuth } from '../../hooks/useAuth';
 import './Applications.css';
 
 const INTERESTED_FIELDS = [
@@ -71,6 +72,12 @@ const fileToBase64 = (file: File): Promise<string> => {
 
 const CandidateApplicationView = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const candidateName =
+    user?.displayName?.trim() ||
+    user?.email?.split('@')[0] ||
+    'Candidate';
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = useState(false);
@@ -305,7 +312,7 @@ const CandidateApplicationView = () => {
               <User size={20} />
             </div>
             <div className="user-info">
-              <span className="user-name">Guest User</span>
+              <span className="user-name">{candidateName}</span>
               <span className="user-role">Candidate</span>
             </div>
           </Link>

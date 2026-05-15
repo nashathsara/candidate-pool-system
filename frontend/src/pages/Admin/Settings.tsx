@@ -2,33 +2,32 @@ import React from 'react';
 import Sidebar from '../../components/admin/Sidebar';
 
 const Settings: React.FC = () => {
-  const inputBaseClass = "w-full p-3 bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all";
+  const inputBaseClass = "w-full p-3 bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-colors duration-200";
   const labelClass = "block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider";
 
   return (
-    <div className="flex bg-[#FBFBFB] min-h-screen">
+    <div className="flex flex-col lg:flex-row bg-[#FBFBFB] min-h-screen">
       <Sidebar />
 
-      <main className="flex-1 p-10 overflow-y-auto">
-        <div className="flex justify-between items-start mb-10">
+      <main className="flex-1 p-6 sm:p-10 overflow-y-auto">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-10">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">System Settings</h2>
             <p className="text-sm text-gray-400 mt-1">Manage your workspace configuration and security protocols.</p>
           </div>
-          <div className="flex gap-3">
-            <button className="px-5 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-lg bg-white hover:bg-gray-50">
+          <div className="flex flex-wrap gap-3">
+            <button className="px-5 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors duration-200">
               Discard Changes
             </button>
-            <button className="px-5 py-2 text-xs font-bold text-white bg-black rounded-lg hover:bg-gray-800">
+            <button className="px-5 py-2 text-xs font-bold text-white bg-black rounded-lg hover:bg-gray-800 transition-colors duration-200">
               Save Settings
             </button>
           </div>
         </div>
 
-        <div className="max-w-4xl space-y-6">
-          {/* Section 1: Edit Profile - Added border-gray-200 for the light outline */}
-          <section className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
-            <div className="flex justify-between items-center mb-6">
+        <div className="max-w-5xl w-full mx-auto space-y-6">
+          <section className="bg-white p-6 sm:p-8 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
               <div>
                 <h3 className="font-bold text-base">Edit Profile</h3>
                 <p className="text-xs text-gray-400">Update your administrative profile details and contact information.</p>
@@ -36,7 +35,7 @@ const Settings: React.FC = () => {
               <span className="text-gray-400 text-lg grayscale">ⓘ</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
                 <label className={labelClass}>Full Name</label>
                 <input type="text" defaultValue="Jane Doe" className={inputBaseClass} />
@@ -57,8 +56,8 @@ const Settings: React.FC = () => {
           </section>
 
           {/* Section 2: Change Password - Added border-gray-200 for the light outline */}
-          <section className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
-            <div className="flex justify-between items-center mb-6">
+          <section className="bg-white p-6 sm:p-8 rounded-xl border border-gray-200 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
               <div>
                 <h3 className="font-bold text-base">Change Password</h3>
                 <p className="text-xs text-gray-400">Update your account credentials.</p>
@@ -79,7 +78,7 @@ const Settings: React.FC = () => {
                 <label className={labelClass}>Confirm Password</label>
                 <input type="password" placeholder="••••••••" className={inputBaseClass} />
               </div>
-              <button className="w-full py-2.5 bg-gray-100 text-gray-500 text-sm font-bold rounded-lg hover:bg-gray-200 transition-all">
+              <button className="w-full py-2.5 bg-gray-100 text-gray-500 text-sm font-bold rounded-lg hover:bg-gray-200 transition-colors duration-200">
                 Update Password
               </button>
             </div>

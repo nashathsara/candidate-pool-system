@@ -2,6 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
+import { AuthProvider } from './contexts/AuthContext'
+import { RBACProvider } from './contexts/RBACContext'
 
 const root = document.getElementById('root')
 
@@ -11,8 +13,12 @@ if (!root) {
   try {
     createRoot(root).render(
       <StrictMode>
-        <App />
-      </StrictMode>,
+      <AuthProvider>
+        <RBACProvider>
+          <App />
+        </RBACProvider>
+      </AuthProvider>
+    </StrictMode>,
     )
     console.log('App mounted successfully')
   } catch (error) {

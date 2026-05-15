@@ -1,17 +1,19 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { auth } from '../../config/firebase';
 import { signOut } from 'firebase/auth';
 
 const Sidebar: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const menuItems = [
-    { name: 'Dashboard', icon: '📊' }, // Use grayscale version or SVG
-    { name: 'Candidates', icon: '👥' },
-    { name: 'Duplicates', icon: '📁' },
-    { name: 'Settings', icon: '⚙️', active: true },
+    { name: 'Dashboard', icon: '📊', path: '/dashboard' },
+    { name: 'Candidates', icon: '👥', path: '/candidates' },
+    { name: 'Duplicates', icon: '📁', path: '/duplicates' },
+    { name: 'Settings', icon: '⚙️', path: '/admin/settings' },
   ];
 
-  const navigate = useNavigate();
 
   const handleSignOut = async () => {
     try {
@@ -23,26 +25,30 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    /* Changed text-sm to text-xs for smaller sidebar font */
-    <div className="w-64 h-screen bg-white border-r border-gray-100 flex flex-col p-6 text-xs">
+    <div className="w-full lg:w-64 min-h-screen bg-white border-b border-gray-100 lg:border-b-0 lg:border-r flex flex-col p-6 text-xs">
       <div className="mb-10">
         <h1 className="font-bold text-lg text-black">CandidateHub</h1>
         <p className="text-[10px] text-gray-400">Global Talent Pool</p>
       </div>
 
       <nav className="space-y-1">
-        {menuItems.map((item) => (
-          <div
-            key={item.name}
-            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg cursor-pointer font-medium transition-all ${
-              item.active ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50'
-            }`}
-          >
-            {/* Filter used to make icons black and white */}
-            <span className="grayscale opacity-70">{item.icon}</span>
-            {item.name}
-          </div>
-        ))}
+        {menuItems.map((item) => {
+          const isActive = location.pathname === item.path;
+          return (
+            <button
+              key={item.name}
+              type="button"
+              onClick={() => navigate(item.path)}
+              className={`w-full text-left flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-colors duration-200 ${
+                isActive ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              <span className="grayscale opacity-70">{item.icon}</span>
+              {item.name}
+            </button>
+          );
+        })}
       </nav>
 
       {/* This container is pushed to the bottom using mt-auto */}

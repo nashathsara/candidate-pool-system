@@ -1,7 +1,6 @@
 const path = require('path');
 const { initializeApp } = require("firebase/app");
 const { getFirestore } = require("firebase/firestore");
-const { getAuth } = require("firebase/auth");
 
 // Load env values in priority order: functions/.env, frontend/.env, root .env
 require('dotenv').config({ path: path.resolve(__dirname, '..', '.env') });
@@ -19,6 +18,5 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
 
-module.exports = { db, auth };
+module.exports = { db };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../../config/firebase';
 import { signOut } from 'firebase/auth';
+import { useAuth } from '../../hooks/useAuth';
 import { User, Briefcase, FileText, HelpCircle, Bell, Search, Settings, LogOut } from 'lucide-react';
 import './HelpCenter.css';
 
@@ -30,6 +31,11 @@ interface HelpArticle {
 
 const HelpCenter: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const candidateName =
+    user?.displayName?.trim() ||
+    user?.email?.split('@')[0] ||
+    'Candidate';
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -321,7 +327,7 @@ const HelpCenter: React.FC = () => {
               <User size={20} />
             </div>
             <div className="user-info">
-              <span className="user-name">John Doe</span>
+              <span className="user-name">{candidateName}</span>
               <span className="user-role">Candidate</span>
             </div>
           </Link>
