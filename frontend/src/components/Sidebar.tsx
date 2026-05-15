@@ -1,12 +1,11 @@
 // components/Sidebar.tsx
 import React from 'react';
-import { 
-  FiHome, 
-  FiUsers, 
-  FiCopy, 
-  FiSettings, 
-  FiSearch, 
-  FiHelpCircle, 
+import {
+  FiHome,
+  FiUsers,
+  FiCopy,
+  FiSettings,
+  FiHelpCircle,
   FiLogOut,
 } from 'react-icons/fi';
 
@@ -21,19 +20,31 @@ const Sidebar: React.FC = () => {
       </div>
 
       <nav className="flex flex-col gap-1 mb-8">
-        <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200">
+        <a
+          href="#"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200"
+        >
           <FiHome className="w-5 h-5" />
           Dashboard
         </a>
-        <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200">
+        <a
+          href="#"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200"
+        >
           <FiUsers className="w-5 h-5" />
           Candidates
         </a>
-        <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200">
+        <a
+          href="#"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200"
+        >
           <FiCopy className="w-5 h-5" />
           Duplicates
         </a>
-        <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200">
+        <a
+          href="#"
+          className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-50 hover:text-gray-900 font-medium transition-all duration-200"
+        >
           <FiSettings className="w-5 h-5" />
           Settings
         </a>
@@ -41,17 +52,18 @@ const Sidebar: React.FC = () => {
 
       {/* Bottom section */}
       <div className="absolute bottom-6 left-6 right-6">
-        <div className="flex items-center gap-3 px-4 py-3 mb-4 rounded-xl bg-gray-50 cursor-pointer transition-all duration-200 text-gray-700 hover:bg-gray-100">
-          <FiSearch className="w-5 h-5" />
-          <span className="text-sm font-medium">New Search</span>
-        </div>
-        
         <div className="flex flex-col gap-1">
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-700 text-sm transition-all duration-200">
+          <a
+            href="#"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-700 text-sm transition-all duration-200"
+          >
             <FiHelpCircle className="w-4 h-4" />
             Support
           </a>
-          <a href="#" className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-700 text-sm transition-all duration-200">
+          <a
+            href="#"
+            className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-gray-700 text-sm transition-all duration-200"
+          >
             <FiLogOut className="w-4 h-4" />
             Sign Out
           </a>

@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { FiShield, FiMail, FiRefreshCw } from 'react-icons/fi';
+import { FiMail, FiRefreshCw } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../config/firebase';
 import { sendEmailVerification, onAuthStateChanged, type User } from 'firebase/auth';
 
 const EmailVerification: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [message, setMessage] = useState('Waiting for you to click the link...');
+  const message = 'Waiting for you to click the link...';
   const navigate = useNavigate();
 
   useEffect(() => {
-    // 1. Auth Status එක බලනවා
+    // 1. Auth Status 
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user);

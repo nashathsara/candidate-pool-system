@@ -228,6 +228,7 @@
 .table-wrapper {
   flex: 1;
   overflow-y: auto;
+  overflow-x: auto;
   padding: 0 24px;
 }
 
@@ -236,6 +237,7 @@
   border-collapse: collapse;
   font-size: 13px;
   margin-top: 0;
+  min-width: 680px;
 }
 
 .candidates-table thead {
@@ -444,6 +446,78 @@
   font-size: 14px;
   padding: 6px 8px;
   min-width: auto;
+}
+
+@media (max-width: 960px) {
+  .page-top,
+  .search-section,
+  .filters-section,
+  .pagination-section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .page-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .title-section {
+    width: 100%;
+  }
+
+  .header-icons {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .filters-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .action-buttons {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .btn {
+    flex: 1 1 auto;
+    min-width: 120px;
+  }
+}
+
+@media (max-width: 760px) {
+  .page-top,
+  .search-section,
+  .filters-section,
+  .pagination-section {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .table-wrapper {
+    padding: 0 12px;
+  }
+
+  .candidates-table th,
+  .candidates-table td {
+    padding: 12px 8px;
+    font-size: 12px;
+  }
+
+  .filter-pill {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .action-buttons {
+    gap: 6px;
+  }
 }
 
 

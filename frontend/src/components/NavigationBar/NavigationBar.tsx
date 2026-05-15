@@ -12,8 +12,8 @@ const NavigationBar = () => {
         </div>
         <nav className="nav-links">
           <Link 
-            to="/browse-jobs" 
-            className={location.pathname === '/browse-jobs' ? 'active' : ''}
+            to="/browse" 
+            className={location.pathname === '/browse' ? 'active' : ''}
           >
             Browse Jobs
           </Link>
@@ -24,8 +24,8 @@ const NavigationBar = () => {
             Applications
           </Link>
           <Link 
-            to="/create-profile" 
-            className={location.pathname === '/create-profile' ? 'active' : ''}
+            to="/candidate-dashboard" 
+            className={location.pathname === '/candidate-dashboard' ? 'active' : ''}
           >
             Profile & Settings
           </Link>
@@ -39,7 +39,7 @@ const NavigationBar = () => {
         <button type="button" className="icon-btn" aria-label="Settings">
           <span className="icon">⚙️</span>
         </button>
-        <Link to="/candidate-settings" className="profile-chip">
+        <Link to="/settings" className="profile-chip">
           <span className="avatar">JS</span>
         </Link>
       </div>
