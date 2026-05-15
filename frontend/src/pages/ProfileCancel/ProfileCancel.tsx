@@ -15,7 +15,7 @@ const ProfileCancel: React.FC = () => {
 
   // Default data if no state is passed
   const defaultData = {
-    candidate1: {
+    application1: {
       fullName: "Unknown Candidate",
       email: "Not provided",
       phone: "Not provided",
@@ -27,7 +27,7 @@ const ProfileCancel: React.FC = () => {
       experienceYears: 0,
       interestedField: "Not specified",
     },
-    candidate2: {
+    application2: {
       fullName: "Unknown Candidate",
       email: "Not provided",
       phone: "Not provided",
@@ -44,7 +44,8 @@ const ProfileCancel: React.FC = () => {
   };
 
   const data = ignoredPair || defaultData;
-  const { candidate1, candidate2, score, matchReason } = data;
+  // CHANGED: from candidate1/candidate2 to application1/application2
+  const { application1, application2, score, matchReason } = data;
 
   // Determine which profile to show as the master record (the one with more complete data)
   const completenessScore = (c: any) => {
@@ -57,15 +58,16 @@ const ProfileCancel: React.FC = () => {
     return score;
   };
 
-  const masterCandidate = completenessScore(candidate1) >= completenessScore(candidate2) ? candidate1 : candidate2;
-  const duplicateCandidate = completenessScore(candidate1) >= completenessScore(candidate2) ? candidate2 : candidate1;
+  // CHANGED: variable names from candidate to application
+  const masterApplication = completenessScore(application1) >= completenessScore(application2) ? application1 : application2;
+  const duplicateApplication = completenessScore(application1) >= completenessScore(application2) ? application2 : application1;
 
   // Calculate combined experience
-  const combinedExperience = Math.max(candidate1.experienceYears || 0, candidate2.experienceYears || 0);
+  const combinedExperience = Math.max(application1.experienceYears || 0, application2.experienceYears || 0);
   const combinedExperienceText = `${combinedExperience} Years ${combinedExperience >= 8 ? '(Expert)' : combinedExperience >= 5 ? '(Senior)' : combinedExperience >= 2 ? '(Mid-Level)' : combinedExperience > 0 ? '(Junior)' : '(Fresher)'}`;
 
   // Combine skills
-  const combinedSkills = [...new Set([...(candidate1.skills || []), ...(candidate2.skills || [])])];
+  const combinedSkills = [...new Set([...(application1.skills || []), ...(application2.skills || [])])];
 
   return (
     <div>
@@ -134,7 +136,7 @@ const ProfileCancel: React.FC = () => {
             <div className="flex items-center gap-4 mb-6">
               {/* User Image - using first letter as avatar */}
               <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold text-3xl shadow-lg">
-                {masterCandidate.fullName?.[0] || '?'}
+                {masterApplication.fullName?.[0] || '?'}
               </div>
               
               {/* Master Record Info */}
@@ -143,7 +145,7 @@ const ProfileCancel: React.FC = () => {
                   MASTER RECORD (KEPT)
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h3 className="text-xl font-bold text-gray-900">{masterCandidate.fullName}</h3>
+                  <h3 className="text-xl font-bold text-gray-900">{masterApplication.fullName}</h3>
                 </div>
                 <div className="flex items-center gap-1 text-orange-600">
                   <FaTimesCircle className="w-4 h-4" />
@@ -165,7 +167,7 @@ const ProfileCancel: React.FC = () => {
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">LOCATION</span>
                   </div>
                   <div>
-                    <p className="font-bold text-gray-800">{masterCandidate.location || 'Not specified'}</p>
+                    <p className="font-bold text-gray-800">{masterApplication.location || 'Not specified'}</p>
                   </div>
                 </div>
 
@@ -207,7 +209,7 @@ const ProfileCancel: React.FC = () => {
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">PRIMARY EMAIL</span>
                   </div>
                   <div>
-                    <p className="font-bold text-gray-800 break-words">{masterCandidate.email || 'Not provided'}</p>
+                    <p className="font-bold text-gray-800 break-words">{masterApplication.email || 'Not provided'}</p>
                   </div>
                 </div>
 
@@ -217,7 +219,7 @@ const ProfileCancel: React.FC = () => {
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">PHONE NUMBER</span>
                   </div>
                   <div>
-                    <p className="font-bold text-gray-800">{masterCandidate.phone || 'Not provided'}</p>
+                    <p className="font-bold text-gray-800">{masterApplication.phone || 'Not provided'}</p>
                   </div>
                 </div>
 
@@ -227,7 +229,7 @@ const ProfileCancel: React.FC = () => {
                     <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">INTERESTED FIELD</span>
                   </div>
                   <div>
-                    <p className="font-bold text-gray-800">{masterCandidate.interestedField || 'Not specified'}</p>
+                    <p className="font-bold text-gray-800">{masterApplication.interestedField || 'Not specified'}</p>
                   </div>
                 </div>
               </div>
@@ -243,7 +245,7 @@ const ProfileCancel: React.FC = () => {
                 <span className="text-sm font-semibold text-orange-800">Duplicate Record Removed:</span>
               </div>
               <p className="text-sm text-orange-700">
-                {duplicateCandidate.fullName} - This duplicate profile has been ignored and will not be merged.
+                {duplicateApplication.fullName} - This duplicate profile has been ignored and will not be merged.
               </p>
             </div>
 
@@ -264,11 +266,12 @@ const ProfileCancel: React.FC = () => {
                 Back to Duplicates
               </Link>
               <Link
+                // CHANGED: from '/candidates' to '/applications' to match the collection change
                 to="/candidates"
                 className="flex items-center justify-center gap-2 px-8 py-3 min-w-[220px] bg-blue-50 hover:bg-blue-100 text-gray-700 rounded-md font-medium transition-all duration-200 text-sm"
               >
                 <FaUserCheck className="w-4 h-4" />
-                View All Candidates
+                View All Applications
               </Link>
             </div>
           </div>

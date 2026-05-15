@@ -13,8 +13,6 @@ import {
   FiDollarSign,
   FiClock,
   FiArrowLeft,
-  FiBriefcase,
-  FiTrendingUp,
   FiAward,
   FiCode
 } from 'react-icons/fi';
@@ -22,7 +20,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
 
-interface CandidateProfile {
+interface ApplicationProfile {
   id: string;
   fullName: string;
   email: string;
@@ -74,7 +72,7 @@ interface ExtractedCVData {
 const ProfileView: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<CandidateProfile | null>(null);
+  const [profile, setProfile] = useState<ApplicationProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [extractedData, setExtractedData] = useState<ExtractedCVData>({
@@ -88,21 +86,22 @@ const ProfileView: React.FC = () => {
 
   useEffect(() => {
     if (id) {
-      fetchCandidateProfile(id);
+      fetchApplicationProfile(id);
     }
   }, [id]);
 
-  const fetchCandidateProfile = async (candidateId: string) => {
+  const fetchApplicationProfile = async (applicationId: string) => {
     setLoading(true);
     setError(null);
     
     try {
-      const docRef = doc(db, 'candidates', candidateId);
+      // CHANGED: from 'candidates' to 'applications'
+      const docRef = doc(db, 'applications', applicationId);
       const docSnap = await getDoc(docRef);
       
       if (docSnap.exists()) {
         const data = docSnap.data();
-        const profileData: CandidateProfile = {
+        const profileData: ApplicationProfile = {
           id: docSnap.id,
           fullName: data.fullName || 'Unknown',
           email: data.email || '',
@@ -127,11 +126,11 @@ const ProfileView: React.FC = () => {
         await extractCVData(profileData);
         
       } else {
-        setError('Candidate not found');
+        setError('Application not found');
       }
     } catch (err) {
-      console.error('Error fetching candidate:', err);
-      setError('Failed to load candidate profile');
+      console.error('Error fetching application:', err);
+      setError('Failed to load application profile');
     } finally {
       setLoading(false);
     }
@@ -443,7 +442,7 @@ const extractProjectsFromText = (text: string) => {
     return experienceEntries;
   };
 
-  const extractCVData = async (profile: CandidateProfile) => {
+  const extractCVData = async (profile: ApplicationProfile) => {
     setExtractionStatus('Starting CV extraction...');
     
     // Extract text from CV file
@@ -537,7 +536,7 @@ const extractProjectsFromText = (text: string) => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">Loading candidate profile...</p>
+          <p className="text-gray-600">Loading application profile...</p>
         </div>
       </div>
     );
@@ -548,12 +547,12 @@ const extractProjectsFromText = (text: string) => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center bg-white rounded-2xl p-8 shadow-sm max-w-md">
           <h2 className="text-2xl font-bold text-red-600 mb-4">Error</h2>
-          <p className="text-gray-600 mb-6">{error || 'Candidate not found'}</p>
+          <p className="text-gray-600 mb-6">{error || 'Application not found'}</p>
           <button 
             onClick={() => navigate('/candidates')} 
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
-            Back to Candidates
+            Back to Applications
           </button>
         </div>
       </div>
@@ -569,7 +568,7 @@ const extractProjectsFromText = (text: string) => {
           className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm font-medium hover:bg-gray-50 hover:border-gray-300 transition-all mb-6"
         >
           <FiArrowLeft className="w-4 h-4" />
-          Back to Candidates
+          Back to Applications
         </button>
 
         {/* Action Buttons */}
@@ -808,36 +807,5 @@ const extractProjectsFromText = (text: string) => {
   );
 };
 
-// Helper Components
-const IconInfo = ({ icon, text }: any) => (
-  <div className="flex items-center gap-2 text-xs font-bold text-gray-500">
-    <span className="text-gray-300">{React.cloneElement(icon, { className: "w-4 h-4" })}</span>
-    {text}
-  </div>
-);
-
-const ExperienceItem = ({ title, company, period, desc }: any) => (
-  <div className="relative pl-8 before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-blue-500 before:rounded-full after:absolute after:left-[2.5px] after:top-6 after:bottom-[-2.5rem] after:w-[1px] after:bg-gray-100 last:after:hidden">
-    <div className="flex justify-between items-start mb-1">
-      <h4 className="text-lg font-black text-gray-900">{title}</h4>
-      <span className="text-[10px] font-black text-gray-300 uppercase tracking-widest">{period}</span>
-    </div>
-    <p className="text-sm text-blue-500 font-bold mb-3 italic">{company}</p>
-    <p className="text-sm text-gray-500 leading-relaxed font-medium">{desc}</p>
-  </div>
-);
-
-const ProgressBar = ({ label, value, color }: any) => (
-  <div className="mb-6 last:mb-0">
-    <div className="flex justify-between mb-2">
-      <span className="text-xs font-black uppercase tracking-wider text-gray-400">{label}</span>
-      <span className="text-xs font-black text-gray-900">{value}%</span>
-    </div>
-    <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-      <div className={`${color} h-full rounded-full transition-all duration-500`} style={{ width: `${value}%` }}></div>
-    </div>
-    <p className="text-[9px] font-black text-gray-300 uppercase mt-1 tracking-tighter">Fit Score</p>
-  </div>
-);
 
 export default ProfileView;

@@ -22,7 +22,7 @@ import {
 import { db } from '../../config/firebase';
 
 // Types
-type CandidateData = {
+type ApplicationData = {
   id: string;
   fullName: string;
   email: string;
@@ -50,8 +50,8 @@ type CandidateData = {
 type DuplicatePair = {
   id1: string;
   id2: string;
-  candidate1: CandidateData;
-  candidate2: CandidateData;
+  application1: ApplicationData;
+  application2: ApplicationData;
   score: number;
   matchReason: string;
   matchedFields: string[];
@@ -129,16 +129,16 @@ class AIDuplicateDetector {
   private static readonly USE_GEMINI = true;
   private static cache: Map<string, number> = new Map();
 
-  static async findDuplicates(candidates: CandidateData[]): Promise<DuplicatePair[]> {
-    if (candidates.length < 2) return [];
+  static async findDuplicates(applications: ApplicationData[]): Promise<DuplicatePair[]> {
+    if (applications.length < 2) return [];
     
     const pairs: DuplicatePair[] = [];
     const processedIds = new Set<string>();
     
-    for (let i = 0; i < candidates.length; i++) {
-      for (let j = i + 1; j < candidates.length; j++) {
-        const a = candidates[i];
-        const b = candidates[j];
+    for (let i = 0; i < applications.length; i++) {
+      for (let j = i + 1; j < applications.length; j++) {
+        const a = applications[i];
+        const b = applications[j];
         
         if (processedIds.has(a.id) || processedIds.has(b.id)) continue;
         
@@ -148,8 +148,8 @@ class AIDuplicateDetector {
           pairs.push({
             id1: a.id,
             id2: b.id,
-            candidate1: a,
-            candidate2: b,
+            application1: a,
+            application2: b,
             score: result.score,
             matchReason: result.reason,
             matchedFields: result.matchedFields
@@ -166,7 +166,7 @@ class AIDuplicateDetector {
     return pairs.sort((x, y) => y.score - x.score);
   }
 
-  private static async comparePair(a: CandidateData, b: CandidateData): Promise<{ score: number; reason: string; matchedFields: string[] }> {
+  private static async comparePair(a: ApplicationData, b: ApplicationData): Promise<{ score: number; reason: string; matchedFields: string[] }> {
     const cacheKey = `${a.id}|${b.id}`;
     if (this.cache.has(cacheKey)) {
       const cachedScore = this.cache.get(cacheKey)!;
@@ -177,7 +177,7 @@ class AIDuplicateDetector {
     let finalScore = ruleScore.score;
     let matchedFields = ruleScore.matchedFields;
     
-    if (this.USE_GEMINI && this.GEMINI_API_KEY && this.GEMINI_API_KEY !== "YOUR_GEMINI_API_KEY") {
+   if (this.USE_GEMINI && this.GEMINI_API_KEY) {
       try {
         const aiScore = await this.getGeminiDuplicateScore(a, b);
         if (aiScore !== null) {
@@ -188,13 +188,13 @@ class AIDuplicateDetector {
       }
     }
     
-    const reason = this.generatePriorityReason(matchedFields, finalScore, a, b);
+    const reason = this.generatePriorityReason(matchedFields, finalScore, a);
     this.cache.set(cacheKey, finalScore);
     
     return { score: finalScore, reason, matchedFields };
   }
 
-  private static calculatePriorityBasedScore(a: CandidateData, b: CandidateData): { score: number; matchedFields: string[] } {
+  private static calculatePriorityBasedScore(a: ApplicationData, b: ApplicationData): { score: number; matchedFields: string[] } {
     let totalWeight = 0;
     let matchWeight = 0;
     const matchedFields: string[] = [];
@@ -300,7 +300,7 @@ class AIDuplicateDetector {
     return { score, matchedFields };
   }
 
-  private static async getGeminiDuplicateScore(a: CandidateData, b: CandidateData): Promise<number | null> {
+  private static async getGeminiDuplicateScore(a: ApplicationData, b: ApplicationData): Promise<number | null> {
     const prompt = `You are a duplicate detection AI for a recruitment system. Analyze these two candidate profiles and rate their similarity from 0 to 100.
 
 CRITICAL: Even if names are DIFFERENT, they could still be the SAME person if they share UNIQUE IDENTIFIERS.
@@ -368,7 +368,7 @@ Duplicate score (0-100):`;
     }
   }
 
-  private static generatePriorityReason(matchedFields: string[], score: number, a: CandidateData, b: CandidateData): string {
+  private static generatePriorityReason(matchedFields: string[], score: number, a: ApplicationData): string {
     if (matchedFields.includes('CV filename (same document)')) {
       return `🔴 CRITICAL: Same CV file uploaded (${a.cvFileName}) - These are the same person despite different names!`;
     }
@@ -449,7 +449,7 @@ Duplicate score (0-100):`;
 // Main Component
 const DuplicateResolution: React.FC = () => {
   const navigate = useNavigate();
-  const [candidates, setCandidates] = useState<CandidateData[]>([]);
+  const [applications, setApplications] = useState<ApplicationData[]>([]);
   const [duplicatePairs, setDuplicatePairs] = useState<DuplicatePair[]>([]);
   const [selectedPair, setSelectedPair] = useState<DuplicatePair | null>(null);
   const [loading, setLoading] = useState(true);
@@ -460,7 +460,7 @@ const DuplicateResolution: React.FC = () => {
   
   // Merge strategy state
   const [mergeStrategy, setMergeStrategy] = useState({
-    keepName: 'candidate1',
+    keepName: 'application1',
     keepEmail: 'auto',
     keepPhone: 'auto',
     keepLocation: 'auto',
@@ -469,17 +469,18 @@ const DuplicateResolution: React.FC = () => {
     keepInterestedField: 'auto',
   });
 
-  // Fetch all candidates from Firestore
-  const fetchAllCandidates = async (): Promise<CandidateData[]> => {
+  // Fetch all applications from Firestore
+  const fetchAllApplications = async (): Promise<ApplicationData[]> => {
     try {
-      const candidatesRef = collection(db, "candidates");
-      const q = query(candidatesRef, orderBy("createdAt", "desc"));
+      // CHANGED: from 'candidates' to 'applications'
+      const applicationsRef = collection(db, "applications");
+      const q = query(applicationsRef, orderBy("createdAt", "desc"));
       const snapshot = await getDocs(q);
-      const fetchedCandidates: CandidateData[] = [];
+      const fetchedApplications: ApplicationData[] = [];
       
       snapshot.forEach((doc) => {
         const data = doc.data();
-        fetchedCandidates.push({
+        fetchedApplications.push({
           id: doc.id,
           fullName: data.fullName || data.name || "Unknown",
           email: data.email || "",
@@ -502,31 +503,31 @@ const DuplicateResolution: React.FC = () => {
         });
       });
       
-      setCandidates(fetchedCandidates);
-      return fetchedCandidates;
+      setApplications(fetchedApplications);
+      return fetchedApplications;
     } catch (error) {
-      console.error("Error fetching candidates:", error);
+      console.error("Error fetching applications:", error);
       return [];
     }
   };
 
-  // Run duplicate detection across all candidates
+  // Run duplicate detection across all applications
   const runDuplicateDetection = async () => {
     setScanning(true);
-    setScanProgress("Fetching candidates...");
+    setScanProgress("Fetching applications...");
     
-    const allCandidates = candidates.length ? candidates : await fetchAllCandidates();
+    const allApplications = applications.length ? applications : await fetchAllApplications();
     
-    if (allCandidates.length === 0) {
+    if (allApplications.length === 0) {
       setDuplicatePairs([]);
       setScanning(false);
       setScanProgress("");
       return;
     }
     
-    setScanProgress(`Analyzing ${allCandidates.length} candidates for duplicates...`);
+    setScanProgress(`Analyzing ${allApplications.length} applications for duplicates...`);
     
-    const pairs = await AIDuplicateDetector.findDuplicates(allCandidates);
+    const pairs = await AIDuplicateDetector.findDuplicates(allApplications);
     
     setDuplicatePairs(pairs);
     setScanProgress(`Found ${pairs.length} potential duplicate pairs`);
@@ -545,81 +546,80 @@ const DuplicateResolution: React.FC = () => {
   const mergeProfiles = async () => {
     if (!selectedPair) return;
     
-    const { id1, id2, candidate1, candidate2 } = selectedPair;
+    const { id1, id2, application1, application2 } = selectedPair;
     
     // Determine which profile to keep based on name selection
-    const keepId = mergeStrategy.keepName === 'candidate1' ? id1 : id2;
+    const keepId = mergeStrategy.keepName === 'application1' ? id1 : id2;
     const removeId = keepId === id1 ? id2 : id1;
-    const keepCandidate = keepId === id1 ? candidate1 : candidate2;
-    const removeCandidate = keepId === id1 ? candidate2 : candidate1;
+    const keepApplication = keepId === id1 ? application1 : application2;
     
     // Merge data based on user strategy
     const mergedData: any = {};
     
     // Name selection
-    mergedData.fullName = mergeStrategy.keepName === 'candidate1' ? candidate1.fullName : candidate2.fullName;
+    mergedData.fullName = mergeStrategy.keepName === 'application1' ? application1.fullName : application2.fullName;
     
     // Email selection
-    if (mergeStrategy.keepEmail === 'candidate1') {
-      mergedData.email = candidate1.email;
-    } else if (mergeStrategy.keepEmail === 'candidate2') {
-      mergedData.email = candidate2.email;
+    if (mergeStrategy.keepEmail === 'application1') {
+      mergedData.email = application1.email;
+    } else if (mergeStrategy.keepEmail === 'application2') {
+      mergedData.email = application2.email;
     } else {
-      mergedData.email = candidate1.email || candidate2.email;
+      mergedData.email = application1.email || application2.email;
     }
     
     // Phone selection
-    if (mergeStrategy.keepPhone === 'candidate1') {
-      mergedData.phone = candidate1.phone;
-    } else if (mergeStrategy.keepPhone === 'candidate2') {
-      mergedData.phone = candidate2.phone;
+    if (mergeStrategy.keepPhone === 'application1') {
+      mergedData.phone = application1.phone;
+    } else if (mergeStrategy.keepPhone === 'application2') {
+      mergedData.phone = application2.phone;
     } else {
-      mergedData.phone = candidate1.phone || candidate2.phone;
+      mergedData.phone = application1.phone || application2.phone;
     }
     
     // Location selection
-    if (mergeStrategy.keepLocation === 'candidate1') {
-      mergedData.location = candidate1.location;
-    } else if (mergeStrategy.keepLocation === 'candidate2') {
-      mergedData.location = candidate2.location;
+    if (mergeStrategy.keepLocation === 'application1') {
+      mergedData.location = application1.location;
+    } else if (mergeStrategy.keepLocation === 'application2') {
+      mergedData.location = application2.location;
     } else {
-      mergedData.location = candidate1.location || candidate2.location;
+      mergedData.location = application1.location || application2.location;
     }
     
     // Skills selection
     if (mergeStrategy.keepSkills === 'combine') {
-      mergedData.skills = [...new Set([...(candidate1.skills || []), ...(candidate2.skills || [])])];
-    } else if (mergeStrategy.keepSkills === 'candidate1') {
-      mergedData.skills = candidate1.skills || [];
+      mergedData.skills = [...new Set([...(application1.skills || []), ...(application2.skills || [])])];
+    } else if (mergeStrategy.keepSkills === 'application1') {
+      mergedData.skills = application1.skills || [];
     } else {
-      mergedData.skills = candidate2.skills || [];
+      mergedData.skills = application2.skills || [];
     }
     
     // Experience selection
     if (mergeStrategy.keepExperience === 'max') {
-      mergedData.experienceYears = Math.max(candidate1.experienceYears || 0, candidate2.experienceYears || 0);
-    } else if (mergeStrategy.keepExperience === 'candidate1') {
-      mergedData.experienceYears = candidate1.experienceYears || 0;
+      mergedData.experienceYears = Math.max(application1.experienceYears || 0, application2.experienceYears || 0);
+    } else if (mergeStrategy.keepExperience === 'application1') {
+      mergedData.experienceYears = application1.experienceYears || 0;
     } else {
-      mergedData.experienceYears = candidate2.experienceYears || 0;
+      mergedData.experienceYears = application2.experienceYears || 0;
     }
     
     // Interested field selection
-    if (mergeStrategy.keepInterestedField === 'candidate1') {
-      mergedData.interestedField = candidate1.interestedField;
-    } else if (mergeStrategy.keepInterestedField === 'candidate2') {
-      mergedData.interestedField = candidate2.interestedField;
+    if (mergeStrategy.keepInterestedField === 'application1') {
+      mergedData.interestedField = application1.interestedField;
+    } else if (mergeStrategy.keepInterestedField === 'application2') {
+      mergedData.interestedField = application2.interestedField;
     } else {
-      mergedData.interestedField = candidate1.interestedField || candidate2.interestedField;
+      mergedData.interestedField = application1.interestedField || application2.interestedField;
     }
     
     // Additional fields to keep
-    mergedData.availability = candidate1.availability || candidate2.availability;
-    mergedData.status = keepCandidate.status;
-    mergedData.dateOfBirth = candidate1.dateOfBirth || candidate2.dateOfBirth;
-    mergedData.linkedIn = candidate1.linkedIn || candidate2.linkedIn;
-    mergedData.source = candidate1.source || candidate2.source;
-    mergedData.cvFileName = candidate1.cvFileName || candidate2.cvFileName;
+    mergedData.availability = application1.availability || application2.availability;
+    mergedData.status = keepApplication.status;
+    mergedData.dateOfBirth = application1.dateOfBirth || application2.dateOfBirth;
+    mergedData.linkedIn = application1.linkedIn || application2.linkedIn;
+    mergedData.source = application1.source || application2.source;
+    mergedData.cvFileName = application1.cvFileName || application2.cvFileName;
     mergedData.mergedFrom = [removeId];
     mergedData.mergedAt = new Date().toISOString();
     mergedData.duplicateResolved = true;
@@ -641,7 +641,7 @@ const DuplicateResolution: React.FC = () => {
       location: mergedData.location,
       experienceYears: mergedData.experienceYears,
       experienceText: combinedExperienceText,
-      status: keepCandidate.status,
+      status: keepApplication.status,
       interestedField: mergedData.interestedField,
       availability: mergedData.availability,
       role: mergedData.interestedField?.split('/')[0] || "Professional",
@@ -649,9 +649,9 @@ const DuplicateResolution: React.FC = () => {
     
     try {
       // Update kept profile with merged data
-      await updateDoc(doc(db, "candidates", keepId), mergedData);
+      await updateDoc(doc(db, "applications", keepId), mergedData);
       // Delete duplicate profile
-      await deleteDoc(doc(db, "candidates", removeId));
+      await deleteDoc(doc(db, "applications", removeId));
       
       // Update local state
       setMergedCount(prev => prev + 1);
@@ -668,8 +668,8 @@ const DuplicateResolution: React.FC = () => {
         setSelectedPair(null);
       }
       
-      // Refresh candidate list
-      await fetchAllCandidates();
+      // Refresh applications list
+      await fetchAllApplications();
       
       // Navigate to ProfileMerge page
       navigate('/profile-merge', { state: { mergedProfile: mergedProfileData, removedId: removeId } });
@@ -680,14 +680,14 @@ const DuplicateResolution: React.FC = () => {
     }
   };
 
-  // Ignore a duplicate pair - Navigate to ProfileCancel with candidate details
+  // Ignore a duplicate pair - Navigate to ProfileCancel with application details
 const ignorePair = () => {
   if (!selectedPair) return;
   
   // Prepare the data to pass to ProfileCancel page
   const cancelledData = {
-    candidate1: selectedPair.candidate1,
-    candidate2: selectedPair.candidate2,
+    application1: selectedPair.application1,
+    application2: selectedPair.application2,
     score: selectedPair.score,
     matchReason: selectedPair.matchReason,
     ignoredAt: new Date().toISOString(),
@@ -701,26 +701,26 @@ const ignorePair = () => {
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      await fetchAllCandidates();
+      await fetchAllApplications();
       setLoading(false);
     };
     init();
   }, []);
 
-  // Auto-run duplicate detection after candidates load
+  // Auto-run duplicate detection after applications load
   useEffect(() => {
-    if (candidates.length > 0 && duplicatePairs.length === 0 && !loading && !scanning) {
+    if (applications.length > 0 && duplicatePairs.length === 0 && !loading && !scanning) {
       runDuplicateDetection();
     }
-  }, [candidates, loading]);
+  }, [applications, loading]);
 
   // Filter pairs by search term
   const filteredPairs = duplicatePairs.filter(pair => 
     searchTerm === "" ||
-    pair.candidate1.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pair.candidate2.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pair.candidate1.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pair.candidate2.email.toLowerCase().includes(searchTerm.toLowerCase())
+    pair.application1.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pair.application2.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pair.application1.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pair.application2.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -728,7 +728,7 @@ const ignorePair = () => {
       <div className="min-h-screen bg-[#F8FAFC] p-8 font-sans text-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-slate-500">Loading candidates from Firestore...</p>
+          <p className="mt-4 text-slate-500">Loading applications from Firestore...</p>
         </div>
       </div>
     );
@@ -764,8 +764,8 @@ const ignorePair = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Total Candidates</p>
-            <p className="text-4xl font-bold text-slate-800">{candidates.length}</p>
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Total Applications</p>
+            <p className="text-4xl font-bold text-slate-800">{applications.length}</p>
           </div>
           <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
             <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Duplicate Pairs Found</p>
@@ -805,7 +805,7 @@ const ignorePair = () => {
               disabled={scanning}
               className="px-5 py-2 bg-[#6366F1] text-white text-sm font-bold rounded-lg hover:bg-indigo-600 transition shadow-md shadow-indigo-100 disabled:opacity-50"
             >
-              {scanning ? 'Scanning...' : 'Scan All Candidates'}
+              {scanning ? 'Scanning...' : 'Scan All Applications'}
             </button>
             {selectedPair && (
               <>
@@ -842,44 +842,44 @@ const ignorePair = () => {
               <div className="absolute top-0 left-0 w-full h-1.5 bg-indigo-500"></div>
               <div className="flex justify-between items-start mb-8">
                 <span className="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-3 py-1 rounded-full border border-indigo-100 uppercase tracking-tighter">
-                  Candidate Profile
+                  Application Profile
                 </span>
               </div>
               <div className="flex flex-col items-center mb-10">
                 <div className="w-20 h-20 bg-slate-50 rounded-2xl mb-4 border border-slate-100 flex items-center justify-center">
                   <FiUser className="w-8 h-8 text-slate-400" />
                 </div>
-                <h2 className="text-xl font-bold text-slate-800">{selectedPair.candidate1.fullName}</h2>
+                <h2 className="text-xl font-bold text-slate-800">{selectedPair.application1.fullName}</h2>
                 <p className="text-xs text-slate-400 font-medium mt-1">
-                  Added {selectedPair.candidate1.addedDate}
+                  Added {selectedPair.application1.addedDate}
                 </p>
               </div>
               <div className="space-y-5">
                 <ProfileField 
                   label="Email Address" 
-                  value={selectedPair.candidate1.email || 'Not provided'} 
-                  isError={selectedPair.candidate1.email === selectedPair.candidate2.email && !!selectedPair.candidate1.email}
+                  value={selectedPair.application1.email || 'Not provided'} 
+                  isError={selectedPair.application1.email === selectedPair.application2.email && !!selectedPair.application1.email}
                 />
                 <ProfileField 
                   label="Phone Number" 
-                  value={selectedPair.candidate1.phone || 'Not provided'} 
+                  value={selectedPair.application1.phone || 'Not provided'} 
                 />
                 <ProfileField 
                   label="Primary Skills" 
-                  value={selectedPair.candidate1.skills?.slice(0, 4).join(', ') || 'None'} 
+                  value={selectedPair.application1.skills?.slice(0, 4).join(', ') || 'None'} 
                 />
                 <ProfileField 
                   label="Location" 
-                  value={selectedPair.candidate1.location || 'Remote'} 
+                  value={selectedPair.application1.location || 'Remote'} 
                 />
                 <ProfileField 
                   label="Status" 
-                  value={selectedPair.candidate1.status || 'New'} 
+                  value={selectedPair.application1.status || 'New'} 
                 />
-                {selectedPair.candidate1.cvFileName && (
+                {selectedPair.application1.cvFileName && (
                   <ProfileField 
                     label="CV Filename" 
-                    value={selectedPair.candidate1.cvFileName} 
+                    value={selectedPair.application1.cvFileName} 
                   />
                 )}
               </div>
@@ -895,40 +895,40 @@ const ignorePair = () => {
               </div>
               <div className="flex flex-col items-center mb-10">
                 <div className="w-20 h-20 bg-slate-800 rounded-2xl mb-4 shadow-lg flex items-center justify-center text-white font-bold text-xl">
-                  {selectedPair.candidate2.fullName?.[0] || '?'}
+                  {selectedPair.application2.fullName?.[0] || '?'}
                 </div>
-                <h2 className="text-xl font-bold text-slate-800">{selectedPair.candidate2.fullName}</h2>
+                <h2 className="text-xl font-bold text-slate-800">{selectedPair.application2.fullName}</h2>
                 <p className="text-xs text-slate-400 font-medium mt-1">
-                  Added {selectedPair.candidate2.addedDate}
+                  Added {selectedPair.application2.addedDate}
                 </p>
               </div>
               <div className="space-y-5">
                 <ProfileField 
                   label="Email Address" 
-                  value={selectedPair.candidate2.email || 'Not provided'} 
-                  isError={selectedPair.candidate1.email === selectedPair.candidate2.email && !!selectedPair.candidate2.email}
+                  value={selectedPair.application2.email || 'Not provided'} 
+                  isError={selectedPair.application1.email === selectedPair.application2.email && !!selectedPair.application2.email}
                 />
                 <ProfileField 
                   label="Phone Number" 
-                  value={selectedPair.candidate2.phone || 'Not provided'} 
-                  isMuted={!selectedPair.candidate2.phone}
+                  value={selectedPair.application2.phone || 'Not provided'} 
+                  isMuted={!selectedPair.application2.phone}
                 />
                 <ProfileField 
                   label="Primary Skills" 
-                  value={selectedPair.candidate2.skills?.slice(0, 4).join(', ') || 'None'} 
+                  value={selectedPair.application2.skills?.slice(0, 4).join(', ') || 'None'} 
                 />
                 <ProfileField 
                   label="Location" 
-                  value={selectedPair.candidate2.location || 'Remote'} 
+                  value={selectedPair.application2.location || 'Remote'} 
                 />
                 <ProfileField 
                   label="Status" 
-                  value={selectedPair.candidate2.status || 'New'} 
+                  value={selectedPair.application2.status || 'New'} 
                 />
-                {selectedPair.candidate2.cvFileName && (
+                {selectedPair.application2.cvFileName && (
                   <ProfileField 
                     label="CV Filename" 
-                    value={selectedPair.candidate2.cvFileName} 
+                    value={selectedPair.application2.cvFileName} 
                   />
                 )}
               </div>
@@ -950,15 +950,15 @@ const ignorePair = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <SelectableOption
                   label="KEEP THIS NAME"
-                  value={selectedPair.candidate1.fullName}
-                  isSelected={mergeStrategy.keepName === 'candidate1'}
-                  onClick={() => setMergeStrategy({...mergeStrategy, keepName: 'candidate1'})}
+                  value={selectedPair.application1.fullName}
+                  isSelected={mergeStrategy.keepName === 'application1'}
+                  onClick={() => setMergeStrategy({...mergeStrategy, keepName: 'application1'})}
                 />
                 <SelectableOption
                   label="OR THIS NAME"
-                  value={selectedPair.candidate2.fullName}
-                  isSelected={mergeStrategy.keepName === 'candidate2'}
-                  onClick={() => setMergeStrategy({...mergeStrategy, keepName: 'candidate2'})}
+                  value={selectedPair.application2.fullName}
+                  isSelected={mergeStrategy.keepName === 'application2'}
+                  onClick={() => setMergeStrategy({...mergeStrategy, keepName: 'application2'})}
                 />
               </div>
             </div>
@@ -969,19 +969,19 @@ const ignorePair = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <SelectableOption
                   label="EMAIL 1"
-                  value={selectedPair.candidate1.email || 'Not provided'}
-                  isSelected={mergeStrategy.keepEmail === 'candidate1'}
-                  onClick={() => setMergeStrategy({...mergeStrategy, keepEmail: 'candidate1'})}
+                  value={selectedPair.application1.email || 'Not provided'}
+                  isSelected={mergeStrategy.keepEmail === 'application1'}
+                  onClick={() => setMergeStrategy({...mergeStrategy, keepEmail: 'application1'})}
                 />
                 <SelectableOption
                   label="EMAIL 2"
-                  value={selectedPair.candidate2.email || 'Not provided'}
-                  isSelected={mergeStrategy.keepEmail === 'candidate2'}
-                  onClick={() => setMergeStrategy({...mergeStrategy, keepEmail: 'candidate2'})}
+                  value={selectedPair.application2.email || 'Not provided'}
+                  isSelected={mergeStrategy.keepEmail === 'application2'}
+                  onClick={() => setMergeStrategy({...mergeStrategy, keepEmail: 'application2'})}
                 />
                 <SelectableOption
                   label="BEST AVAILABLE"
-                  value={selectedPair.candidate1.email || selectedPair.candidate2.email || 'No email'}
+                  value={selectedPair.application1.email || selectedPair.application2.email || 'No email'}
                   isSelected={mergeStrategy.keepEmail === 'auto'}
                   onClick={() => setMergeStrategy({...mergeStrategy, keepEmail: 'auto'})}
                   isItalic
@@ -995,19 +995,19 @@ const ignorePair = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <SelectableOption
                   label="PHONE 1"
-                  value={selectedPair.candidate1.phone || 'Not provided'}
-                  isSelected={mergeStrategy.keepPhone === 'candidate1'}
-                  onClick={() => setMergeStrategy({...mergeStrategy, keepPhone: 'candidate1'})}
+                  value={selectedPair.application1.phone || 'Not provided'}
+                  isSelected={mergeStrategy.keepPhone === 'application1'}
+                  onClick={() => setMergeStrategy({...mergeStrategy, keepPhone: 'application1'})}
                 />
                 <SelectableOption
                   label="PHONE 2"
-                  value={selectedPair.candidate2.phone || 'Not provided'}
-                  isSelected={mergeStrategy.keepPhone === 'candidate2'}
-                  onClick={() => setMergeStrategy({...mergeStrategy, keepPhone: 'candidate2'})}
+                  value={selectedPair.application2.phone || 'Not provided'}
+                  isSelected={mergeStrategy.keepPhone === 'application2'}
+                  onClick={() => setMergeStrategy({...mergeStrategy, keepPhone: 'application2'})}
                 />
                 <SelectableOption
                   label="BEST AVAILABLE"
-                  value={selectedPair.candidate1.phone || selectedPair.candidate2.phone || 'No phone'}
+                  value={selectedPair.application1.phone || selectedPair.application2.phone || 'No phone'}
                   isSelected={mergeStrategy.keepPhone === 'auto'}
                   onClick={() => setMergeStrategy({...mergeStrategy, keepPhone: 'auto'})}
                   isItalic
@@ -1021,22 +1021,22 @@ const ignorePair = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <SelectableOption
                   label="COMBINE ALL SKILLS"
-                  value={`${new Set([...(selectedPair.candidate1.skills || []), ...(selectedPair.candidate2.skills || [])]).size} unique skills`}
+                  value={`${new Set([...(selectedPair.application1.skills || []), ...(selectedPair.application2.skills || [])]).size} unique skills`}
                   isSelected={mergeStrategy.keepSkills === 'combine'}
                   onClick={() => setMergeStrategy({...mergeStrategy, keepSkills: 'combine'})}
                   isItalic
                 />
                 <SelectableOption
                   label="SKILLS FROM PROFILE 1"
-                  value={`${selectedPair.candidate1.skills?.length || 0} skills`}
-                  isSelected={mergeStrategy.keepSkills === 'candidate1'}
-                  onClick={() => setMergeStrategy({...mergeStrategy, keepSkills: 'candidate1'})}
+                  value={`${selectedPair.application1.skills?.length || 0} skills`}
+                  isSelected={mergeStrategy.keepSkills === 'application1'}
+                  onClick={() => setMergeStrategy({...mergeStrategy, keepSkills: 'application1'})}
                 />
                 <SelectableOption
                   label="SKILLS FROM PROFILE 2"
-                  value={`${selectedPair.candidate2.skills?.length || 0} skills`}
-                  isSelected={mergeStrategy.keepSkills === 'candidate2'}
-                  onClick={() => setMergeStrategy({...mergeStrategy, keepSkills: 'candidate2'})}
+                  value={`${selectedPair.application2.skills?.length || 0} skills`}
+                  isSelected={mergeStrategy.keepSkills === 'application2'}
+                  onClick={() => setMergeStrategy({...mergeStrategy, keepSkills: 'application2'})}
                 />
               </div>
             </div>
@@ -1047,22 +1047,22 @@ const ignorePair = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <SelectableOption
                   label="MAXIMUM EXPERIENCE"
-                  value={`${Math.max(selectedPair.candidate1.experienceYears || 0, selectedPair.candidate2.experienceYears || 0)} years`}
+                  value={`${Math.max(selectedPair.application1.experienceYears || 0, selectedPair.application2.experienceYears || 0)} years`}
                   isSelected={mergeStrategy.keepExperience === 'max'}
                   onClick={() => setMergeStrategy({...mergeStrategy, keepExperience: 'max'})}
                   isItalic
                 />
                 <SelectableOption
                   label="PROFILE 1 EXPERIENCE"
-                  value={`${selectedPair.candidate1.experienceYears || 0} years`}
-                  isSelected={mergeStrategy.keepExperience === 'candidate1'}
-                  onClick={() => setMergeStrategy({...mergeStrategy, keepExperience: 'candidate1'})}
+                  value={`${selectedPair.application1.experienceYears || 0} years`}
+                  isSelected={mergeStrategy.keepExperience === 'application1'}
+                  onClick={() => setMergeStrategy({...mergeStrategy, keepExperience: 'application1'})}
                 />
                 <SelectableOption
                   label="PROFILE 2 EXPERIENCE"
-                  value={`${selectedPair.candidate2.experienceYears || 0} years`}
-                  isSelected={mergeStrategy.keepExperience === 'candidate2'}
-                  onClick={() => setMergeStrategy({...mergeStrategy, keepExperience: 'candidate2'})}
+                  value={`${selectedPair.application2.experienceYears || 0} years`}
+                  isSelected={mergeStrategy.keepExperience === 'application2'}
+                  onClick={() => setMergeStrategy({...mergeStrategy, keepExperience: 'application2'})}
                 />
               </div>
             </div>
@@ -1092,7 +1092,7 @@ const ignorePair = () => {
               filteredPairs.map((pair) => (
                 <TaskRow 
                   key={`${pair.id1}-${pair.id2}`}
-                  name={`${pair.candidate1.fullName} vs. ${pair.candidate2.fullName}`}
+                  name={`${pair.application1.fullName} vs. ${pair.application2.fullName}`}
                   match={`${pair.score}%`}
                   isActive={selectedPair?.id1 === pair.id1 && selectedPair?.id2 === pair.id2}
                   onClick={() => setSelectedPair(pair)}
@@ -1101,7 +1101,7 @@ const ignorePair = () => {
             ) : (
               <div className="p-8 text-center text-slate-400">
                 {duplicatePairs.length === 0 && !scanning 
-                  ? '✅ No duplicates detected! All candidate profiles are unique.' 
+                  ? '✅ No duplicates detected! All application profiles are unique.' 
                   : searchTerm 
                     ? 'No matching duplicates found for your search.'
                     : 'No duplicate pairs detected'}
