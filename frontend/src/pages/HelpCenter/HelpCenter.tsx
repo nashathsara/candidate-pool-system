@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { auth } from '../../config/firebase';
+import { signOut } from 'firebase/auth';
 import { User, Briefcase, FileText, HelpCircle, Bell, Search, Settings, LogOut } from 'lucide-react';
 import './HelpCenter.css';
 
@@ -32,9 +34,13 @@ const HelpCenter: React.FC = () => {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const handleSignOut = () => {
-    // Add any logout logic here (clear tokens, etc.)
-    navigate('/signin');
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('HelpCenter sign out failed:', error);
+    }
+    navigate('/', { replace: true });
   };
 
   const helpCategories: HelpCategory[] = [

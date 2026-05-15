@@ -51,7 +51,7 @@ const SignIn: React.FC = () => {
       });
 
       if (response.data?.status === "success") {
-        navigate("/settings");
+        navigate("/candidate-dashboard");
         return;
       }
 
@@ -69,11 +69,12 @@ const SignIn: React.FC = () => {
           ? `Unable to reach backend at ${API_BASE_URL}. Make sure the server is running.`
           : null;
 
-      // Keep your existing behavior idea: show verification prompt if backend indicates unverified
+      // If user exists but email not verified, guide to verification page
       const backendStatus = axiosErr?.response?.data?.status;
       if (backendStatus === "unverified") {
-        alert("Please verify your email first.");
-        navigate("/EmailVerification");
+        // User already has Firebase account but email not verified
+        // They should complete email verification first
+        navigate("/EmailVerification", { replace: true });
         return;
       }
 

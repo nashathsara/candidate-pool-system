@@ -1,14 +1,20 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { auth } from '../../config/firebase.js';
+import { signOut } from 'firebase/auth';
 import { User, Briefcase, FileText, HelpCircle, Bell, Search, Settings, TrendingUp, Clock, CheckCircle, AlertCircle, Star, ArrowRight, Calendar, MessageSquare, BarChart3, LogOut } from 'lucide-react';
 import './CandidateDashboard.css';
 
 const CandidateDashboard = () => {
   const navigate = useNavigate();
 
-  const handleSignOut = () => {
-    // Add any logout logic here (clear tokens, etc.)
-    navigate('/signin');
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Candidate sign out failed:', error);
+    }
+    navigate('/', { replace: true });
   };
 
   return (

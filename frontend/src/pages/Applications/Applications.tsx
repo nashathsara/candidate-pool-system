@@ -2,7 +2,8 @@ import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Briefcase, FileText, HelpCircle, Bell, Search, Settings, LogOut } from 'lucide-react';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { db } from '../../config/firebase';
+import { auth, db } from '../../config/firebase';
+import { signOut } from 'firebase/auth';
 import './Applications.css';
 
 const INTERESTED_FIELDS = [
@@ -75,8 +76,13 @@ const CandidateApplicationView = () => {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  const handleSignOut = () => {
-    navigate('/signin');
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Applications sign out failed:', error);
+    }
+    navigate('/', { replace: true });
   };
 
   const [formData, setFormData] = useState({

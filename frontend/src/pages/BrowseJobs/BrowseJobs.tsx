@@ -67,7 +67,7 @@ function BrowseJobs() {
 
   useEffect(() => {
     if (!loading && !isSignedIn) {
-      navigate("/signin");
+      navigate("/", { replace: true });
     }
   }, [canLoad, isSignedIn, loading, navigate]);
 

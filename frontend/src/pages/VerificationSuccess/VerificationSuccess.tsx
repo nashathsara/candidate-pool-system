@@ -18,9 +18,9 @@ const VerificationSuccess = () => {
 
         <button
           className="primary-btn"
-          onClick={() => navigate("/candidates")}
+          onClick={() => navigate("/profile/create", { replace: true })}
         >
-          Continue
+          Continue to Profile Setup
         </button>
 
         <button className="link-btn">

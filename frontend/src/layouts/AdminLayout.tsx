@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../config/firebase";
 import "./AdminLayout.css";
 
 const DashboardIcon = () => (
@@ -66,6 +68,16 @@ export interface AdminLayoutProps {
 
 const AdminLayout = ({ children, headerTitle }: AdminLayoutProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Admin sign out failed:", error);
+    }
+    navigate('/', { replace: true });
+  };
 
   const navigationItems = [
     { name: "Dashboard", path: "/dashboard", icon: <DashboardIcon /> },
@@ -110,7 +122,7 @@ const AdminLayout = ({ children, headerTitle }: AdminLayoutProps) => {
             <HelpIcon />
             Support
           </button>
-          <button type="button" className="admin-foot-link">
+          <button type="button" className="admin-foot-link" onClick={handleSignOut}>
             <SignOutIcon />
             Sign Out
           </button>

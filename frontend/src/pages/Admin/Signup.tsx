@@ -39,9 +39,9 @@ const Signup: React.FC = () => {
       });
 
       if (response.data.status === 'success') {
-        // ඊමේල් එක ගිය බව දන්වා වෙරිෆිකේෂන් පේජ් එකට යැවීම
-        alert("Verification link sent to your email!");
-        navigate('/email-verification'); 
+        // Verification link sent - user should check email
+        alert("Verification link sent to your email! Please check your inbox.");
+        navigate('/EmailVerification', { replace: true }); 
       } else if (response.data.status === 'duplicate') {
         alert("This profile already exists in the system.");
       }
