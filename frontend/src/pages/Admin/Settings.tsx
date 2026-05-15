@@ -116,21 +116,6 @@ const Settings: React.FC = () => {
             <h2 className="text-2xl font-bold text-gray-900">System Settings</h2>
             <p className="text-sm text-gray-400 mt-1">Manage your workspace configuration and security protocols.</p>
           </div>
-<<<<<<< HEAD
-          <div className="flex flex-wrap gap-3">
-            <button className="px-5 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-colors duration-200">
-              Discard Changes
-            </button>
-            <button className="px-5 py-2 text-xs font-bold text-white bg-black rounded-lg hover:bg-gray-800 transition-colors duration-200">
-              Save Settings
-            </button>
-          </div>
-        </div>
-
-        <div className="max-w-5xl w-full mx-auto space-y-6">
-          <section className="bg-white p-6 sm:p-8 rounded-xl border border-gray-200 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
-=======
           <div className="flex gap-3">
             <button 
               onClick={handleDiscardChanges}
@@ -138,8 +123,6 @@ const Settings: React.FC = () => {
             >
               Discard Changes
             </button>
-            
-            {/* Replaced static plain HTML button with your responsive custom common Button */}
             <Button 
               label="Save Settings"
               onClick={handleSaveSettings}
@@ -149,16 +132,9 @@ const Settings: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-4xl space-y-6">
-          {/* Section 1: Edit Profile */}
+        <div className="max-w-5xl w-full mx-auto space-y-6">
           <section className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex justify-between items-center mb-6">
->>>>>>> 1761665778a1cb705262f39c9829a95c94ef827a
-              <div>
-                <h3 className="font-bold text-base">Edit Profile</h3>
-                <p className="text-xs text-gray-400">Update your administrative profile details and contact information.</p>
-              </div>
-              <span className="text-gray-400 text-lg grayscale">ⓘ</span>
             </div>
 
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -201,15 +177,8 @@ const Settings: React.FC = () => {
             </div>
           </section>
 
-<<<<<<< HEAD
-          {/* Section 2: Change Password - Added border-gray-200 for the light outline */}
-          <section className="bg-white p-6 sm:p-8 rounded-xl border border-gray-200 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
-=======
-          {/* Section 2: Change Password */}
           <section className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex justify-between items-center mb-6">
->>>>>>> 1761665778a1cb705262f39c9829a95c94ef827a
               <div>
                 <h3 className="font-bold text-base">Change Password</h3>
                 <p className="text-xs text-gray-400">Update your account credentials.</p>
@@ -248,20 +217,12 @@ const Settings: React.FC = () => {
                   className={inputBaseClass} 
                 />
               </div>
-<<<<<<< HEAD
-              <button className="w-full py-2.5 bg-gray-100 text-gray-500 text-sm font-bold rounded-lg hover:bg-gray-200 transition-colors duration-200">
-                Update Password
-              </button>
-=======
-
-              {/* Upgraded this button to use the common Button component to leverage isLoading states */}
               <Button 
                 label="Update Password"
                 onClick={handleUpdatePassword}
                 variant="primary"
                 isLoading={isUpdatingPassword}
               />
->>>>>>> 1761665778a1cb705262f39c9829a95c94ef827a
             </div>
           </section>
         </div>
