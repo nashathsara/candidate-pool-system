@@ -1,3 +1,5 @@
+
+
 import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import VerificationSuccess from "./pages/VerificationSuccess/VerificationSuccess";
 import EmailVerification from "./pages/EmailVerification/EmailVerification";
@@ -19,6 +21,7 @@ import TicketSubmitForm from "./pages/TicketSubmitForm/TicketSubmitForm";
 import Settings from "./pages/Admin/Settings";
 import TicketSuccess from "./pages/TicketSuccess/TicketSuccess";
 import AdminDashboardPage from "./pages/Admin/AdminDashboardPage";
+import CandidateDetails from "./pages/CandidateDetails/CandidateDetails";
 import ProfileCreate from "./pages/ProfileCreate/ProfileCreate";
 import Home from "./pages/Home/Home";
 import Applications from "./pages/Applications/Applications";
@@ -44,10 +47,9 @@ const AppRoutes = () => {
     <BrowserRouter>
       <Routes>
         {/* Public routes (without MainLayout) */}
-        <Route path="/" element={<Home />} />
-        <Route path="/Home" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin/settings" element={<Settings />} />
+        <Route path="/" element={<VerificationSuccess />} />
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/EmailVerification" element={<EmailVerification />} />
         <Route path="/applications" element={<Applications />} />
@@ -74,7 +76,7 @@ const AppRoutes = () => {
             </MainLayout>
           }
         />
-
+        
         <Route
           path="/candidates"
           element={
@@ -124,28 +126,17 @@ const AppRoutes = () => {
             </MainLayout>
           }
         />
-
         <Route
           path="/settings"
           element={
             <MainLayout>
               <CandidateSettings />
-            </MainLayout>
-          }
-        />
+            </MainLayout>}/>
 
-        <Route
-          path="/support"
-          element={
-            <MainLayout>
-              <TicketSubmitForm />
-            </MainLayout>
-          }
-        />
+          <Route path="/ticket-success" element={<TicketSuccess />} />
+  
+          <Route path="/" element={<Navigate to="/signup" />} />
 
-        <Route path="/ticket-success" element={<TicketSuccess />} />
-
-        <Route path="/" element={<Navigate to="/signup" />} />
       </Routes>
     </BrowserRouter>
   );

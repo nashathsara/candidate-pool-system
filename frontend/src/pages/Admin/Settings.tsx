@@ -1,9 +1,110 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Sidebar from '../../components/admin/Sidebar';
+import Button from '../../common/Button/Button'; // Import your newly upgraded common button
 
 const Settings: React.FC = () => {
   const inputBaseClass = "w-full p-3 bg-[#F1F5F9] border border-[#E2E8F0] rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all";
   const labelClass = "block text-[10px] font-bold text-gray-400 mb-1.5 uppercase tracking-wider";
+
+  // --- Profile States ---
+  // Notice the key matches your Firestore key "full name" exactly
+  const [fullName, setFullName] = useState<string>("Jane Doe");
+  const [role, setRole] = useState<string>("Super Admin");
+  const [email, setEmail] = useState<string>("jane.d@talentpulse.io");
+  const [phone, setPhone] = useState<string>("+1 (555) 0123-456");
+  const [isSavingSettings, setIsSavingSettings] = useState<boolean>(false);
+
+  // --- Password States ---
+  const [currentPassword, setCurrentPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState<boolean>(false);
+
+  // --- Handlers ---
+  const handleSaveSettings = async () => {
+    setIsSavingSettings(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/admin/update-profile", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          uid: "dev_test_admin_999", // The test ID we generated in your database
+          "full name": fullName,       // Matches your exact Firestore collection key
+          role: role,
+          email: email,
+          phone: phone,
+          bio: "Updated from the dynamic settings dashboard UI."
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Profile updated successfully in real time!");
+      } else {
+        alert(`Error: ${data.error || "Failed to update profile"}`);
+      }
+    } catch (error) {
+      console.error("Network error saving profile:", error);
+      alert("Failed to connect to the backend server.");
+    } finally {
+      setIsSavingSettings(false);
+    }
+  };
+
+  const handleUpdatePassword = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      alert("Please fill out all password fields.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("New password and confirm password do not match.");
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/admin/change-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          uid: "dev_test_admin_999",
+          currentPassword: currentPassword,
+          newPassword: newPassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Password updated successfully!");
+        // Clear fields out after a successful run
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        alert(`Error: ${data.error || "Failed to update password"}`);
+      }
+    } catch (error) {
+      console.error("Network error updating password:", error);
+      alert("Failed to reach the backend security service.");
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
+
+  const handleDiscardChanges = () => {
+    // Quick reset mechanism back to initial placeholders
+    setFullName("Jane Doe");
+    setRole("Super Admin");
+    setEmail("jane.d@talentpulse.io");
+    setPhone("+1 (555) 0123-456");
+  };
 
   return (
     <div className="flex bg-[#FBFBFB] min-h-screen">
@@ -16,17 +117,25 @@ const Settings: React.FC = () => {
             <p className="text-sm text-gray-400 mt-1">Manage your workspace configuration and security protocols.</p>
           </div>
           <div className="flex gap-3">
-            <button className="px-5 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-lg bg-white hover:bg-gray-50">
+            <button 
+              onClick={handleDiscardChanges}
+              className="px-5 py-2 text-xs font-bold text-gray-500 border border-gray-200 rounded-lg bg-white hover:bg-gray-50 transition-all"
+            >
               Discard Changes
             </button>
-            <button className="px-5 py-2 text-xs font-bold text-white bg-black rounded-lg hover:bg-gray-800">
-              Save Settings
-            </button>
+            
+            {/* Replaced static plain HTML button with your responsive custom common Button */}
+            <Button 
+              label="Save Settings"
+              onClick={handleSaveSettings}
+              variant="primary"
+              isLoading={isSavingSettings}
+            />
           </div>
         </div>
 
         <div className="max-w-4xl space-y-6">
-          {/* Section 1: Edit Profile - Added border-gray-200 for the light outline */}
+          {/* Section 1: Edit Profile */}
           <section className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex justify-between items-center mb-6">
               <div>
@@ -39,24 +148,44 @@ const Settings: React.FC = () => {
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className={labelClass}>Full Name</label>
-                <input type="text" defaultValue="Jane Doe" className={inputBaseClass} />
+                <input 
+                  type="text" 
+                  value={fullName} 
+                  onChange={(e) => setFullName(e.target.value)} 
+                  className={inputBaseClass} 
+                />
               </div>
               <div>
                 <label className={labelClass}>Administrative Role</label>
-                <input type="text" defaultValue="Super Admin" className={inputBaseClass} />
+                <input 
+                  type="text" 
+                  value={role} 
+                  onChange={(e) => setRole(e.target.value)} 
+                  className={inputBaseClass} 
+                />
               </div>
               <div>
                 <label className={labelClass}>Email Address</label>
-                <input type="email" defaultValue="jane.d@talentpulse.io" className={inputBaseClass} />
+                <input 
+                  type="email" 
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)} 
+                  className={inputBaseClass} 
+                />
               </div>
               <div>
                 <label className={labelClass}>Phone Number</label>
-                <input type="text" defaultValue="+1 (555) 0123-456" className={inputBaseClass} />
+                <input 
+                  type="text" 
+                  value={phone} 
+                  onChange={(e) => setPhone(e.target.value)} 
+                  className={inputBaseClass} 
+                />
               </div>
             </div>
           </section>
 
-          {/* Section 2: Change Password - Added border-gray-200 for the light outline */}
+          {/* Section 2: Change Password */}
           <section className="bg-white p-8 rounded-xl border border-gray-200 shadow-sm">
             <div className="flex justify-between items-center mb-6">
               <div>
@@ -69,19 +198,42 @@ const Settings: React.FC = () => {
             <div className="space-y-5">
               <div>
                 <label className={labelClass}>Current Password</label>
-                <input type="password" placeholder="••••••••" className={inputBaseClass} />
+                <input 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className={inputBaseClass} 
+                />
               </div>
               <div>
                 <label className={labelClass}>New Password</label>
-                <input type="password" placeholder="••••••••" className={inputBaseClass} />
+                <input 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className={inputBaseClass} 
+                />
               </div>
               <div>
                 <label className={labelClass}>Confirm Password</label>
-                <input type="password" placeholder="••••••••" className={inputBaseClass} />
+                <input 
+                  type="password" 
+                  placeholder="••••••••" 
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={inputBaseClass} 
+                />
               </div>
-              <button className="w-full py-2.5 bg-gray-100 text-gray-500 text-sm font-bold rounded-lg hover:bg-gray-200 transition-all">
-                Update Password
-              </button>
+
+              {/* Upgraded this button to use the common Button component to leverage isLoading states */}
+              <Button 
+                label="Update Password"
+                onClick={handleUpdatePassword}
+                variant="primary"
+                isLoading={isUpdatingPassword}
+              />
             </div>
           </section>
         </div>
