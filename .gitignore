@@ -17,3 +17,4 @@ Thumbs.db
 logs
 *.log
 .vscode/
+serviceAccountKey.json
