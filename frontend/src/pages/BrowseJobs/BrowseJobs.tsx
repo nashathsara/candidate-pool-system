@@ -1,5 +1,5 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Bell, Settings, MapPin } from "lucide-react";
+import { Bell, Settings, MapPin, X } from "lucide-react";
 import "./BrowseJobs.css";
 import { fetchJobs } from "../../services/firebaseService";
 import { useAuth } from "../../hooks/useAuth";
@@ -14,6 +14,21 @@ type Job = {
   badge?: string;
   description?: string;
   department?: string;
+};
+
+const jobRoleDescriptions: Record<string, string> = {
+  "Senior Software Engineer":
+    "A high-level technical role focused on building and maintaining complex web applications. You’ll be responsible for the full development lifecycle—from writing clean code to mentoring junior staff—ensuring that global platforms remain scalable, secure, and high-performing.",
+  "Principal UX Designer":
+    "A strategic leadership position that oversees the look and feel of digital products. This role combines user research with hands-on design (wireframing and prototyping) to create intuitive experiences, while also maintaining a cohesive design system across the entire organization.",
+  "Backend Developer (Rust)":
+    "A specialized engineering role focused on high-performance infrastructure. Using the Rust programming language, you will design the \"under-the-hood\" systems, such as APIs and microservices, that ensure data flows quickly and reliably across distributed networks.",
+  "Technical Project Manager":
+    "The bridge between business goals and technical execution. This role involves planning timelines, managing risks, and leading Agile ceremonies (like sprint planning) to ensure that software projects are delivered on time, within budget, and according to quality standards.",
+  "Security Analyst":
+    "A critical defense role dedicated to protecting company data from cyber threats. You will spend your time monitoring for vulnerabilities, conducting risk assessments, and responding to incidents to ensure the company's digital infrastructure remains secure and compliant.",
+  "Product Owner":
+    "A leadership role that acts as the \"voice of the customer\" within the development team. You are responsible for defining the product roadmap, prioritizing the feature backlog, and ensuring that every technical task aligns with the overall business strategy and user needs.",
 };
 
 type JobFilters = {
@@ -35,8 +50,9 @@ function BrowseJobs() {
   const [loadingJobs, setLoadingJobs] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [showNotificationsDropdown, setShowNotificationsDropdown] = useState<boolean>(false);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [showJobModal, setShowJobModal] = useState<boolean>(false);
   const notificationsRef = useRef<HTMLDivElement>(null);
-  const [lastFetchedCount, setLastFetchedCount] = useState<number>(0);
 
   // Pagination logic linked to URL
   const page = parseInt(searchParams.get("page") || "1", 10);
@@ -64,13 +80,11 @@ function BrowseJobs() {
       try {
         const { jobs } = await fetchJobs(filters, PAGE_SIZE, null);
         setAllJobs(jobs as Job[]);
-        setLastFetchedCount((jobs as Job[]).length);
         setPage(1);
       } catch (e) {
         const message = e instanceof Error ? e.message : "Failed to load jobs";
         setError(message);
         setAllJobs([]);
-        setLastFetchedCount(0);
       } finally {
         setLoadingJobs(false);
       }
@@ -144,13 +158,13 @@ function BrowseJobs() {
           </div>
 
           <nav className="header-nav">
-            <Link to="/jobs" className={window.location.pathname === "/jobs" ? "nav-link active" : "nav-link"}>
+            <Link to="/browse" className={window.location.pathname === "/browse" ? "nav-link active" : "nav-link"}>
               Browse Jobs
             </Link>
             <Link to="/applications" className={window.location.pathname === "/applications" ? "nav-link active" : "nav-link"}>
               Applications
             </Link>
-            <Link to="/profile" className={window.location.pathname === "/profile" ? "nav-link active" : "nav-link"}>
+            <Link to="/candidate-dashboard" className={window.location.pathname === "/candidate-dashboard" ? "nav-link active" : "nav-link"}>
               Profile
             </Link>
           </nav>
@@ -180,7 +194,9 @@ function BrowseJobs() {
               <Settings size={18} />
             </Link>
 
-            <div className="avatar">{user?.email?.[0]?.toUpperCase() ?? "U"}</div>
+            <Link to="/candidate-dashboard" className="avatar-link" aria-label="Profile">
+              <div className="avatar">{user?.email?.[0]?.toUpperCase() ?? "U"}</div>
+            </Link>
           </div>
         </div>
       </header>
@@ -194,7 +210,6 @@ function BrowseJobs() {
 
           <div className="search-panel">
             <div className="search-field">
-              <Search size={18} className="search-icon" />
               <input
                 type="search"
                 placeholder="Search by title, keywords, or technology..."
@@ -251,13 +266,6 @@ function BrowseJobs() {
             {loadingJobs ? "LOADING..." : `SHOWING ${visibleJobs.length} OPEN POSITIONS`}
           </p>
 
-          <p style={{ marginTop: 8, fontSize: 12, color: "#64748b" }}>
-            Debug: Fetched jobs: <strong>{lastFetchedCount}</strong> (filters:{" "}
-            <span>
-              {filters.department ?? "∅"}/{filters.location ?? "∅"}/{filters.jobType ?? "∅"}
-            </span>
-            )
-          </p>
         </section>
 
         {error && (
@@ -281,23 +289,28 @@ function BrowseJobs() {
               </div>
 
               <div className="job-card-body">
-                <Link to={`/jobs/${job.id}`} className="job-title-link">
-                  <h2>{job.title ?? "Untitled position"}</h2>
-                </Link>
+                <h2>{job.title ?? "Untitled position"}</h2>
                 <div className="job-detail-row">
                   <MapPin size={16} className="location-icon" />
                   <span>{job.location ?? "Location not set"}</span>
                 </div>
                 <p className="job-type">{job.jobType ?? "Job type not set"}</p>
                 <p className="job-description">
-                  {job.description || "No description available for this position."}
+                  {job.description || jobRoleDescriptions[job.title ?? ""] || "No description available for this position."}
                 </p>
               </div>
               <div className="job-card-footer">
                 <span className="job-salary">{job.salary ?? ""}</span>
-                <Link to={`/jobs/${job.id}`} className="details-link">
+                <button
+                  type="button"
+                  className="details-link"
+                  onClick={() => {
+                    setSelectedJob(job);
+                    setShowJobModal(true);
+                  }}
+                >
                   View Details →
-                </Link>
+                </button>
               </div>
             </article>
           ))}
@@ -316,6 +329,76 @@ function BrowseJobs() {
             </button>
           ))}
         </section>
+
+        {showJobModal && selectedJob && (
+          <div className="modal-overlay" onClick={() => setShowJobModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                className="modal-close-btn"
+                onClick={() => setShowJobModal(false)}
+                aria-label="Close modal"
+              >
+                <X size={24} />
+              </button>
+
+              <div className="modal-header">
+                <div className="job-icon-box-large">🧠</div>
+                <div className="modal-header-text">
+                  <span className="job-badge-large">{selectedJob.badge ?? "GENERAL"}</span>
+                  <h1>{selectedJob.title ?? "Untitled position"}</h1>
+                </div>
+              </div>
+
+              <div className="modal-body">
+                <div className="modal-detail-row">
+                  <span className="detail-label">Location:</span>
+                  <div className="detail-content">
+                    <MapPin size={16} />
+                    <span>{selectedJob.location ?? "Location not set"}</span>
+                  </div>
+                </div>
+
+                <div className="modal-detail-row">
+                  <span className="detail-label">Job Type:</span>
+                  <span className="detail-content">{selectedJob.jobType ?? "Job type not set"}</span>
+                </div>
+
+                <div className="modal-detail-row">
+                  <span className="detail-label">Salary:</span>
+                  <span className="detail-content">{selectedJob.salary ?? "Not specified"}</span>
+                </div>
+
+                <div className="modal-detail-row">
+                  <span className="detail-label">Department:</span>
+                  <span className="detail-content">{selectedJob.department ?? "Not specified"}</span>
+                </div>
+
+                <div className="modal-description-section">
+                  <h3>Job Description</h3>
+                  <p>
+                    {selectedJob.description ||
+                      jobRoleDescriptions[selectedJob.title ?? ""] ||
+                      "No description available for this position."}
+                  </p>
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="apply-btn"
+                  onClick={() => {
+                    setShowJobModal(false);
+                    navigate("/applications");
+                  }}
+                >
+                  Apply Now
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
