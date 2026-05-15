@@ -25,6 +25,7 @@ import TicketSubmitForm from "./pages/TicketSubmitForm/TicketSubmitForm";
 import Settings from "./pages/Admin/Settings";
 import TicketSuccess from "./pages/TicketSuccess/TicketSuccess";
 import AdminDashboardPage from "./pages/Admin/AdminDashboardPage";
+import CandidateDetails from "./pages/CandidateDetails/CandidateDetails";
 import ProfileCreate from "./pages/ProfileCreate/ProfileCreate";
 import Home from "./pages/Home/Home";
 import Applications from "./pages/Applications/Applications";
