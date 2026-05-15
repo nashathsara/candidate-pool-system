@@ -50,17 +50,19 @@ const AppRoutes = () => {
         <Route path="/" element={<Home />} />
         <Route path="/Home" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/candidate-dashboard" element={<CandidateDashboard />} />
+        <Route path="/help" element={<HelpCenter />} />
         <Route path="/admin/settings" element={<Settings />} />
+        <Route path="/candidate-settings" element={<CandidateSettings />} />
         <Route path="/verified" element={<VerificationSuccess />} />
-        <Route path="/EmailVerification" element={<EmailVerification />} />
+        <Route path="/email-verification" element={<EmailVerification />} />
         {/* <Route path="/candidate/duplicate-check" element={<DuplicationView />} /> */}
         <Route path="/applications" element={<Applications />} />
         <Route path="/application-success" element={<Navigate to="/browse" replace />} />
         <Route path="/application-success/:jobId" element={<ApplicationSuccess />} />
 
         {/* Case-insensitive-ish aliases (React Router paths are case-sensitive) */}
-        <Route path="/BrowseJobs" element={<Navigate to="/browse" replace />} />
-        <Route path="/browse" element={<BrowseJobs />} />
+        <Route path="/browse-jobs" element={<BrowseJobs />} />
 
         <Route path="/signin" element={<SignIn />} />
         <Route path="/profile/create" element={<ProfileCreate />} />
