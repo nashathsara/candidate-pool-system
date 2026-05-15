@@ -1,4 +1,7 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { auth } from '../../config/firebase';
+import { signOut } from 'firebase/auth';
 
 const Sidebar: React.FC = () => {
   const menuItems = [
@@ -7,6 +10,17 @@ const Sidebar: React.FC = () => {
     { name: 'Duplicates', icon: '📁' },
     { name: 'Settings', icon: '⚙️', active: true },
   ];
+
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Admin sidebar sign out failed:', error);
+    }
+    navigate('/', { replace: true });
+  };
 
   return (
     /* Changed text-sm to text-xs for smaller sidebar font */
@@ -40,9 +54,13 @@ const Sidebar: React.FC = () => {
           <p className="cursor-pointer hover:text-black flex items-center gap-2">
             <span className="grayscale">🎧</span> Support
           </p>
-          <p className="cursor-pointer hover:text-black flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleSignOut}
+            className="w-full text-left cursor-pointer hover:text-black flex items-center gap-2"
+          >
             <span className="grayscale">🚪</span> Sign Out
-          </p>
+          </button>
         </div>
       </div>
     </div>

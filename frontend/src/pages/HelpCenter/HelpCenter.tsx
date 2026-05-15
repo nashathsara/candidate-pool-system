@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Search, LogOut } from 'lucide-react';
+import { auth } from '../../config/firebase';
+import { signOut } from 'firebase/auth';
+import { User, Briefcase, FileText, HelpCircle, Bell, Search, Settings, LogOut } from 'lucide-react';
 import './HelpCenter.css';
 
 interface FAQItem {
@@ -32,9 +34,13 @@ const HelpCenter: React.FC = () => {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const handleSignOut = () => {
-    // Add any logout logic here (clear tokens, etc.)
-    navigate('/SignIn');
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('HelpCenter sign out failed:', error);
+    }
+    navigate('/', { replace: true });
   };
 
   const helpCategories: HelpCategory[] = [
@@ -288,7 +294,7 @@ const HelpCenter: React.FC = () => {
             <Briefcase size={18} />
             Dashboard
           </Link>
-          <Link to="/browse-jobs" className="nav-link">
+          <Link to="/browse" className="nav-link">
             <Search size={18} />
             Browse Jobs
           </Link>
@@ -307,7 +313,10 @@ const HelpCenter: React.FC = () => {
             <Bell className="notification-bell" size={20} />
             <span className="notification-badge">3</span>
           </div>
-          <div className="user-profile">
+          <Link to="/settings" className="icon-btn" aria-label="Settings">
+            <Settings size={18} />
+          </Link>
+          <Link to="/candidate-dashboard" className="user-profile">
             <div className="user-avatar">
               <User size={20} />
             </div>
@@ -315,7 +324,7 @@ const HelpCenter: React.FC = () => {
               <span className="user-name">John Doe</span>
               <span className="user-role">Candidate</span>
             </div>
-          </div>
+          </Link>
           <button 
             type="button" 
             className="signout-btn"
