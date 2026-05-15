@@ -46,30 +46,11 @@ const createCandidateProfile = async (req, res) => {
       });
     }
 
-    // 2) Create user (ADMIN SDK)
-    console.log("Attempting to create user in Firebase Auth...");
-    let userRecord;
-    try {
-      userRecord = await auth.createUser({
-        email,
-        password,
-        displayName: fullName,
-        emailVerified: false
-      });
-      console.log("User created successfully:", userRecord.uid);
-    } catch (authError) {
-      console.log("Firebase Auth error:", authError.code, authError.message);
-      
-      if (authError.code === "auth/email-already-exists") {
-        return res.status(400).json({
-          status: "error",
-          message: "This email is already registered. Please sign in instead.",
-          code: "EMAIL_EXISTS"
-        });
-      }
-      
-      throw authError;
-    }
+    // Redirect URL
+    const actionCodeSettings = {
+      url: 'http://localhost:3000/verified', 
+      handleCodeInApp: false,
+    };
 
     // 3) Generate 6-digit verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();

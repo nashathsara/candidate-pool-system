@@ -53,6 +53,7 @@ const AppRoutes = () => {
         <Route path="/candidate-dashboard" element={<CandidateDashboard />} />
         <Route path="/help" element={<HelpCenter />} />
         <Route path="/admin/settings" element={<Settings />} />
+        <Route path="/" element={<VerificationSuccess />} />
         <Route path="/candidate-settings" element={<CandidateSettings />} />
         <Route path="/verified" element={<VerificationSuccess />} />
         <Route path="/email-verification" element={<EmailVerification />} />
