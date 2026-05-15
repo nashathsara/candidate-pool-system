@@ -1,302 +1,344 @@
-import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Search, TrendingUp, Clock, CheckCircle, AlertCircle, Star, ArrowRight, Calendar, MessageSquare, BarChart3, LogOut } from 'lucide-react';
-import './CandidateDashboard.css';
+// frontend/src/pages/CandidateDashboard/CandidateDashboard.tsx
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  Briefcase, FileText, MessageSquare, TrendingUp, 
+  CheckCircle, AlertCircle, Star, ArrowRight, 
+  Calendar, BarChart3, Search, HelpCircle 
+} from 'lucide-react';
+import axios from 'axios';
+import CandidateNav from '../../components/CandidateNav';
+import StatCard from '../../components/StatCard';
+import QuickActionCard from '../../components/QuickActionCard';
 
 const CandidateDashboard = () => {
   const navigate = useNavigate();
+  const [userData, setUserData] = useState({
+    fullName: '',
+    email: '',
+    profileCompletion: 0,
+    profileViews: 0,
+    profileStrength: '',
+    isVerified: false,
+    uid: ''
+  });
+  const [stats, setStats] = useState({
+    savedJobs: 0,
+    applications: 0,
+    messages: 0,
+    unreadMessages: 0,
+    profileStrength: '0%'
+  });
+  const [recentActivity, setRecentActivity] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleSignOut = () => {
-    // Add any logout logic here (clear tokens, etc.)
-    navigate('/SignIn');
+  useEffect(() => {
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      navigate('/signin');
+      return;
+    }
+
+    const user = JSON.parse(userStr);
+    if (!user || !user.email) {
+      navigate('/signin');
+      return;
+    }
+
+    fetchUserData(user);
+    fetchStats(user);
+    fetchRecentActivity(user);
+  }, []);
+
+  const fetchUserData = async (user) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/candidates/profile/${user.email}`);
+      if (response.data.status === 'success') {
+        const candidate = response.data.data;
+        setUserData({
+          fullName: candidate.fullName || '',
+          email: candidate.email || '',
+          profileCompletion: calculateProfileCompletion(candidate),
+          profileViews: candidate.profileViews || 0,
+          profileStrength: candidate.profileStrength || '0%',
+          isVerified: candidate.isVerified || false,
+          uid: candidate.uid || ''
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  const calculateProfileCompletion = (candidate) => {
+    let completion = 0;
+    if (candidate.fullName && candidate.fullName !== '') completion += 20;
+    if (candidate.email && candidate.email !== '') completion += 20;
+    if (candidate.phone && candidate.phone !== '') completion += 15;
+    if (candidate.skills && candidate.skills.length > 0) completion += 25;
+    if (candidate.experience && candidate.experience !== '') completion += 20;
+    return completion;
+  };
+
+  const fetchStats = async (user) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/candidates/stats/${user.uid}`);
+      if (response.data.status === 'success') {
+        setStats(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  const fetchRecentActivity = async (user) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/candidates/activity/${user.uid}`);
+      if (response.data.status === 'success') {
+        setRecentActivity(response.data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching activity:', error);
+    }
+  };
+
+  const handleSignOut = () => {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    localStorage.removeItem('pendingVerificationEmail');
+    navigate('/signin');
+  };
+
+  const handleUpdateProfile = () => {
+    navigate('/create-profile');
+  };
+
+  const handleBrowseJobs = () => {
+    navigate('/browse-jobs');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="candidate-dashboard">
-      {/* Enhanced Header */}
-      <header className="dashboard-header">
-        <div className="header-left">
-          <div className="logo-container">
-            <Briefcase className="logo-icon" size={28} />
-            <h1 className="logo">CandidateHub</h1>
-          </div>
-        </div>
-        
-        <nav className="header-nav">
-          <Link to="/candidate-dashboard" className="nav-link active">
-            <BarChart3 size={18} />
-            Dashboard
-          </Link>
-          <Link to="/browse-jobs" className="nav-link">
-            <Search size={18} />
-            Browse Jobs
-          </Link>
-          <Link to="/applications" className="nav-link">
-            <FileText size={18} />
-            Applications
-          </Link>
-          <Link to="/help" className="nav-link">
-            <HelpCircle size={18} />
-            Help Center
-          </Link>
-        </nav>
+    <div className="min-h-screen bg-gray-50">
+      <CandidateNav 
+        fullName={userData.fullName} 
+        unreadMessages={stats.unreadMessages} 
+        onSignOut={handleSignOut} 
+      />
 
-        <div className="header-right">
-          <div className="notifications">
-            <Bell className="notification-bell" size={20} />
-            <span className="notification-badge">3</span>
-          </div>
-          <Link to="/candidate-settings">
-            <div className="user-profile">
-              <div className="user-avatar">
-                <User size={20} />
+      <main className="max-w-7xl mx-auto px-4 py-8 md:px-8">
+        {/* Welcome Section */}
+        <section className="mb-8">
+          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+                  Welcome back, {userData.fullName || 'Candidate'}! 👋
+                </h2>
+                <p className="text-gray-500 mt-1">
+                  {userData.profileCompletion < 100 
+                    ? `Your profile is ${userData.profileCompletion}% complete. Complete it to increase your visibility.`
+                    : "Your profile is complete! You're ready to start applying."}
+                </p>
               </div>
-              <div className="user-info">
-                <span className="user-name">John Doe</span>
-                <span className="user-role">Candidate</span>
-              </div>
-            </div>
-          </Link>
-          <button 
-            type="button" 
-            className="signout-btn"
-            onClick={handleSignOut}
-            aria-label="Sign out"
-          >
-            <LogOut size={18} />
-            <span>Sign Out</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="dashboard-main">
-        {/* Enhanced Welcome Section */}
-        <section className="welcome-section">
-          <div className="welcome-content">
-            <div className="welcome-text">
-              <h2 className="welcome-title">Welcome back, John! 👋</h2>
-              <p className="welcome-subtitle">Your profile is 85% complete. Complete it to increase your visibility to recruiters.</p>
-            </div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: '85%' }}></div>
-              <span className="progress-text">85%</span>
+              {userData.profileCompletion < 100 && (
+                <div className="w-full md:w-64">
+                  <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="absolute left-0 top-0 h-full bg-gray-900 rounded-full transition-all duration-500"
+                      style={{ width: `${userData.profileCompletion}%` }}
+                    />
+                  </div>
+                  <div className="text-right text-sm font-semibold text-gray-900 mt-1">
+                    {userData.profileCompletion}%
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </section>
 
-        <div className="dashboard-grid">
-          {/* Stats Overview */}
-          <div className="stats-section">
-            <div className="stat-card">
-              <div className="stat-icon">
-                <Briefcase size={24} />
-              </div>
-              <div className="stat-content">
-                <div className="stat-value">8</div>
-                <div className="stat-label">Saved Jobs</div>
-                <div className="stat-change positive">+2 this week</div>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <FileText size={24} />
-              </div>
-              <div className="stat-content">
-                <div className="stat-value">3</div>
-                <div className="stat-label">Applications</div>
-                <div className="stat-change positive">+1 this week</div>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <MessageSquare size={24} />
-              </div>
-              <div className="stat-content">
-                <div className="stat-value">5</div>
-                <div className="stat-label">Messages</div>
-                <div className="stat-change neutral">2 unread</div>
-              </div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-icon">
-                <TrendingUp size={24} />
-              </div>
-              <div className="stat-content">
-                <div className="stat-value">92%</div>
-                <div className="stat-label">Profile Strength</div>
-                <div className="stat-change positive">Excellent</div>
-              </div>
-            </div>
-          </div>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatCard icon={Briefcase} value={stats.savedJobs} label="Saved Jobs" />
+          <StatCard icon={FileText} value={stats.applications} label="Applications" />
+          <StatCard icon={MessageSquare} value={stats.messages} label="Messages" />
+          <StatCard icon={TrendingUp} value={stats.profileStrength} label="Profile Strength" />
+        </div>
 
-          {/* Main Content Area */}
-          <div className="dashboard-content">
-            {/* Enhanced Main Card */}
-            <div className="candidate-home-card">
-              <div className="card-header">
-                <div className="card-label-section">
-                  <span className="card-label">CANDIDATE HOME</span>
-                  <div className="card-status">
-                    <CheckCircle size={16} className="status-icon" />
-                    <span>Profile Active</span>
-                  </div>
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+          {/* Main Card */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100">
+              <div className="flex justify-between items-start mb-4">
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  CANDIDATE HOME
+                </span>
+                <div className="flex items-center gap-1 text-green-600">
+                  <CheckCircle size={16} />
+                  <span className="text-sm font-medium">
+                    {userData.isVerified ? 'Verified' : 'Profile Active'}
+                  </span>
                 </div>
-                <h3 className="card-title">Ready for your next career move?</h3>
               </div>
-              <p className="card-description">
-                Your profile is getting noticed! 3 recruiters viewed your profile this week. 
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready for your next career move?</h3>
+              <p className="text-gray-600 mb-6 leading-relaxed">
+                {userData.profileViews > 0 
+                  ? `Your profile is getting noticed! ${userData.profileViews} recruiters viewed your profile.`
+                  : "Complete your profile to get noticed by recruiters."}
                 Keep your information updated and explore new opportunities that match your skills.
               </p>
-              <div className="card-highlights">
-                <div className="highlight-item">
-                  <Star size={16} className="highlight-icon" />
-                  <span>Top 10% candidate profile</span>
+              <div className="flex flex-col gap-3 mb-6">
+                <div className="flex items-center gap-3 text-gray-700">
+                  <Star size={16} className="text-gray-900" />
+                  <span className="text-sm">Complete your profile to stand out</span>
                 </div>
-                <div className="highlight-item">
-                  <TrendingUp size={16} className="highlight-icon" />
-                  <span>Profile views increased by 45%</span>
+                <div className="flex items-center gap-3 text-gray-700">
+                  <TrendingUp size={16} className="text-gray-900" />
+                  <span className="text-sm">Apply to jobs that match your skills</span>
                 </div>
               </div>
-              <div className="card-actions">
-                <Link to="/browse-jobs" className="btn btn-primary">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={handleBrowseJobs}
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white font-semibold rounded-xl hover:bg-gray-800 transition-all"
+                >
                   <Search size={18} />
                   Browse Jobs
-                </Link>
-                <Link to="/create-profile" className="btn btn-secondary">
+                </button>
+                <button
+                  onClick={handleUpdateProfile}
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-white text-gray-900 font-semibold rounded-xl border border-gray-300 hover:bg-gray-50 transition-all"
+                >
                   <FileText size={18} />
                   Update Profile
-                </Link>
+                </button>
               </div>
             </div>
           </div>
 
-          {/* Right Sidebar */}
-          <div className="dashboard-sidebar">
+          {/* Sidebar */}
+          <div className="space-y-6">
             {/* Profile Status Card */}
-            <div className="profile-status-card">
-              <div className="status-header">
-                <span className="status-label">Profile Status</span>
-                <span className="status-badge verified">VERIFIED</span>
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex justify-between items-center mb-4">
+                <span className="font-semibold text-gray-900">Profile Status</span>
+                <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                  userData.isVerified 
+                    ? 'bg-green-100 text-green-700' 
+                    : 'bg-yellow-100 text-yellow-700'
+                }`}>
+                  {userData.isVerified ? 'VERIFIED' : 'PENDING'}
+                </span>
               </div>
-              <div className="profile-completion">
-                <div className="completion-item">
-                  <CheckCircle size={16} className="completion-icon complete" />
-                  <span>Basic Information</span>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <CheckCircle size={16} className={userData.fullName ? 'text-green-500' : 'text-gray-300'} />
+                  <span className="text-sm text-gray-700">Basic Information</span>
                 </div>
-                <div className="completion-item">
-                  <CheckCircle size={16} className="completion-icon complete" />
-                  <span>Work Experience</span>
+                <div className="flex items-center gap-3">
+                  <AlertCircle size={16} className="text-gray-300" />
+                  <span className="text-sm text-gray-700">Work Experience</span>
                 </div>
-                
-                <div className="completion-item">
-                  <AlertCircle size={16} className="completion-icon incomplete" />
-                  <span>Skills & Certifications</span>
+                <div className="flex items-center gap-3">
+                  <AlertCircle size={16} className={userData.profileCompletion >= 85 ? 'text-green-500' : 'text-gray-300'} />
+                  <span className="text-sm text-gray-700">Skills & Certifications</span>
                 </div>
               </div>
             </div>
 
-            {/* Recent Activity */}
-            <div className="activity-card">
-              <h3 className="activity-title">Recent Activity</h3>
-              <div className="activity-list">
-                <div className="activity-item">
-                  <div className="activity-icon">
-                    <Briefcase size={16} />
+            {/* Recent Activity Card */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-gray-900 mb-4">Recent Activity</h3>
+              <div className="space-y-4">
+                {recentActivity.length > 0 ? (
+                  recentActivity.map((activity, index) => (
+                    <div key={index} className="flex gap-3">
+                      <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center text-white">
+                        {activity.type === 'application' && <Briefcase size={14} />}
+                        {activity.type === 'message' && <MessageSquare size={14} />}
+                        {activity.type === 'profile' && <TrendingUp size={14} />}
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{activity.text}</p>
+                        <p className="text-xs text-gray-500 mt-1">{activity.time}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-6">
+                    <p className="text-gray-500 text-sm">No recent activity</p>
+                    <p className="text-xs text-gray-400 mt-1">Start applying to jobs!</p>
                   </div>
-                  <div className="activity-content">
-                    <span className="activity-text">Applied to Senior Developer position</span>
-                    <span className="activity-time">2 hours ago</span>
-                  </div>
-                </div>
-                <div className="activity-item">
-                  <div className="activity-icon">
-                    <MessageSquare size={16} />
-                  </div>
-                  <div className="activity-content">
-                    <span className="activity-text">New message from recruiter</span>
-                    <span className="activity-time">5 hours ago</span>
-                  </div>
-                </div>
-                <div className="activity-item">
-                  <div className="activity-icon">
-                    <TrendingUp size={16} />
-                  </div>
-                  <div className="activity-content">
-                    <span className="activity-text">Profile strength increased</span>
-                    <span className="activity-time">1 day ago</span>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Enhanced Quick Actions Section */}
-        <section className="quick-actions">
-          <div className="section-header">
-            <h3 className="section-title">QUICK ACTIONS</h3>
-            <p className="section-subtitle">Get started with these common tasks</p>
+        {/* Quick Actions Section */}
+        <section>
+          <div className="text-center mb-6">
+            <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">QUICK ACTIONS</h3>
+            <p className="text-gray-500 mt-1">Get started with these common tasks</p>
           </div>
-          <div className="quick-actions-grid">
-            <div className="action-card">
-              <div className="action-icon">
-                <BarChart3 size={24} />
-              </div>
-              <h4 className="action-title">Application Tracker</h4>
-              <p className="action-description">Monitor your application status and follow up with recruiters</p>
-              <div className="action-link">
-                <span>View Applications</span>
-                <ArrowRight size={16} />
-              </div>
-            </div>
-            <div className="action-card">
-              <div className="action-icon">
-                <FileText size={24} />
-              </div>
-              <h4 className="action-title">Update Resume</h4>
-              <p className="action-description">Keep your resume fresh and tailored to new opportunities</p>
-              <div className="action-link">
-                <span>Upload Resume</span>
-                <ArrowRight size={16} />
-              </div>
-            </div>
-            <div className="action-card">
-              <div className="action-icon">
-                <Calendar size={24} />
-              </div>
-              <h4 className="action-title">Schedule Interview</h4>
-              <p className="action-description">Book interview slots and manage your calendar</p>
-              <div className="action-link">
-                <span>View Calendar</span>
-                <ArrowRight size={16} />
-              </div>
-            </div>
-            <div className="action-card">
-              <div className="action-icon">
-                <HelpCircle size={24} />
-              </div>
-              <h4 className="action-title">Help Center</h4>
-              <p className="action-description">Get quick answers or open a ticket with our support team</p>
-              <div className="action-link">
-                <span>Get Help</span>
-                <ArrowRight size={16} />
-              </div>
-            </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <QuickActionCard
+              icon={BarChart3}
+              title="Application Tracker"
+              description="Monitor your application status and follow up with recruiters"
+              onClick={() => navigate('/applications')}
+            />
+            <QuickActionCard
+              icon={FileText}
+              title="Update Resume"
+              description="Keep your resume fresh and tailored to new opportunities"
+              onClick={handleUpdateProfile}
+            />
+            <QuickActionCard
+              icon={Calendar}
+              title="Schedule Interview"
+              description="Book interview slots and manage your calendar"
+              onClick={() => navigate('/calendar')}
+            />
+            <QuickActionCard
+              icon={HelpCircle}
+              title="Help Center"
+              description="Get quick answers or open a ticket with our support team"
+              onClick={() => navigate('/help')}
+            />
           </div>
         </section>
       </main>
 
-      <footer className="browse-footer">
-        <div className="footer-brand">
-          <strong>WHS Solution</strong>
-          <span>© 2024 WHS Solution Engineered for Excellence.</span>
-        </div>
-        <div className="footer-links">
-          <a href="#">LEGAL</a>
-          <a href="#">PRIVACY POLICY</a>
-          <a href="#">HELP CENTER</a>
-          <a href="#">CONTACT SUPPORT</a>
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 mt-12">
+        <div className="max-w-7xl mx-auto px-4 py-6 md:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="text-center md:text-left">
+              <strong className="text-gray-900">CandidateHub</strong>
+              <span className="text-gray-500 text-sm ml-2">© 2024 Engineered for Excellence.</span>
+            </div>
+            <div className="flex gap-6">
+              <a href="#" className="text-xs text-gray-500 hover:text-gray-900 transition">LEGAL</a>
+              <a href="#" className="text-xs text-gray-500 hover:text-gray-900 transition">PRIVACY POLICY</a>
+              <a href="#" className="text-xs text-gray-500 hover:text-gray-900 transition">HELP CENTER</a>
+              <a href="#" className="text-xs text-gray-500 hover:text-gray-900 transition">CONTACT SUPPORT</a>
+            </div>
+          </div>
         </div>
       </footer>
     </div>

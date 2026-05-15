@@ -18,7 +18,7 @@ const VerificationSuccess = () => {
 
         <button
           className="primary-btn"
-          onClick={() => navigate("/candidates")}
+          onClick={() => navigate("/candidate-dashboard")}
         >
           Continue
         </button>

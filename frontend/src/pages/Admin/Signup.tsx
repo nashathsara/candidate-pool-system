@@ -27,29 +27,36 @@ const Signup: React.FC = () => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      // Backend එකට දත්ත යැවීම
-      const response = await axios.post('http://localhost:5000/api/candidates/register', {
-        fullName: formData.fullName,
-        email: formData.email,
-        password: formData.password
-      });
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    const response = await axios.post('http://localhost:5000/api/candidates/register', {
+      fullName: formData.fullName,
+      email: formData.email,
+      password: formData.password
+    });
 
-      if (response.data.status === 'success') {
-        // ඊමේල් එක ගිය බව දන්වා වෙරිෆිකේෂන් පේජ් එකට යැවීම
-        alert("Verification link sent to your email!");
-        navigate('/email-verification'); 
-      } else if (response.data.status === 'duplicate') {
-        alert("This profile already exists in the system.");
-      }
-    } catch (error: any) {
-      console.error("Signup Error:", error);
-      const errorMessage = error.response?.data?.message || "Something went wrong. Please check your backend connection.";
+    if (response.data.status === 'success') {
+      localStorage.setItem('pendingVerificationEmail', formData.email);
+      navigate('/email-verification', { 
+        state: { email: formData.email }
+      });
+    } else if (response.data.status === 'duplicate') {
+      alert("This profile already exists in the system.");
+    }
+  } catch (error: any) {
+    console.error("Signup Error:", error);
+    
+    // Better error handling
+    if (error.response?.data?.code === 'EMAIL_EXISTS') {
+      alert("This email is already registered. Please sign in instead.");
+      navigate('/signin');
+    } else {
+      const errorMessage = error.response?.data?.message || "Something went wrong. Please try again.";
       alert(errorMessage);
     }
-  };
+  }
+};
 
   return (
     <div className="flex min-h-screen w-full font-sans">

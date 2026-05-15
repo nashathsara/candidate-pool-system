@@ -2,7 +2,6 @@ node_modules/
 client/node_modules/
 functions/node_modules/
 
-.env
 
 # Build files
 dist/
@@ -11,10 +10,8 @@ client/dist/
 # OS files
 .DS_Store
 Thumbs.db
-.env
-.env.*
 /dist
 logs
 *.log
-.vscode/
 serviceAccountKey.json
+config.bat
