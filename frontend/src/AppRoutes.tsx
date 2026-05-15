@@ -51,8 +51,9 @@ const AppRoutes = () => {
         <Route path="/Home" element={<Home />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/admin/settings" element={<Settings />} />
+        <Route path="/" element={<VerificationSuccess />} />
         <Route path="/verified" element={<VerificationSuccess />} />
-        <Route path="/EmailVerification" element={<EmailVerification />} />
+        <Route path="/email-verification" element={<EmailVerification />} />
         {/* <Route path="/candidate/duplicate-check" element={<DuplicationView />} /> */}
         <Route path="/applications" element={<Applications />} />
         <Route path="/application-success" element={<Navigate to="/browse" replace />} />

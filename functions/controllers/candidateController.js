@@ -27,7 +27,7 @@ const createCandidateProfile = async (req, res) => {
 
     // Redirect URL
     const actionCodeSettings = {
-      url: 'http://localhost:5173/verified', 
+      url: 'http://localhost:3000/verified', 
       handleCodeInApp: false,
     };
 
