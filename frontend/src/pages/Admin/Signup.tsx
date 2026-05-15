@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate,Link } from 'react-router-dom'; // පේජ් එක මාරු කිරීමට අවශ්‍යයි
+import { useNavigate, Link } from 'react-router-dom'; // පේජ් එක මාරු කිරීමට අවශ්‍යයි
+import { API_BASE_URL } from '../../services/api';
 import Button from '../../common/Button/Button';
 
 const Signup: React.FC = () => {
@@ -31,7 +32,7 @@ const Signup: React.FC = () => {
     e.preventDefault();
     try {
       // Backend එකට දත්ත යැවීම
-      const response = await axios.post('http://localhost:5000/api/candidates/register', {
+      const response = await axios.post(`${API_BASE_URL}/api/candidates/register`, {
         fullName: formData.fullName,
         email: formData.email,
         password: formData.password
@@ -46,7 +47,10 @@ const Signup: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Signup Error:", error);
-      const errorMessage = error.response?.data?.message || "Something went wrong. Please check your backend connection.";
+      const errorMessage = error.response?.data?.message ||
+        (error.message === 'Network Error'
+          ? `Unable to connect to backend at ${API_BASE_URL}. Make sure the server is running.`
+          : "Something went wrong. Please check your backend connection.");
       alert(errorMessage);
     }
   };

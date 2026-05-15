@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { auth } from "../../config/firebase";
 import axios from "axios";
+import { API_BASE_URL } from "../../services/api";
 import { 
   onAuthStateChanged, 
   updatePassword, 
   EmailAuthProvider, 
   reauthenticateWithCredential 
 } from "firebase/auth";
-import { FiUser, FiLock, FiEye, FiSettings, FiLoader, FiCheckCircle, FiShield } from 'react-icons/fi';
-import CandidatePublicLayout from "../../layouts/CandidatePublicLayout";
+import { FiUser, FiLock, FiSettings, FiLoader, FiCheckCircle, FiShield } from 'react-icons/fi';
 
 const CandidateSettings: React.FC = () => {
   const [profileVisibility, setProfileVisibility] = useState(true);
@@ -29,7 +30,7 @@ useEffect(() => {
     if (user && user.email) {
       console.log("Logged in as:", user.email);
       try {
-        const response = await axios.get(`http://localhost:5000/api/candidates/profile/${user.email}`);
+        const response = await axios.get(`${API_BASE_URL}/api/candidates/profile/${user.email}`);
         if (response.data.status === "success") {
           const data = response.data.data;
           setUserData({
@@ -70,7 +71,7 @@ const handleUpdateProfile = async (e: React.FormEvent) => {
   setIsUpdating(true);
   try {
     const response = await axios.patch(
-      `http://localhost:5000/api/candidates/profile/update/${userEmail}`, 
+      `${API_BASE_URL}/api/candidates/profile/update/${userEmail}`, 
       {
         fullName: userData.fullName,
         bio: userData.bio,
@@ -135,16 +136,16 @@ const handleUpdateProfile = async (e: React.FormEvent) => {
         <div className="flex items-center gap-8">
           <span className="text-xl font-black text-slate-900 tracking-tight">CandidateHub</span>
           <nav className="hidden md:flex gap-6 text-sm font-bold text-slate-400 uppercase tracking-widest">
-            <a href="#" className="hover:text-slate-900 transition">Browse Jobs</a>
-            <a href="#" className="hover:text-slate-900 transition">Applications</a>
-            <a href="#" className="text-indigo-600 border-b-2 border-indigo-600 pb-1">Profile</a>
+            <Link to="/browse" className="hover:text-slate-900 transition">Browse Jobs</Link>
+            <Link to="/applications" className="hover:text-slate-900 transition">Applications</Link>
+            <Link to="/candidate-dashboard" className="text-indigo-600 border-b-2 border-indigo-600 pb-1">Profile</Link>
           </nav>
         </div>
         <div className="flex items-center gap-4">
-          <button className="p-2 text-slate-400 hover:text-slate-900 transition-colors text-xl"><FiSettings /></button>
-          <div className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-black text-sm shadow-indigo-200 shadow-lg">
+          <Link to="/settings" className="p-2 text-slate-400 hover:text-slate-900 transition-colors text-xl" aria-label="Settings"><FiSettings /></Link>
+          <Link to="/candidate-dashboard" className="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-black text-sm shadow-indigo-200 shadow-lg">
             {userData.fullName ? userData.fullName.charAt(0).toUpperCase() : "U"}
-          </div>
+          </Link>
         </div>
       </header>
 

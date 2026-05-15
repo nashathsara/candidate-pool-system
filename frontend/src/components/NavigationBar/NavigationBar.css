@@ -64,8 +64,9 @@
 }
 
 .nav-link.active {
-  color: #3b82f6;
-  background-color: #eff6ff;
+  color: #ffffff;
+  background-color: #0f172a;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 
 /* Right Section */
