@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Search, BarChart3, LogOut } from 'lucide-react';
+import { auth } from '../../config/firebase';
+import { signOut } from 'firebase/auth';
+import { User, Briefcase, FileText, HelpCircle, Bell, Search, Settings, BarChart3, LogOut } from 'lucide-react';
 import './CandidateSettingsPage.css';
 
 const CandidateSettingsPage = () => {
@@ -8,9 +10,13 @@ const CandidateSettingsPage = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showNewPassword, setShowNewPassword] = React.useState(false);
 
-  const handleSignOut = () => {
-    // Add any logout logic here (clear tokens, etc.)
-    navigate('/SignIn');
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('CandidateSettings sign out failed:', error);
+    }
+    navigate('/', { replace: true });
   };
 
   const handleUpdateProfile = () => {
@@ -41,7 +47,7 @@ const CandidateSettingsPage = () => {
             <BarChart3 size={18} />
             Dashboard
           </Link>
-          <Link to="/browse-jobs" className="nav-link">
+          <Link to="/browse" className="nav-link">
             <Search size={18} />
             Browse Jobs
           </Link>
@@ -60,7 +66,10 @@ const CandidateSettingsPage = () => {
             <Bell className="notification-bell" size={20} />
             <span className="notification-badge">3</span>
           </div>
-          <Link to="/candidate-settings">
+          <Link to="/settings" className="icon-btn" aria-label="Settings">
+            <Settings size={18} />
+          </Link>
+          <Link to="/candidate-dashboard">
             <div className="user-profile">
               <div className="user-avatar">
                 <User size={20} />

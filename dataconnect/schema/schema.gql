@@ -1,0 +1,48 @@
+type User @table {
+  displayName: String!
+  email: String!
+  role: String!
+  photoUrl: String
+}
+
+type JobPosting @table {
+  title: String!
+  description: String!
+  requirements: String!
+  status: String!
+  createdAt: Timestamp!
+  location: String
+  salaryRange: String
+  department: String
+  createdBy: User
+}
+
+type Candidate @table {
+  firstName: String!
+  lastName: String!
+  email: String!
+  createdAt: Timestamp!
+  phone: String
+  resumeUrl: String
+  linkedinProfile: String
+  skills: [String]
+}
+
+type Application @table {
+  applicationDate: Date!
+  status: String!
+  createdAt: Timestamp!
+  updatedAt: Timestamp!
+  notes: String
+  candidate: Candidate!
+  jobPosting: JobPosting!
+}
+
+type Feedback @table {
+  score: Int!
+  comments: String!
+  createdAt: Timestamp!
+  interviewStage: String
+  submittedBy: User!
+  application: Application!
+}

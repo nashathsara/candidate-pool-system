@@ -3,10 +3,11 @@
   query,
   limit,
   getDocs,
+  getDoc,
+  doc,
   addDoc,
   serverTimestamp,
   type QueryDocumentSnapshot,
-  type QueryConstraint,
 } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, db, storage } from "../config/firebase.js";
@@ -73,7 +74,7 @@ async function seedJobsIfEmpty() {
       jobType: "Full-time",
       salary: "$140k - $190k",
       badge: "ENGINEERING",
-      description: "Design and maintain scalable enterprise software while mentoring junior engineers and collaborating with cross-functional teams.",
+      description: "A high-level technical role focused on building and maintaining complex web applications. You’ll be responsible for the full development lifecycle—from writing clean code to mentoring junior staff—ensuring that global platforms remain scalable, secure, and high-performing.",
     },
     {
       title: "Principal UX Designer",
@@ -82,7 +83,7 @@ async function seedJobsIfEmpty() {
       jobType: "Full-time",
       salary: "$160k - $210k",
       badge: "PRODUCT DESIGN",
-      description: "Lead UX strategy and design direction to create intuitive, visually engaging user experiences through research and wireframing.",
+      description: "A strategic leadership position that oversees the look and feel of digital products. This role combines user research with hands-on design (wireframing and prototyping) to create intuitive experiences, while also maintaining a cohesive design system across the entire organization.",
     },
     {
       title: "Backend Developer (Rust)",
@@ -91,7 +92,7 @@ async function seedJobsIfEmpty() {
       jobType: "Full-time",
       salary: "$130k - $180k",
       badge: "ENGINEERING",
-      description: "Build high-performance backend systems and distributed services using Rust, focusing on reliable APIs and system scalability.",
+      description: "A specialized engineering role focused on high-performance infrastructure. Using the Rust programming language, you will design the \"under-the-hood\" systems, such as APIs and microservices, that ensure data flows quickly and reliably across distributed networks.",
     },
     {
       title: "Technical Project Manager",
@@ -100,7 +101,7 @@ async function seedJobsIfEmpty() {
       jobType: "Full-time",
       salary: "$110k - $150k",
       badge: "OPERATIONS",
-      description: "Oversee software development lifecycles, ensuring timely delivery by coordinating between technical teams and stakeholders.",
+      description: "The bridge between business goals and technical execution. This role involves planning timelines, managing risks, and leading Agile ceremonies (like sprint planning) to ensure that software projects are delivered on time, within budget, and according to quality standards.",
     },
     {
       title: "Security Analyst",
@@ -109,7 +110,7 @@ async function seedJobsIfEmpty() {
       jobType: "Full-time",
       salary: "$120k - $170k",
       badge: "ENGINEERING",
-      description: "Protect company data and systems from cyber threats by monitoring for vulnerabilities and implementing robust security controls.",
+      description: "A critical defense role dedicated to protecting company data from cyber threats. You will spend your time monitoring for vulnerabilities, conducting risk assessments, and responding to incidents to ensure the company's digital infrastructure remains secure and compliant.",
     },
     {
       title: "Product Owner",
@@ -118,7 +119,7 @@ async function seedJobsIfEmpty() {
       jobType: "Full-time",
       salary: "$130k - $175k",
       badge: "PRODUCT DESIGN",
-      description: "Manage product vision and prioritize feature backlogs to maximize product value through close collaboration with development teams.",
+      description: "A leadership role that acts as the \"voice of the customer\" within the development team. You are responsible for defining the product roadmap, prioritizing the feature backlog, and ensuring that every technical task aligns with the overall business strategy and user needs.",
     },
   ];
 
@@ -185,6 +186,21 @@ export async function fetchJobs(
     usedCollection,
     seeded: seedResult.seeded,
   };
+}
+
+export async function fetchJobById(jobId: string) {
+  await seedJobsIfEmpty();
+  const collectionCandidates = ["jobs", "job", "Job"];
+
+  for (const name of collectionCandidates) {
+    const jobRef = doc(db, name, jobId);
+    const snapshot = await getDoc(jobRef);
+    if (snapshot.exists()) {
+      return { id: snapshot.id, ...(snapshot.data() as Job) };
+    }
+  }
+
+  throw new Error("Job not found.");
 }
 
 export async function submitApplication(jobId: string, userData: ApplicationData) {

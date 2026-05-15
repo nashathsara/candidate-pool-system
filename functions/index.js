@@ -28,6 +28,8 @@ app.use(express.urlencoded({ extended: true }));
 // 2. API ROUTES (Must come AFTER middleware!)
 // ==========================================
 app.use('/api/admin', adminRoutes);
+app.use('/api/candidates', candidateRoutes);
+
 
 // ==========================================
 // 3. SERVER INITIALIZATION

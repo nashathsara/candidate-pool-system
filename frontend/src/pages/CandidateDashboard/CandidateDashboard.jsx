@@ -1,14 +1,20 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Search, TrendingUp, Clock, CheckCircle, AlertCircle, Star, ArrowRight, Calendar, MessageSquare, BarChart3, LogOut } from 'lucide-react';
+import { auth } from '../../config/firebase.js';
+import { signOut } from 'firebase/auth';
+import { User, Briefcase, FileText, HelpCircle, Bell, Search, Settings, TrendingUp, Clock, CheckCircle, AlertCircle, Star, ArrowRight, Calendar, MessageSquare, BarChart3, LogOut } from 'lucide-react';
 import './CandidateDashboard.css';
 
 const CandidateDashboard = () => {
   const navigate = useNavigate();
 
-  const handleSignOut = () => {
-    // Add any logout logic here (clear tokens, etc.)
-    navigate('/SignIn');
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Candidate sign out failed:', error);
+    }
+    navigate('/', { replace: true });
   };
 
   return (
@@ -27,7 +33,7 @@ const CandidateDashboard = () => {
             <BarChart3 size={18} />
             Dashboard
           </Link>
-          <Link to="/browse-jobs" className="nav-link">
+          <Link to="/browse" className="nav-link">
             <Search size={18} />
             Browse Jobs
           </Link>
@@ -46,7 +52,10 @@ const CandidateDashboard = () => {
             <Bell className="notification-bell" size={20} />
             <span className="notification-badge">3</span>
           </div>
-          <Link to="/candidate-settings">
+          <Link to="/settings" className="icon-btn" aria-label="Settings">
+            <Settings size={18} />
+          </Link>
+          <Link to="/candidate-dashboard">
             <div className="user-profile">
               <div className="user-avatar">
                 <User size={20} />
@@ -159,11 +168,11 @@ const CandidateDashboard = () => {
                 </div>
               </div>
               <div className="card-actions">
-                <Link to="/browse-jobs" className="btn btn-primary">
+                <Link to="/browse" className="btn btn-primary">
                   <Search size={18} />
                   Browse Jobs
                 </Link>
-                <Link to="/create-profile" className="btn btn-secondary">
+                <Link to="/profile/create" className="btn btn-secondary">
                   <FileText size={18} />
                   Update Profile
                 </Link>

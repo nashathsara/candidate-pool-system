@@ -5,7 +5,6 @@ import {
   FiUsers,
   FiCopy,
   FiSettings,
-  FiSearch,
   FiHelpCircle,
   FiLogOut,
 } from 'react-icons/fi';

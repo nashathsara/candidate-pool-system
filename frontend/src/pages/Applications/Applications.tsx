@@ -1,6 +1,9 @@
 import { type ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Briefcase, FileText, HelpCircle, Bell, Search, LogOut } from 'lucide-react';
+import { User, Briefcase, FileText, HelpCircle, Bell, Search, Settings, LogOut } from 'lucide-react';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '../../config/firebase';
+import { signOut } from 'firebase/auth';
 import './Applications.css';
 
 const INTERESTED_FIELDS = [
@@ -43,8 +46,6 @@ const STATUS_OPTIONS = ['Actively Looking', 'Open to Opportunities'];
 const AVAILABILITY_OPTIONS = ['Immediate', '2 Weeks', '1 Month', '2 Months', '3 Months'];
 const CONTACT_METHODS = ['Call', 'Email', 'WhatsApp', 'SMS', 'LinkedIn Message'];
 
-
-
 const calculateAge = (dob: string) => {
   if (!dob) return '';
   const birthDate = new Date(dob);
@@ -59,51 +60,69 @@ const calculateAge = (dob: string) => {
   return String(age);
 };
 
-const CandidateApplicationView = () => {
-  const navigate = useNavigate()
+const fileToBase64 = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = (error) => reject(error);
+  });
+};
 
-  const handleSignOut = () => {
-    // Add any logout logic here (clear tokens, etc.)
-    navigate('/SignIn');
+const CandidateApplicationView = () => {
+  const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('Applications sign out failed:', error);
+    }
+    navigate('/', { replace: true });
   };
 
   const [formData, setFormData] = useState({
-    fullName: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (555) 000-0000',
+    fullName: '',
+    email: '',
+    phone: '',
     dob: '',
-    linkedIn: 'linkedin.com/in/username',
+    linkedIn: '',
     interestedField: INTERESTED_FIELDS[0],
-    experienceYears: '5',
+    experienceYears: '0',
     status: STATUS_OPTIONS[0],
     availability: AVAILABILITY_OPTIONS[0],
     contactMethods: ['Email', 'Call'] as string[],
-    salaryMin: '80000',
-    salaryMax: '120000',
+    salaryMin: '',
+    salaryMax: '',
     cvFile: null as File | null,
     cvFileName: '',
   });
-  const [selectedSkills, setSelectedSkills] = useState<string[]>(FIELD_SKILLS[INTERESTED_FIELDS[0]] ?? []);
-  // Candidate Filters UI removed from this page, so filters state is not needed.
-
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   const currentFieldSkills = FIELD_SKILLS[formData.interestedField] ?? [];
+  
   useEffect(() => {
     setSelectedSkills((current) => current.filter((skill) => currentFieldSkills.includes(skill)));
   }, [formData.interestedField, currentFieldSkills]);
 
   const age = useMemo(() => calculateAge(formData.dob), [formData.dob]);
-  const salaryRange = `${formData.salaryMin}-${formData.salaryMax}`;
+  const salaryRange = formData.salaryMin && formData.salaryMax 
+    ? `${formData.salaryMin}-${formData.salaryMax}` 
+    : '';
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = event.target;
-    const checked = (event.target as HTMLInputElement).checked;
-
+    
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: type === 'checkbox' ? (event.target as HTMLInputElement).checked : value,
     }));
   };
 
@@ -122,15 +141,135 @@ const CandidateApplicationView = () => {
     }));
   };
 
+  const handleSubmit = async () => {
+    // Reset messages
+    setSubmitError(null);
+    setUploadProgress(0);
+    
+    // Validation
+    if (!agreeToTerms) {
+      setSubmitError('Please agree to the Terms of Service and Privacy Policy');
+      return;
+    }
 
+    if (!formData.fullName || !formData.email || !formData.phone) {
+      setSubmitError('Please fill in all required fields');
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setSubmitError('Please enter a valid email address');
+      return;
+    }
+
+    // Validate phone number (basic validation)
+    if (formData.phone.replace(/[\s\-\(\)\+]/g, '').length < 10) {
+      setSubmitError('Please enter a valid phone number');
+      return;
+    }
+
+    if (!formData.cvFile) {
+      setSubmitError('Please upload your CV');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Simulate progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => Math.min(prev + 10, 90));
+      }, 200);
+
+      // Convert CV to Base64
+      console.log('Converting file to Base64...');
+      const base64CV = await fileToBase64(formData.cvFile);
+      console.log('File converted, size:', (base64CV.length / 1024 / 1024).toFixed(2), 'MB');
+      
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+      
+      // Generate a unique application ID
+      const applicationId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Prepare application data with CV embedded as Base64
+      const applicationData = {
+        applicationId: applicationId,
+        fullName: formData.fullName,
+        email: formData.email.toLowerCase(),
+        phone: formData.phone,
+        dateOfBirth: formData.dob || null,
+        age: age || null,
+        linkedIn: formData.linkedIn || null,
+        interestedField: formData.interestedField,
+        skills: selectedSkills,
+        experienceYears: parseInt(formData.experienceYears) || 0,
+        status: formData.status,
+        availability: formData.availability,
+        contactMethods: formData.contactMethods,
+        expectedSalaryMin: formData.salaryMin ? parseInt(formData.salaryMin) : null,
+        expectedSalaryMax: formData.salaryMax ? parseInt(formData.salaryMax) : null,
+        cvData: {
+          fileName: formData.cvFile.name,
+          fileType: formData.cvFile.type,
+          fileSize: formData.cvFile.size,
+          content: base64CV, // Store CV content directly in Firestore
+          uploadedAt: new Date().toISOString()
+        },
+        cvFileName: formData.cvFileName,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+        applicationStatus: 'pending',
+        source: 'direct_application'
+      };
+
+      // Save to Firestore - CHANGED from 'candidates' to 'applications'
+      console.log('Saving to Firestore...');
+      const applicationsCollection = collection(db, 'applications');
+      const docRef = await addDoc(applicationsCollection, applicationData);
+      
+      console.log('Application submitted with ID:', docRef.id);
+      
+      setSubmitSuccess(true);
+      
+      // Reset form after successful submission
+      setTimeout(() => {
+        navigate('/application-success', { 
+          state: { 
+            applicationId: docRef.id,
+            candidateName: formData.fullName,
+            candidateEmail: formData.email
+          } 
+        });
+      }, 1500);
+      
+    } catch (error: any) {
+      console.error('Error submitting application:', error);
+      console.error('Error details:', error.message, error.code);
+      
+      if (error.code === 'permission-denied') {
+        setSubmitError('Firestore permission denied. Please check your Firestore security rules.');
+      } else if (error.message && error.message.includes('exceeds')) {
+        setSubmitError('File is too large. Please use a smaller file (under 1MB recommended).');
+      } else {
+        setSubmitError(error.message || 'Failed to submit application. Please try again.');
+      }
+      setSubmitSuccess(false);
+    } finally {
+      setIsSubmitting(false);
+      setTimeout(() => setUploadProgress(0), 2000);
+    }
+  };
 
   return (
-    <div className="browse-page">
+    <div className="applications-page">
       <header className="browse-header">
         <div className="header-left">
           <div className="logo-container">
             <Briefcase className="logo-icon" size={28} />
-            <h1 className="logo">CandidateHub</h1>
+            <h1 className="logo">Applications</h1>
           </div>
         </div>
         
@@ -139,7 +278,7 @@ const CandidateApplicationView = () => {
             <Briefcase size={18} />
             Dashboard
           </Link>
-          <Link to="/browse-jobs" className="nav-link">
+          <Link to="/browse" className="nav-link">
             <Search size={18} />
             Browse Jobs
           </Link>
@@ -158,15 +297,18 @@ const CandidateApplicationView = () => {
             <Bell className="notification-bell" size={20} />
             <span className="notification-badge">3</span>
           </div>
-          <div className="user-profile">
+          <Link to="/settings" className="icon-btn" aria-label="Settings">
+            <Settings size={18} />
+          </Link>
+          <Link to="/candidate-dashboard" className="user-profile">
             <div className="user-avatar">
               <User size={20} />
             </div>
             <div className="user-info">
-              <span className="user-name">John Doe</span>
+              <span className="user-name">Guest User</span>
               <span className="user-role">Candidate</span>
             </div>
-          </div>
+          </Link>
           <button 
             type="button" 
             className="signout-btn"
@@ -180,36 +322,98 @@ const CandidateApplicationView = () => {
       </header>
 
       <main className="registration-card">
-
         <h1 className="page-title">Candidate Registration</h1>
+
+        {/* Upload Progress Bar */}
+        {uploadProgress > 0 && uploadProgress < 100 && (
+          <div className="upload-progress" style={{
+            backgroundColor: '#e3f2fd',
+            padding: '12px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            border: '1px solid #90caf9'
+          }}>
+            <div style={{ marginBottom: '8px', fontSize: '14px' }}>
+              Processing CV: {Math.round(uploadProgress)}%
+            </div>
+            <div style={{
+              width: '100%',
+              height: '8px',
+              backgroundColor: '#f0f0f0',
+              borderRadius: '4px',
+              overflow: 'hidden'
+            }}>
+              <div style={{
+                width: `${uploadProgress}%`,
+                height: '100%',
+                backgroundColor: '#2196f3',
+                transition: 'width 0.3s ease'
+              }} />
+            </div>
+          </div>
+        )}
+
+        {submitSuccess && (
+          <div className="success-message" style={{
+            backgroundColor: '#e8f5e9',
+            color: '#2e7d32',
+            padding: '12px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            border: '1px solid #a5d6a7',
+            textAlign: 'center'
+          }}>
+            ✓ Application submitted successfully! Redirecting...
+          </div>
+        )}
+
+        {submitError && (
+          <div className="error-message" style={{
+            backgroundColor: '#fee',
+            color: '#c00',
+            padding: '12px',
+            borderRadius: '8px',
+            marginBottom: '20px',
+            border: '1px solid #fcc'
+          }}>
+            ⚠ {submitError}
+          </div>
+        )}
 
         <section className="form-section">
           <div className="section-header">
             <h2>Candidate Details</h2>
+            <p style={{ fontSize: '14px', color: '#666', marginTop: '8px' }}>
+              Please fill in your information accurately. All fields marked with * are required.
+            </p>
           </div>
           <div className="field-grid">
             <label className="field-label">
-              Full Name
+              Full Name *
               <input
                 type="text"
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
                 className="input-field"
+                placeholder="Enter your full name"
+                required
               />
             </label>
             <label className="field-label">
-              Email Address
+              Email Address *
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 className="input-field"
+                placeholder="you@example.com"
+                required
               />
             </label>
             <label className="field-label">
-              Mobile Number
+              Mobile Number *
               <input
                 type="tel"
                 name="phone"
@@ -217,6 +421,7 @@ const CandidateApplicationView = () => {
                 onChange={handleChange}
                 className="input-field"
                 placeholder="+1 555 000 0000"
+                required
               />
             </label>
             <label className="field-label">
@@ -251,7 +456,7 @@ const CandidateApplicationView = () => {
               />
             </label>
             <label className="field-label">
-              Interested Field
+              Interested Field *
               <select
                 name="interestedField"
                 value={formData.interestedField}
@@ -288,10 +493,11 @@ const CandidateApplicationView = () => {
                 className="input-field"
                 min="0"
                 step="1"
+                placeholder="0"
               />
             </label>
             <label className="field-label">
-              Status
+              Status *
               <select
                 name="status"
                 value={formData.status}
@@ -304,7 +510,7 @@ const CandidateApplicationView = () => {
               </select>
             </label>
             <label className="field-label">
-              Availability
+              Availability *
               <select
                 name="availability"
                 value={formData.availability}
@@ -317,8 +523,8 @@ const CandidateApplicationView = () => {
               </select>
             </label>
             <label className="field-label full-width">
-              CV Upload
-              <span className="help-text">Upload your PDF/DOC/DOCX resume from your device.</span>
+              CV Upload *
+              <span className="help-text">Upload your PDF/DOC/DOCX resume from your device. Max 5MB.</span>
 
               <div
                 className={formData.cvFileName ? 'cv-dropzone cv-dropzone--filled' : 'cv-dropzone'}
@@ -339,11 +545,16 @@ const CandidateApplicationView = () => {
                   className="file-input"
                   onChange={(e) => {
                     const file = e.currentTarget.files?.[0] ?? null;
+                    if (file && file.size > 5 * 1024 * 1024) {
+                      setSubmitError('File size must be less than 5MB');
+                      return;
+                    }
                     setFormData((prev) => ({
                       ...prev,
                       cvFile: file,
                       cvFileName: file?.name ?? '',
                     }));
+                    setSubmitError(null);
                   }}
                 />
 
@@ -381,6 +592,9 @@ const CandidateApplicationView = () => {
                   </div>
                 ) : null}
               </div>
+              <p className="help-text" style={{ fontSize: '12px', color: '#666', marginTop: '8px' }}>
+                Note: Your CV will be stored securely in the database.
+              </p>
             </label>
           </div>
         </section>
@@ -391,7 +605,7 @@ const CandidateApplicationView = () => {
           </div>
           <div className="field-grid">
             <div className="field-label salary-block full-width">
-              <span className="sub-label">Expected Salary Range</span>
+              <span className="sub-label">Expected Salary Range (Annual USD)</span>
               <div className="salary-range">
                 <input
                   type="number"
@@ -399,23 +613,24 @@ const CandidateApplicationView = () => {
                   value={formData.salaryMin}
                   onChange={handleChange}
                   className="input-field"
-                  placeholder="80000"
+                  placeholder="Minimum"
                   min="0"
                 />
+                <span style={{ margin: '0 10px', alignSelf: 'center' }}>to</span>
                 <input
                   type="number"
                   name="salaryMax"
                   value={formData.salaryMax}
                   onChange={handleChange}
                   className="input-field"
-                  placeholder="120000"
+                  placeholder="Maximum"
                   min="0"
                 />
               </div>
-              <div className="salary-hint">Standard range format: {salaryRange}</div>
+              {salaryRange && <div className="salary-hint">Standard range format: ${salaryRange}</div>}
             </div>
             <div className="field-label full-width">
-              <span className="sub-label">Preferred Contact Methods</span>
+              <span className="sub-label">Preferred Contact Methods *</span>
               <span className="help-text">Select how you would like recruiters to contact you for relevant roles.</span>
               <div className="contact-methods-grid">
                 {CONTACT_METHODS.map((method) => (
@@ -458,6 +673,8 @@ const CandidateApplicationView = () => {
                 <ul>
                   <li>Candidate information may be used to manage your profile and match roles.</li>
                   <li>Uploaded documents are used for recruitment purposes only.</li>
+                  <li>We reserve the right to modify these terms at any time.</li>
+                  <li>Your data will be handled in accordance with applicable laws.</li>
                 </ul>
               </div>
             </div>
@@ -483,11 +700,13 @@ const CandidateApplicationView = () => {
               </div>
               <div className="policy-modal-body">
                 <p>
-                  We may collect data you provide during registration (including your CV) to support recruitment.
+                  We collect data you provide during registration (including your CV) to support recruitment.
                 </p>
                 <ul>
                   <li>Your CV is used for matching you with relevant opportunities.</li>
                   <li>We keep data for as long as needed to operate and comply with legal obligations.</li>
+                  <li>Your data is not shared with third parties without your consent.</li>
+                  <li>You can request data deletion at any time by contacting support.</li>
                 </ul>
               </div>
             </div>
@@ -495,7 +714,11 @@ const CandidateApplicationView = () => {
         ) : null}
 
         <label className="terms-row">
-          <input type="checkbox" />
+          <input 
+            type="checkbox" 
+            checked={agreeToTerms}
+            onChange={(e) => setAgreeToTerms(e.target.checked)}
+          />
           <span>
             I agree to the{' '}
             <button
@@ -513,12 +736,21 @@ const CandidateApplicationView = () => {
             >
               Privacy Policy
             </button>{' '}
-            regarding my candidate data submission.
+            regarding my candidate data submission. *
           </span>
         </label>
 
-        <button className="submit-btn" type="button" onClick={() => navigate('/ApplicationSuccess')}>
-          Complete Registration →
+        <button 
+          className="submit-btn" 
+          type="button" 
+          onClick={handleSubmit}
+          disabled={isSubmitting || submitSuccess}
+          style={{
+            opacity: (isSubmitting || submitSuccess) ? 0.7 : 1,
+            cursor: (isSubmitting || submitSuccess) ? 'not-allowed' : 'pointer'
+          }}
+        >
+          {isSubmitting ? 'Processing Application...' : submitSuccess ? 'Submitted!' : 'Complete Registration →'}
         </button>
       </main>
     </div>
