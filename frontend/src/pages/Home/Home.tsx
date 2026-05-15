@@ -1,14 +1,71 @@
 import './Home.css'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Search, Check, Star, Users, Shield, Clock, TrendingUp, Globe, Award, ChevronRight, ArrowRight, Play } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 
 function Home() {
+  const navigate = useNavigate()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [stats, setStats] = useState({
+    totalFreelancers: '60M+',
+    countries: '220+',
+    satisfaction: '98%'
+  })
+  const [recentJobs, setRecentJobs] = useState([])
+
+  // Fetch dynamic stats from backend
+  useEffect(() => {
+    fetchStats()
+    fetchRecentJobs()
+  }, [])
+
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/candidates/stats')
+      if (response.data.status === 'success') {
+        setStats(response.data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+      // Keep default stats
+    }
+  }
+
+  const fetchRecentJobs = async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/candidates/recent-jobs')
+      if (response.data.status === 'success') {
+        setRecentJobs(response.data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching jobs:', error)
+    }
+  }
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      navigate(`/browse?search=${encodeURIComponent(searchQuery)}`)
+    }
+  }
+
+  const handlePostJob = () => {
+    // Check if user is logged in
+    const user = localStorage.getItem('user')
+    if (user) {
+      navigate('/post-job')
+    } else {
+      navigate('/signin', { state: { returnTo: '/post-job' } })
+    }
+  }
+
   return (
     <div className="home-page">
       {/* Navigation */}
       <nav className="navbar">
         <div className="nav-container">
-          <div className="nav-logo">
+          <div className="nav-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
             <h2>CandidateHub</h2>
           </div>
           <div className="nav-actions">
@@ -26,28 +83,30 @@ function Home() {
             <p className="hero-description">
               Work with the best freelance talent from around the world on our secure collaborative platform.
             </p>
-            <div className="hero-search">
+            <form onSubmit={handleSearch} className="hero-search">
               <div className="search-container">
                 <Search className="search-icon" />
                 <input 
                   type="text" 
-                  placeholder="Try &quot;building mobile app&quot;" 
+                  placeholder="Try 'building mobile app'" 
                   className="search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <button className="search-btn">Find Talent</button>
+                <button type="submit" className="search-btn">Find Talent</button>
               </div>
-            </div>
+            </form>
             <div className="hero-stats">
               <div className="stat">
-                <span className="stat-number">60M+</span>
+                <span className="stat-number">{stats.totalFreelancers}</span>
                 <span className="stat-label">Total Freelancers</span>
               </div>
               <div className="stat">
-                <span className="stat-number">220+</span>
+                <span className="stat-number">{stats.countries}</span>
                 <span className="stat-label">Countries Served</span>
               </div>
               <div className="stat">
-                <span className="stat-number">98%</span>
+                <span className="stat-number">{stats.satisfaction}</span>
                 <span className="stat-label">Client Satisfaction</span>
               </div>
             </div>
@@ -101,17 +160,22 @@ function Home() {
           <h2 className="section-title">Find Top Talent</h2>
           <div className="talent-grid">
             {[
-              { title: 'Software Engineer', desc: 'Build, test, and maintain software applications' },
-              { title: 'Data Scientist', desc: 'Analyze complex data and provide insights' },
-              { title: 'UI/UX Designer', desc: 'Create beautiful and functional user interfaces' },
-              { title: 'Mobile Developer', desc: 'Build native and cross-platform mobile apps' },
-              { title: 'DevOps Engineer', desc: 'Streamline development and deployment processes' },
-              { title: 'Product Manager', desc: 'Lead product strategy and development' },
-              { title: 'Content Writer', desc: 'Create engaging content for your audience' },
-              { title: 'Digital Marketer', desc: 'Drive growth through digital marketing strategies' },
-              { title: 'Business Analyst', desc: 'Analyze business processes and recommend improvements' }
+              { title: 'Software Engineer', desc: 'Build, test, and maintain software applications', path: '/browse?category=development' },
+              { title: 'Data Scientist', desc: 'Analyze complex data and provide insights', path: '/browse?category=data-science' },
+              { title: 'UI/UX Designer', desc: 'Create beautiful and functional user interfaces', path: '/browse?category=design' },
+              { title: 'Mobile Developer', desc: 'Build native and cross-platform mobile apps', path: '/browse?category=mobile' },
+              { title: 'DevOps Engineer', desc: 'Streamline development and deployment processes', path: '/browse?category=devops' },
+              { title: 'Product Manager', desc: 'Lead product strategy and development', path: '/browse?category=product' },
+              { title: 'Content Writer', desc: 'Create engaging content for your audience', path: '/browse?category=writing' },
+              { title: 'Digital Marketer', desc: 'Drive growth through digital marketing strategies', path: '/browse?category=marketing' },
+              { title: 'Business Analyst', desc: 'Analyze business processes and recommend improvements', path: '/browse?category=business' }
             ].map((talent, index) => (
-              <div key={index} className="talent-card">
+              <div 
+                key={index} 
+                className="talent-card"
+                onClick={() => navigate(talent.path)}
+                style={{ cursor: 'pointer' }}
+              >
                 <div className="talent-icon">
                   <Users />
                 </div>
@@ -120,7 +184,9 @@ function Home() {
               </div>
             ))}
           </div>
-          <button className="see-all-btn">See All Talent <ChevronRight /></button>
+          <button className="see-all-btn" onClick={() => navigate('/browse')}>
+            See All Talent <ChevronRight />
+          </button>
         </div>
       </section>
 
@@ -136,7 +202,9 @@ function Home() {
               <li><Check /> 24/7 customer support</li>
               <li><Check /> Easy collaboration tools</li>
             </ul>
-            <button className="learn-more-btn">Learn More <ArrowRight /></button>
+            <button className="learn-more-btn" onClick={() => navigate('/about')}>
+              Learn More <ArrowRight />
+            </button>
           </div>
           <div className="why-choose-image">
             <img src="/api/placeholder/500/600" alt="Professional working" />
@@ -178,7 +246,9 @@ function Home() {
               <p>Get started quickly and see results in days, not months</p>
             </div>
           </div>
-          <button className="feedback-btn">Get Your Feedback <ArrowRight /></button>
+          <button className="feedback-btn" onClick={() => navigate('/contact')}>
+            Get Your Feedback <ArrowRight />
+          </button>
         </div>
       </section>
 
@@ -205,7 +275,9 @@ function Home() {
                 <p>Pay for time as you need it</p>
               </div>
             </div>
-            <button className="learn-more-btn">Learn More <ArrowRight /></button>
+            <button className="learn-more-btn" onClick={() => navigate('/how-it-works')}>
+              Learn More <ArrowRight />
+            </button>
           </div>
         </div>
       </section>
@@ -222,7 +294,9 @@ function Home() {
               <li><Check /> Regular security audits</li>
               <li><Check /> GDPR compliant</li>
             </ul>
-            <button className="get-started-btn">Get Started Now <ArrowRight /></button>
+            <button className="get-started-btn" onClick={handlePostJob}>
+              Get Started Now <ArrowRight />
+            </button>
           </div>
           <div className="security-visual">
             <div className="gears">
@@ -292,28 +366,37 @@ function Home() {
                 image: '/api/placeholder/300/200',
                 title: 'The Future of Remote Work',
                 date: 'March 15, 2024',
-                desc: 'How companies are adapting to distributed teams...'
+                desc: 'How companies are adapting to distributed teams...',
+                path: '/blog/future-remote-work'
               },
               {
                 image: '/api/placeholder/300/200',
                 title: 'Hiring Trends in Tech',
                 date: 'March 12, 2024',
-                desc: 'Latest insights on tech recruitment and skill demands...'
+                desc: 'Latest insights on tech recruitment and skill demands...',
+                path: '/blog/hiring-trends'
               },
               {
                 image: '/api/placeholder/300/200',
                 title: 'Freelance Economy Growth',
                 date: 'March 10, 2024',
-                desc: 'The rapid expansion of the global freelance market...'
+                desc: 'The rapid expansion of the global freelance market...',
+                path: '/blog/freelance-economy'
               },
               {
                 image: '/api/placeholder/300/200',
                 title: 'AI and the Future of Work',
                 date: 'March 8, 2024',
-                desc: 'How artificial intelligence is changing work...'
+                desc: 'How artificial intelligence is changing work...',
+                path: '/blog/ai-future-work'
               }
             ].map((insight, index) => (
-              <div key={index} className="insight-card">
+              <div 
+                key={index} 
+                className="insight-card"
+                onClick={() => navigate(insight.path)}
+                style={{ cursor: 'pointer' }}
+              >
                 <img src={insight.image} alt={insight.title} />
                 <div className="insight-content">
                   <h3>{insight.title}</h3>
@@ -323,7 +406,9 @@ function Home() {
               </div>
             ))}
           </div>
-          <button className="view-all-btn">View All Insights <ChevronRight /></button>
+          <button className="view-all-btn" onClick={() => navigate('/blog')}>
+            View All Insights <ChevronRight />
+          </button>
         </div>
       </section>
 
@@ -332,7 +417,9 @@ function Home() {
         <div className="container">
           <h2>Find the right talent for your business</h2>
           <p>Join millions of companies already using CandidateHub</p>
-          <button className="post-job-btn">Post a Job Now <ArrowRight /></button>
+          <button className="post-job-btn" onClick={handlePostJob}>
+            Post a Job Now <ArrowRight />
+          </button>
         </div>
       </section>
 
@@ -347,7 +434,7 @@ function Home() {
               'Business', 'Sales & Marketing', 'Engineering & Architecture'
             ].map((category, index) => (
               <div key={index} className="category-card">
-                <Link to={`/browse?category=${category.toLowerCase().replace(' & ', '-').replace(' ', '-')}`}>
+                <Link to={`/browse?category=${category.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`}>
                   {category} <ChevronRight />
                 </Link>
               </div>
@@ -372,10 +459,10 @@ function Home() {
             <div className="footer-column">
               <h3>Categories</h3>
               <ul>
-                <li><Link to="/categories/development">Development & IT</Link></li>
-                <li><Link to="/categories/design">Design & Creative</Link></li>
-                <li><Link to="/categories/marketing">Digital Marketing</Link></li>
-                <li><Link to="/categories/writing">Writing & Translation</Link></li>
+                <li><Link to="/browse?category=development">Development & IT</Link></li>
+                <li><Link to="/browse?category=design">Design & Creative</Link></li>
+                <li><Link to="/browse?category=marketing">Digital Marketing</Link></li>
+                <li><Link to="/browse?category=writing">Writing & Translation</Link></li>
               </ul>
             </div>
             <div className="footer-column">
