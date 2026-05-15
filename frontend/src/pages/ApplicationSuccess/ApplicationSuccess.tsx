@@ -1,8 +1,6 @@
 import './ApplicationSuccess.css'
-import { useNavigate } from 'react-router-dom'
 
 function ApplicationSuccess() {
-  const navigate = useNavigate()
   return (
     <div className="submitted-page">
       <main className="submitted-main">
@@ -16,8 +14,8 @@ function ApplicationSuccess() {
         </p>
 
         <div className="actions-row">
-          <button className="primary-button" onClick={() => navigate('/candidate-dashboard')}>Go to Dashboard →</button>
-          <button className="secondary-button" onClick={() => navigate('/candidate-settings')}>View Submitted Profile</button>
+          <button className="primary-button">Go to Dashboard →</button>
+          <button className="secondary-button">View Submitted Profile</button>
         </div>
 
         <p className="support-copy">
