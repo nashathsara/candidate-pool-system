@@ -1,6 +1,5 @@
-
-
-import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from "react-router-dom";
+import { useAuth } from "./hooks/useAuth";
 import VerificationSuccess from "./pages/VerificationSuccess/VerificationSuccess";
 import EmailVerification from "./pages/EmailVerification/EmailVerification";
 import ProfileView from "./pages/ProfileView/ProfileView";
@@ -41,102 +40,198 @@ const ViewCVWrapper = () => {
   return <ViewCV candidateId={candidateId} />;
 };
 
+const RequireAuth = ({ children }: { children: React.ReactElement }) => {
+  const { isSignedIn, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return null;
+  }
+
+  if (!isSignedIn) {
+    return <Navigate to="/signin" replace state={{ from: location }} />;
+  }
+
+  return children;
+};
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes (without MainLayout) */}
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/admin/settings" element={<Settings />} />
-        <Route path="/" element={<VerificationSuccess />} />
-        <Route path="/verified" element={<VerificationSuccess />} />
-        <Route path="/EmailVerification" element={<EmailVerification />} />
-        <Route path="/applications" element={<Applications />} />
-        <Route path="/application-success" element={<Navigate to="/browse" replace />} />
-        <Route path="/application-success/:jobId" element={<ApplicationSuccess />} />
-
-        {/* Case-insensitive-ish aliases (React Router paths are case-sensitive) */}
-        <Route path="/BrowseJobs" element={<Navigate to="/browse" replace />} />
-        <Route path="/browse-jobs" element={<Navigate to="/browse" replace />} />
-        <Route path="/jobs" element={<Navigate to="/browse" replace />} />
-        <Route path="/browse" element={<BrowseJobs />} />
-        <Route path="/profile" element={<Navigate to="/candidate-dashboard" replace />} />
-        <Route path="/candidate-dashboard" element={<CandidateDashboard />} />
-        <Route path="/help" element={<HelpCenter />} />
-
+        {/* ============ PUBLIC ROUTES ============ */}
+        <Route path="/" element={<Home />} />
+        <Route path="/home" element={<Home />} />
+        
+        {/* Authentication Routes */}
         <Route path="/signin" element={<SignIn />} />
-        <Route path="/profile/create" element={<ProfileCreate />} />
-
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/EmailVerification" element={<EmailVerification />} />
+        <Route path="/verified" element={<VerificationSuccess />} />
+        
+        {/* ============ CANDIDATE FLOW ============ */}
+        {/* Profile Setup */}
+        <Route 
+          path="/profile/create" 
+          element={
+            <RequireAuth>
+              <ProfileCreate />
+            </RequireAuth>
+          }
+        />
+        
+        {/* Candidate Protected Routes */}
+        <Route
+          path="/browse"
+          element={
+            <RequireAuth>
+              <BrowseJobs />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/applications"
+          element={
+            <RequireAuth>
+              <Applications />
+            </RequireAuth>
+          }
+        />
+        <Route 
+          path="/application-success/:jobId" 
+          element={<ApplicationSuccess />} 
+        />
+        
+        <Route
+          path="/candidate-dashboard"
+          element={
+            <RequireAuth>
+              <CandidateDashboard />
+            </RequireAuth>
+          }
+        />
+        
+        <Route
+          path="/profile-merge"
+          element={
+            <RequireAuth>
+              <ProfileMerge />
+            </RequireAuth>
+          }
+        />
+        
+        <Route
+          path="/support"
+          element={
+            <RequireAuth>
+              <TicketSubmitForm />
+            </RequireAuth>
+          }
+        />
+        <Route path="/ticket-success" element={<TicketSuccess />} />
+        
+        <Route
+          path="/settings"
+          element={
+            <RequireAuth>
+              <CandidateSettings />
+            </RequireAuth>
+          }
+        />
+        
+        <Route
+          path="/help"
+          element={
+            <RequireAuth>
+              <HelpCenter />
+            </RequireAuth>
+          }
+        />
+        
+        {/* ============ ADMIN FLOW ============ */}
         <Route
           path="/dashboard"
           element={
-            <MainLayout>
-              <AdminDashboardPage />
-            </MainLayout>
+            <RequireAuth>
+              <MainLayout>
+                <AdminDashboardPage />
+              </MainLayout>
+            </RequireAuth>
           }
         />
         
         <Route
           path="/candidates"
           element={
-            <MainLayout>
-              <Candidates />
-            </MainLayout>
-          }
-        />
-        <Route
-          path="/view-cv/:candidateId"
-          element={
-            <MainLayout>
-              <ViewCVWrapper />
-            </MainLayout>
+            <RequireAuth>
+              <MainLayout>
+                <Candidates />
+              </MainLayout>
+            </RequireAuth>
           }
         />
         
         <Route
           path="/candidate-profile/:id"
           element={
-            <MainLayout>
-              <ProfileView />
-            </MainLayout>
+            <RequireAuth>
+              <MainLayout>
+                <ProfileView />
+              </MainLayout>
+            </RequireAuth>
           }
         />
+        
         <Route
-          path="/profile-merge"
+          path="/view-cv/:candidateId"
           element={
-            <MainLayout>
-              <ProfileMerge />
-            </MainLayout>
+            <RequireAuth>
+              <MainLayout>
+                <ViewCVWrapper />
+              </MainLayout>
+            </RequireAuth>
           }
         />
-        <Route
-          path="/profile-cancel"
-          element={
-            <MainLayout>
-              <ProfileCancel />
-            </MainLayout>
-          }
-        />
+        
         <Route
           path="/duplicates-admin"
           element={
-            <MainLayout>
-              <DuplicateResolution />
-            </MainLayout>
+            <RequireAuth>
+              <MainLayout>
+                <DuplicateResolution />
+              </MainLayout>
+            </RequireAuth>
           }
         />
+        
         <Route
-          path="/settings"
+          path="/admin/settings"
           element={
-            <MainLayout>
-              <CandidateSettings />
-            </MainLayout>}/>
-
-          <Route path="/ticket-success" element={<TicketSuccess />} />
-  
-          <Route path="/" element={<Navigate to="/signup" />} />
-
+            <RequireAuth>
+              <Settings />
+            </RequireAuth>
+          }
+        />
+        
+        {/* ============ DEPRECATED/LEGACY ROUTES (Redirects) ============ */}
+        <Route path="/BrowseJobs" element={<Navigate to="/browse" replace />} />
+        <Route path="/browse-jobs" element={<Navigate to="/browse" replace />} />
+        <Route path="/jobs" element={<Navigate to="/browse" replace />} />
+        <Route path="/profile" element={<Navigate to="/candidate-dashboard" replace />} />
+        <Route path="/application-success" element={<Navigate to="/browse" replace />} />
+        
+        {/* Legacy Route */}
+        <Route
+          path="/profile-cancel"
+          element={
+            <RequireAuth>
+              <ProfileCancel />
+            </RequireAuth>
+          }
+        />
+        
+        {/* ============ 404 FALLBACK ============ */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

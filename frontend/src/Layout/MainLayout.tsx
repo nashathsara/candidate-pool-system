@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { signOut } from "firebase/auth";
+import { auth } from "../config/firebase";
 import {
   FiHome,
   FiUsers,
@@ -16,6 +18,16 @@ interface MainLayoutProps {
 
 const MainLayout = ({ children }: MainLayoutProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
+    navigate("/", { replace: true });
+  };
 
   const navigationItems = [
     { name: "Dashboard", path: "/dashboard", icon: <FiHome className="w-5 h-5" /> },
@@ -71,13 +83,14 @@ const MainLayout = ({ children }: MainLayoutProps) => {
               <FiHelpCircle className="w-4 h-4" />
               Support
             </a>
-            <a
-              href="#"
-              className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600 text-sm transition-all duration-200"
+            <button
+              type="button"
+              onClick={handleSignOut}
+              className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600 text-sm transition-all duration-200 text-left"
             >
               <FiLogOut className="w-4 h-4" />
               Sign Out
-            </a>
+            </button>
           </div>
         </div>
       </aside>

@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { auth } from '../../config/firebase';
+import { signOut } from 'firebase/auth';
 import { User, Briefcase, FileText, HelpCircle, Bell, Search, Settings, BarChart3, LogOut } from 'lucide-react';
 import './CandidateSettingsPage.css';
 
@@ -8,9 +10,13 @@ const CandidateSettingsPage = () => {
   const [showPassword, setShowPassword] = React.useState(false);
   const [showNewPassword, setShowNewPassword] = React.useState(false);
 
-  const handleSignOut = () => {
-    // Add any logout logic here (clear tokens, etc.)
-    navigate('/signin');
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+    } catch (error) {
+      console.error('CandidateSettings sign out failed:', error);
+    }
+    navigate('/', { replace: true });
   };
 
   const handleUpdateProfile = () => {

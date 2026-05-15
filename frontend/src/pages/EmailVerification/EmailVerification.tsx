@@ -6,7 +6,7 @@ import { sendEmailVerification, onAuthStateChanged, type User } from 'firebase/a
 
 const EmailVerification: React.FC = () => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const message = 'Waiting for you to click the link...';
+  const [message, setMessage] = useState('Waiting for you to click the link...');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,13 +18,17 @@ const EmailVerification: React.FC = () => {
       }
     });
 
-    // 2. Automatic Check: 3 seconds
+    // 2. Automatic Check: Every 3 seconds for email verification
     const checkInterval = setInterval(async () => {
       if (auth.currentUser) {
         await auth.currentUser.reload();
         if (auth.currentUser.emailVerified) {
           clearInterval(checkInterval);
-          navigate('/verified');
+          setMessage('Email verified! Redirecting...');
+          // Redirect to verification success page (1 second delay for UX)
+          setTimeout(() => {
+            navigate('/verified', { replace: true });
+          }, 1000);
         }
       }
     }, 3000); 
