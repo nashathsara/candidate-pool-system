@@ -1,19 +1,21 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { getStorage } from "firebase/storage"; // 1. Import the Storage module
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "AIzaSyDovLKo3djdRbs963vqKdbj-geRWyzMTrg", // Keep your hardcoded test keys here for now
+  authDomain: "candidate-pool-system-6dbc9.firebaseapp.com",
+  projectId: "candidate-pool-system-6dbc9",
+  storageBucket: "candidate-pool-system-6dbc9.firebasestorage.app",
+  messagingSenderId: "844476035831",
+  appId: "1:844476035831:web:bddd2dd5394fb1346459f2"
 };
 
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const storage = getStorage(app);
+export const storage = getStorage(app); // 2. Initialize and export storage!
+
+export default app;
